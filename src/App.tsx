@@ -1,26 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Layout, Row, Col } from 'antd';
+import UploadSection from './components/UploadSection';
+import 'antd/dist/reset.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          TEST protected branch 
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const { Header, Footer, Content } = Layout;
+
+const App = () => {
+  return <Layout>
+    <Header>
+      <Row>
+        <Col xs={2} sm={4} md={6} lg={8} xl={10}>
+          <img src="./QAS.svg" alt="logo" />
+        </Col>
+        <Col xs={20} sm={16} md={12} lg={8} xl={4}>
+          Col
+        </Col>
+        <Col xs={2} sm={4} md={6} lg={8} xl={10}>
+          Col
+        </Col>
+      </Row>
+    </Header>
+    <Content>
+    <UploadSection />
+
+    </Content>
+    <Footer >Footer</Footer>
+  </Layout>;
+};
 
 export default App;
