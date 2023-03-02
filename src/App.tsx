@@ -1,31 +1,21 @@
 import React from 'react';
-import { Layout, Row, Col } from 'antd';
-import UploadSection from './components/UploadSection';
-import 'antd/dist/reset.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LoginForm from './LoginForm';
+import MainPage from './MainPage';
+import kc from 'keycloak-js';
 
-const { Header, Footer, Content } = Layout;
-
-const App = () => {
-  return <Layout>
-    <Header>
-      <Row>
-        <Col xs={2} sm={4} md={6} lg={8} xl={10}>
-          <img src="./QAS.svg" alt="logo" />
-        </Col>
-        <Col xs={20} sm={16} md={12} lg={8} xl={4}>
-          Col
-        </Col>
-        <Col xs={2} sm={4} md={6} lg={8} xl={10}>
-          Col
-        </Col>
-      </Row>
-    </Header>
-    <Content>
-    <UploadSection />
-
-    </Content>
-    <Footer >Footer</Footer>
-  </Layout>;
-};
+function App() {
+  const keycloak = new kc({
+    url: 'http://keycloak-server${kc_base_path}',
+    realm: 'myrealm',
+    clientId: 'myapp'
+});
+  return (
+    <Routes>
+        <Route path="/" element={<LoginForm/>} />
+        <Route path="/mainpage" element={<MainPage/>}/>
+    </Routes>
+  );
+}
 
 export default App;

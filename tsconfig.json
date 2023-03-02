@@ -21,6 +21,8 @@
     "jsx": "preserve"
   },
   "include": [
+    "node_modules/@types/quill/index.d.ts",
     "src"
   ]
 }
+
