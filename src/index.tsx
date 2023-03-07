@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Route } from 'react-router-dom'
 import Main from './MainPage';
-import Login from './LoginForm';
+import Login from './Login/LoginForm';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
