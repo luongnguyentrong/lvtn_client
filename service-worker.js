@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/lvtn_client/precache-manifest.bc653b6a7316af4fd81c25b0812f514b.js"
+  "/lvtn_client/precache-manifest.6b7bd10df417a0bf0cab8b32be5e0faf.js"
 );
 
 workbox.clientsClaim();
