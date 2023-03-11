@@ -7,8 +7,8 @@ import kc from 'keycloak-js';
 function App() {
   const keycloak = new kc({
     url: 'http://keycloak-server${kc_base_path}',
-    realm: 'myrealm',
-    clientId: 'myapp'
+    realm: 'master',
+    clientId: 'main-page'
   });
   return (
     <Routes>
