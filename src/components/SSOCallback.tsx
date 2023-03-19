@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
 function SSOCallback() {
-    const cookies = new Cookies()
     const navigate = useNavigate()
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
+        const cookies = new Cookies()
 
         if (code === null) {
             navigate("/")
@@ -54,7 +54,7 @@ function SSOCallback() {
             .catch(error => {
                 console.error(error);
             });
-    }, [navigate, cookies]);
+    }, [navigate]);
 
     return <div>Processing SSO callback...</div>;
 }
