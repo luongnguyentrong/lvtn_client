@@ -1,17 +1,16 @@
 {
-  "main.css": "/lvtn_client/static/css/main.632f8e42.chunk.css",
-  "main.js": "/lvtn_client/static/js/main.617aa323.chunk.js",
-  "main.js.map": "/lvtn_client/static/js/main.617aa323.chunk.js.map",
-  "runtime~main.js": "/lvtn_client/static/js/runtime~main.06d8230f.js",
-  "runtime~main.js.map": "/lvtn_client/static/js/runtime~main.06d8230f.js.map",
-  "static/css/2.156aaf1c.chunk.css": "/lvtn_client/static/css/2.156aaf1c.chunk.css",
-  "static/js/2.fe211226.chunk.js": "/lvtn_client/static/js/2.fe211226.chunk.js",
-  "static/js/2.fe211226.chunk.js.map": "/lvtn_client/static/js/2.fe211226.chunk.js.map",
-  "static/js/3.39587857.chunk.js": "/lvtn_client/static/js/3.39587857.chunk.js",
-  "static/js/3.39587857.chunk.js.map": "/lvtn_client/static/js/3.39587857.chunk.js.map",
-  "index.html": "/lvtn_client/index.html",
-  "precache-manifest.a87947d391018165b094c27afc379cbd.js": "/lvtn_client/precache-manifest.a87947d391018165b094c27afc379cbd.js",
-  "service-worker.js": "/lvtn_client/service-worker.js",
-  "static/css/2.156aaf1c.chunk.css.map": "/lvtn_client/static/css/2.156aaf1c.chunk.css.map",
-  "static/css/main.632f8e42.chunk.css.map": "/lvtn_client/static/css/main.632f8e42.chunk.css.map"
+  "files": {
+    "main.css": "/static/css/main.073c9b0a.css",
+    "main.js": "/static/js/main.e0c88010.js",
+    "static/js/787.69883d35.chunk.js": "/static/js/787.69883d35.chunk.js",
+    "static/media/logo.svg": "/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/index.html",
+    "main.073c9b0a.css.map": "/static/css/main.073c9b0a.css.map",
+    "main.e0c88010.js.map": "/static/js/main.e0c88010.js.map",
+    "787.69883d35.chunk.js.map": "/static/js/787.69883d35.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.e0c88010.js"
+  ]
 }
