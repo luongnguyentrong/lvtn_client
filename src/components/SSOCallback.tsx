@@ -54,7 +54,7 @@ function SSOCallback() {
             .catch(error => {
                 console.error(error);
             });
-    }, [navigate]);
+    }, [navigate, cookies]);
 
     return <div>Processing SSO callback...</div>;
 }
