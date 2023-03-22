@@ -8,7 +8,7 @@ interface cols {
 }
 
 const CreateTable: React.FC = () => {
-  const [name, setTableName] = useState<string>("");
+  const [Tablename, setTableName] = useState<string>("");
   const [fields, setFields] = useState<cols[]>([{ colsname: "", type:"" }]);
   
   const handleFieldNameChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,12 +17,11 @@ const CreateTable: React.FC = () => {
     setFields(newFields);
   };
 
-  const handleFieldTypeChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldTypeChange = (index: number, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newFields = [...fields];
     newFields[index].type = event.target.value;
     setFields(newFields);
   };
-
   const handleAddField = () => {
     setFields([...fields, { colsname: '', type: '' }]);
   };
@@ -46,7 +45,7 @@ const CreateTable: React.FC = () => {
     for (var i in fields){
       cols[String(fields[i].colsname)] = fields[i].type;
     }
-    request["name"] = name;
+    request["name"] = Tablename;
     request["cols"] = cols;
     try {
       await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/', request);
@@ -61,7 +60,7 @@ const CreateTable: React.FC = () => {
     <form onSubmit={handleSubmit}>
       <label>
         Table name:
-        <input type="text" value={name} onChange={handleTableNameChange} />
+        <input type="text" value={Tablename} onChange={handleTableNameChange} />
       </label>
       <table>
         <thead>
@@ -78,7 +77,14 @@ const CreateTable: React.FC = () => {
                 <input type="text" value={field.colsname} onChange={(event) => handleFieldNameChange(index, event)} />
               </td>
               <td>
-                <input type="text" value={field.type} onChange={(event) => handleFieldTypeChange(index, event)} />
+                <select value={field.type} onChange={(event) => handleFieldTypeChange(index, event)}>
+                  <option value="">-- Select Data Type --</option>
+                  <option value="text">Text</option>
+                  <option value="integer">Integer</option>
+                  <option value="boolean">Boolean</option>
+                  <option value="serial">Autonumber</option>
+                  <option value="date">Date</option>
+                  </select>
               </td>
               <td>
                 {index > 0 && (

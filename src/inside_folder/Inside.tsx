@@ -4,13 +4,29 @@ import type { MenuProps } from 'antd';
 import 'antd/dist/reset.css';
 const { Header, Footer, Content, Sider } = Layout;
 import { theme } from 'antd';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import { Modal } from 'antd';
 import './inside.css';
 import { useState, useEffect } from "react";
 import CreateTable from '../Create-table/CreateTable';
 import Uploadfile from '../Upload-file/Uploadfile';
-const apiEndpoint = 'https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/dev/create-table';
+//const apiEndpoint = 'https://er37kclyy9.execute-api.ap-southeast-1.amazonaws.com/dev/lvtnstorage/Untitled.png';
 
 const Inside = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const {
     token: { colorBgContainer },
@@ -31,7 +47,14 @@ const items: MenuProps['items'] = [
   {
     key: '3',
     label: (
-      <div>tạo bảng dữ liêu</div>
+      <>
+      <Button onClick={showModal}>
+        Tạo bảng dữ liệu
+      </Button>
+      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <CreateTable />
+      </Modal>
+    </>
     ),
   },
 ];
@@ -52,15 +75,15 @@ const items: MenuProps['items'] = [
           >
             Đánh giá sinh viên
             <Button style={{ margin: '0px 10px 0px 900px' }}>Phân tích</Button>
-            <Dropdown className='Plus' menu={{ items }} placement="bottomLeft" arrow={{ pointAtCenter: true }}>
+            <Dropdown className='Plus' menu={{ items }} placement="bottomLeft" arrow={{ pointAtCenter: true }} trigger={['click']}>
               <Button>+ Thêm mới</Button>
             </Dropdown>
             <br />
-          <Uploadfile apiEndpoint={apiEndpoint}/>
+          
+        {/* //  <Uploadfile apiEndpoint={apiEndpoint}/> */}
           </Content>
         </Layout>
       </Layout>
-      <CreateTable />
     </Content>
     <Footer >Footer</Footer>
 
