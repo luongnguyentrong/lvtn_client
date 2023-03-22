@@ -65,8 +65,8 @@ function App() {
                             setMainRole("admin")
                         } else if (roles.includes("unit_admin")) {
                             setMainRole("unit_admin")
-                        } else if (roles.includes("normal")) {
-                            setMainRole("normal")
+                        } else if (roles.includes("unit_normal")) {
+                            setMainRole("unit_normal")
                         }
                     }
                 }
