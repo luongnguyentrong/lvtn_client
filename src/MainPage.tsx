@@ -16,51 +16,6 @@ interface TableRow {
   [key: string]: any;
 }
 
-
-
-// function DynamicForm({fields}: any) {
-//   const [formData, setFormData] = useState({});
-
-//   const handleChange = (e: any) => {
-//     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
-//   };
-
-//   const handleSubmit = (e: any) => {
-//     e.preventDefault();
-//     console.log(formData); // do something with the form data
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       {fields.map((field: any) => (
-//         <div key={field}>
-//           <label htmlFor={field}>{field}</label>
-//           <input
-//             type="text"
-//             id={field}
-//             name={field}
-//             value={formData[field] || ""}
-//             onChange={handleChange}
-//           />
-//         </div>
-//       ))}
-//       <button type="submit">Submit</button>
-//     </form>
-//   );
-// }
-
-async function getMenuItems(): Promise<ItemType[]> {
-  try {
-    const response = await axios.get('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show');
-    const data = response.data; // extract the data from the response
-    return data; // return the data as an array of ItemType
-  } catch (error) {
-    console.error('Failed', error);
-    return []; // or return an empty array if there's an error
-  }
-}
-
 async function getItems(a: any): Promise<ItemType[]> {
   try {
     var request: any = {
@@ -106,9 +61,6 @@ const items: MenuProps['items'] = [
   },
 ];
 
-
-
-
 const Main = () => {
   const [data, setData] = useState<ItemType[]>([])
   const {
@@ -120,6 +72,24 @@ const Main = () => {
   const [colName, setColName] = useState([]);
   const [count, setCount] = useState(2);
   const [formData, setFormData] = useState({});
+  const getMenuItems= async (e: any) => {
+    e.preventDefault();
+    let item: Array<string> = [];
+    let items2: MenuProps['items'] = [];
+    try {
+      const response = await axios.get('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show');
+      const data1 = response.data;
+      item = data1["body"]
+      items2 = item.map((key) => ({
+          key,
+          label: `${key}`,
+        }));
+        setData(items2)
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
+  }
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const formValues = Object.values(formData);
@@ -132,6 +102,23 @@ const Main = () => {
     } catch (error) {
       console.error('Error creating table:', error);
     }
+    let x: any = rows   
+    let z: any = []
+    let zz: any = []
+    z = Object.keys(columns).map(k => columns[k])
+    for (const element of z) {
+      zz.push(element["title"])
+    }
+    zz.pop()
+    let zzz: any = {}
+    zzz["key"] = count + 1;
+    let i =0;
+    for (const ele of zz){
+      zzz[ele] = formValues[i]
+      i++ 
+    }
+    x.push(zzz)
+    setRows(x)
   };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -143,20 +130,20 @@ const Main = () => {
     setCount(count + 1);
   };
   const handleDelete = async (key: React.Key) => {
+    const newData = rows.filter((item) => item.key !== key);
+    setRows(newData);
     key = key + ''
     let k: number = Number(key)
     const entries = Object.entries(rows[k-1]);
     let request: any = {}
-    request["name"] = data[k]
-    request["rows"] = [entries[1][0],entries[1][1]]
-    console.log(request)
-    // try {
-    //   await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/', request);
-    //   console.log(request);
-    //   console.log('Table created successfully!');
-    // } catch (error) {
-    //   console.error('Error creating table:', error);
-    // }
+    request["name"] = name
+    request["col"] = [entries[1][0],entries[1][1]]
+    try {
+      await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
+      console.log('Delete successfully!');
+    } catch (error) {
+      console.error('Error creating table:', error);
+    }
   };
 
   const onClick: MenuProps['onClick'] = (e) => {
@@ -185,20 +172,7 @@ const Main = () => {
       setColName(arr[2])
     })
   };
-
-  let item: Array<string> = [];
-  let items2: MenuProps['items'] = [];
-  const rs = getMenuItems()
-  rs.then((value) => {
-    const arr = value["body"];
-    item = arr;
-    items2 = item.map((key) => ({
-      key,
-      label: `${key}`,
-    }));
-    setData(items2)
-  })
-  return (<Layout>
+  return (<Layout onLoad={getMenuItems}>
     <Header>
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
         <Col className='Logo' span={6}>
@@ -215,7 +189,6 @@ const Main = () => {
     </Header>
 
     <Content style={{ width: '80%', height: '1000px', margin: '20px 0px' }}>
-
       <Layout>
         <Sider width={200} style={{ background: colorBgContainer }}>
           <div>
