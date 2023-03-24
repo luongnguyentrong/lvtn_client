@@ -11,7 +11,6 @@ import Uploadfile from '../Upload-file/Uploadfile';
 const apiEndpoint = 'https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/dev/create-table';
 
 const Inside = () => {
-
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -40,16 +39,20 @@ const items: MenuProps['items'] = [
 
     <Content style={{ width: '80%', height: '1000px', margin: '0 0' }}>
       <Layout>
+        
         <Layout style={{ padding: '0 24px 24px' }}>
+          <CreateTable/>
           <Content
             style={{
               width: 1290,
               padding: 24,
               margin: 0,
-              minHeight: 280,
+              height: 180,
               background: colorBgContainer,
+              marginTop: 50
             }}
           >
+            
             Đánh giá sinh viên
             <Button style={{ margin: '0px 10px 0px 900px' }}>Phân tích</Button>
             <Dropdown className='Plus' menu={{ items }} placement="bottomLeft" arrow={{ pointAtCenter: true }}>
@@ -60,7 +63,7 @@ const items: MenuProps['items'] = [
           </Content>
         </Layout>
       </Layout>
-      <CreateTable />
+      
     </Content>
     <Footer >Footer</Footer>
 

@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+.table1{
+  margin-right: 50px;
+  height: fit-content;
+  padding-bottom: 100px;
+  width: fit-content;
+}
+
+.form2{
+  width: 200px;
+}
+
+.btt2{
+  margin-top: 20px;
+}
