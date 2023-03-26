@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
 
 interface S3UploaderProps {
-  apiEndpoint: 'https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/dev/create-table';
+  apiEndpoint: 'https://er37kclyy9.execute-api.ap-southeast-1.amazonaws.com/dev/lvtnstorage/Untitled.png';
 }
 
 interface S3UploaderState {
@@ -33,7 +33,7 @@ const S3Uploader: React.FC<S3UploaderProps> = ({ apiEndpoint }) => {
     formData.append('file', state.selectedFile);
 
     try {
-      const response: AxiosResponse<S3UploadResponse> = await axios.post(apiEndpoint, formData, {
+      const response: AxiosResponse<S3UploadResponse> = await axios.put(apiEndpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert(`File uploaded to S3 with URL: ${response.data.url}`);
