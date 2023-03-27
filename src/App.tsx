@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import Cookies from 'universal-cookie';
 import 'antd/dist/reset.css'
 import './index.css';
 import axios from 'axios';
-import MainPage from './MainPage';
 import Loading from './pages/Loading';
-import UnitAdmin from './pages/Admin';
+import UnitAdmin from './pages/UnitAdmin';
 import Admin from './pages/Admin';
 import Normal from './pages/Normal';
 import { getUnit } from './utils';
@@ -68,19 +66,18 @@ function App() {
             })
         }
     }, [])
-
     switch (mainRole) {
         case "admin":
-            return <Admin />
+            return <Admin/>
 
         case "unit_admin":
-            return <MainPage />
+            return <UnitAdmin/>
 
         case "unit_normal":
-            return <Normal />
+            return <Normal/>
 
         default:
-            return <Loading />
+            return <Loading/>
     }
 }
 

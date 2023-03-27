@@ -1,8 +1,8 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 
 interface S3UploaderProps {
-  apiEndpoint: 'https://er37kclyy9.execute-api.ap-southeast-1.amazonaws.com/dev/lvtnstorage/Untitled.png';
+  apiEndpoint: string;
 }
 
 interface S3UploaderState {
@@ -30,13 +30,13 @@ const S3Uploader: React.FC<S3UploaderProps> = ({ apiEndpoint }) => {
     }
 
     const formData = new FormData();
-    formData.append('file', state.selectedFile);
+    formData.append('upload', state.selectedFile);
 
     try {
-      const response: AxiosResponse<S3UploadResponse> = await axios.put(apiEndpoint, formData, {
+      const response: AxiosResponse<S3UploadResponse> = await axios.post(apiEndpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      alert(`File uploaded to S3 with URL: ${response.data.url}`);
+      alert("Upload file successfully")
     } catch (error) {
       console.error(error);
       alert('An error occurred while uploading the file!');
@@ -45,9 +45,11 @@ const S3Uploader: React.FC<S3UploaderProps> = ({ apiEndpoint }) => {
 
   return (
     <div>
-      <h1>Upload a file to AWS S3</h1>
-      <input type="file" onChange={handleFileSelect} />
-      <button onClick={handleFileUpload}>Upload</button>
+      <h1>Upload files</h1>
+      <form>
+        <input type="file" name="upload" onChange={handleFileSelect} />
+        <button type="button" onClick={handleFileUpload}>Upload</button>
+      </form>
     </div>
   );
 };
