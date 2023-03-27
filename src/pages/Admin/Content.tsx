@@ -1,9 +1,11 @@
-import { Card, Layout, Menu, Input, Space, Typography, Button, Row, Col, Table } from "antd"
+import { Card, Layout, Menu, Input, Space, Typography, Button, Row, Col, Table, message } from "antd"
 import type { MenuProps } from 'antd';
-import { LineChartOutlined, ApartmentOutlined, TeamOutlined, PlusOutlined, DeleteColumnOutlined } from '@ant-design/icons';
+import { LineChartOutlined, ApartmentOutlined, TeamOutlined, PlusOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "universal-cookie";
+import CreateUnitModal from "./CreateUnitModal";
+import { getAPIHost } from '../../utils'
 
 const navs = [
     {
@@ -36,7 +38,7 @@ const columns = [
         dataIndex: "action",
         key: "action",
         render: (_: any, record: ITableData) => (
-            <Button type="primary" icon={<DeleteColumnOutlined />}>Xóa</Button>
+            <Button type="primary" icon={<DeleteOutlined />} disabled={record.unit_name == "master" ? true : false}>Xóa</Button>
         )
     }
 ]
@@ -58,36 +60,77 @@ interface ITableData {
 }
 
 export default function () {
+    const [messageApi, contextHolder] = message.useMessage();
     const [tableData, setTableData] = useState<Array<ITableData>>([])
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const cookies = new Cookies()
 
-    useEffect(() => {
-        const cookies = new Cookies()
+    const showModal = () => {
+        setIsModalOpen(true)
+    }
 
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleCreate = (values: any) => {
+        const token = cookies.get("access_token")
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        };
+
+        axios.post(`${getAPIHost()}/units`, values, config).then(res => {
+            if (res.status === 201) {
+                messageApi.open({
+                    type: "success",
+                    content: "Tạo đơn vị thành công!"
+                })
+
+                setIsModalOpen(false)
+            }
+        }).catch((info) => {
+            console.log('Validate Failed:', info);
+        });
+    }
+
+    const updateTableData = () => {
         const token = cookies.get("access_token")
 
         if (token) {
             const config = {
                 headers: {
-                    'Authorization': `Bearer ${cookies}`,
+                    'Authorization': `Bearer ${token}`,
                 },
             };
 
             axios.get("https://sso.ducluong.monster/admin/realms?briefRepresentation=true", config).then(res => {
                 if (res.status === 200) {
-                    const data: Array<ITableData> = res.data.map((idx: number, realm: any) => ({
-                        key: realm.id,
-                        order: idx + 1,
-                        unit_name: realm.realm
-                    }))
+                    const data: Array<ITableData> = res.data.map((realm: any, idx: number) => {
+                        return ({
+                            key: realm.id,
+                            order: idx + 1,
+                            unit_name: realm.realm
+                        })
+                    })
 
                     setTableData(data)
                 }
             })
         }
-    }, [])
+
+    }
+
+    useEffect(() => {
+        updateTableData()
+    }, [isModalOpen])
 
     return (
         <Layout>
+            {contextHolder}
+
             <Layout.Sider theme='light'>
                 <Menu
                     mode="inline"
@@ -97,6 +140,8 @@ export default function () {
                     items={sider_items}
                 />
             </Layout.Sider>
+
+            <CreateUnitModal open={isModalOpen} onCreate={handleCreate} onCancel={handleCancel} />
 
             <Layout style={{ margin: '24px 24px 0' }}>
                 <Layout.Content style={{ paddingLeft: "10px" }}>
@@ -109,12 +154,12 @@ export default function () {
                             <Col>
                                 <Space>
                                     <Input.Search placeholder="Enter unit name" />
-                                    <Button type="primary" icon={<PlusOutlined />}>Tạo đơn vị</Button>
+                                    <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>Tạo đơn vị</Button>
                                 </Space>
                             </Col>
                         </Row>
 
-                        <Table loading={tableData.length === 0 ? true : false} dataSource={tableData} columns={columns} />
+                        <Table style={{ marginTop: "16px" }} loading={tableData.length === 0 ? true : false} dataSource={tableData} columns={columns} />
                     </Card>
                 </Layout.Content>
             </Layout>
