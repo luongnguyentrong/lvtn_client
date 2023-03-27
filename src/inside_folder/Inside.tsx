@@ -4,7 +4,7 @@ import type { MenuProps } from 'antd';
 import 'antd/dist/reset.css';
 const { Header, Footer, Content, Sider } = Layout;
 import { theme } from 'antd';
-import Popup from 'reactjs-popup';
+//import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import { Modal } from 'antd';
 import './inside.css';

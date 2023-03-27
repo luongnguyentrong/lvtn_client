@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { json } from 'stream/consumers';
-
+import './create.css';
 interface cols {
   colsname: string;
   type: string;
@@ -9,8 +9,8 @@ interface cols {
 
 const CreateTable: React.FC = () => {
   const [Tablename, setTableName] = useState<string>("");
-  const [fields, setFields] = useState<cols[]>([{ colsname: "", type:"" }]);
-  
+  const [fields, setFields] = useState<cols[]>([{ colsname: "", type: "" }]);
+
   const handleFieldNameChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const newFields = [...fields];
     newFields[index].colsname = event.target.value;
@@ -36,15 +36,36 @@ const CreateTable: React.FC = () => {
     setTableName(event.target.value);
   };
 
+  const handleAddRow = () => {
+
+    // var request: any = {
+    // };
+    // var cols: any = {
+    // }
+    // for (var i in fields) {
+    //   cols[String(fields[i].colsname)] = fields[i].type;
+    // }
+    // request["name"] = name;
+    // request["cols"] = cols;
+    // try {
+    //   await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', request);
+    //   console.log(request);
+    //   console.log('Add row successfully');
+    // } catch (error) {
+    //   console.error('Add row failed', error);
+    // }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     var request: any = {
     };
-    var cols: any = {
-    }
-    for (var i in fields){
+    var cols: any = {}
+    cols["ID"] = "SERIAL PRIMARY KEY"
+    for (var i in fields) {
       cols[String(fields[i].colsname)] = fields[i].type;
     }
+
     request["name"] = Tablename;
     request["cols"] = cols;
     try {
@@ -57,7 +78,7 @@ const CreateTable: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="create">
       <label>
         Table name:
         <input type="text" value={Tablename} onChange={handleTableNameChange} />
@@ -84,7 +105,7 @@ const CreateTable: React.FC = () => {
                   <option value="boolean">Boolean</option>
                   <option value="serial">Autonumber</option>
                   <option value="date">Date</option>
-                  </select>
+                </select>
               </td>
               <td>
                 {index > 0 && (
@@ -97,13 +118,12 @@ const CreateTable: React.FC = () => {
           ))}
         </tbody>
       </table>
-      <button type="button" onClick={handleAddField}>
+      <button type="button" onClick={handleAddField} className="createbtt">
         Add field
       </button>
-      <button type="submit">Create table</button>
+      <button type="submit" className="createbtt">Create table</button>
     </form>
   );
 };
 
 export default CreateTable;
-
