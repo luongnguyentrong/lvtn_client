@@ -6,7 +6,7 @@ export function getUnit(): string {
     const arr = window.location.hostname.split(".")
 
     if (arr.length === 2) {
-        return "main"
+        return "master"
     }
 
     if (arr.length === 3) {
