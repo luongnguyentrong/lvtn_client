@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
+import { getUnit } from '../utils';
 
 function SSOCallback() {
     const navigate = useNavigate()
@@ -31,7 +32,7 @@ function SSOCallback() {
             },
         };
 
-        axios.post('https://sso.ducluong.monster/realms/hcmut/protocol/openid-connect/token', data, config)
+        axios.post(`https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/token`, data, config)
             .then(response => {
                 if (response.status === 200) {
                     const { access_token, expires_in, id_token, refresh_expires_in, refresh_token } = response.data;
@@ -52,7 +53,10 @@ function SSOCallback() {
                 }
             })
             .catch(error => {
-                console.error(error);
+                cookies.remove("access_token")
+                cookies.remove("id_token")
+                cookies.remove("refresh_token")
+                navigate("/")
             });
     }, [navigate]);
 

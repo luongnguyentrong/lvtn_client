@@ -1,26 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
 import 'antd/dist/reset.css'
+import './index.css';
 import axios from 'axios';
 import MainPage from './MainPage';
-
-function getUnit(): string {
-    if (process.env.NODE_ENV === "development") {
-        return "hcmut"
-    }
-
-    const arr = window.location.hostname.split(".")
-
-    if (arr.length === 2) {
-        return "main"
-    }
-
-    if (arr.length === 3) {
-        return arr[0]
-    }
-
-    return ""
-}
+import Loading from './pages/Loading';
+import UnitAdmin from './pages/Admin';
+import Admin from './pages/Admin';
+import Normal from './pages/Normal';
+import { getUnit } from './utils';
+import { useNavigate } from 'react-router-dom';
 
 function getAuthParams() {
     const data = {
@@ -37,6 +26,7 @@ function getAuthParams() {
 
 function App() {
     const [mainRole, setMainRole] = useState<string>("")
+    const navigate = useNavigate()
 
     useEffect(() => {
         const cookies = new Cookies()
@@ -69,13 +59,28 @@ function App() {
                         }
                     }
                 }
+            }).catch(error => {
+                cookies.remove("access_token")
+                cookies.remove("id_token")
+                cookies.remove("refresh_token")
+                navigate("/")
             })
         }
     }, [])
 
-    return (
-       <MainPage/>
-    );
+    switch (mainRole) {
+        case "admin":
+            return <Admin />
+
+        case "unit_admin":
+            return <UnitAdmin />
+
+        case "unit_normal":
+            return <Normal />
+
+        default:
+            return <Loading />
+    }
 }
 
 export default App;
