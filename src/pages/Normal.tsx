@@ -4,14 +4,11 @@ const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined} from '@ant-design/icons';
-import './index.css';
-import './App.css';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
-import CreateTable from './Create-table/CreateTable';
 interface TableRow {
   [key: string]: any;
 }
@@ -89,7 +86,6 @@ const Main = () => {
             Tạo bảng dữ liệu
           </Button>
           <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <CreateTable />
           </Modal>
         </>
       ),
