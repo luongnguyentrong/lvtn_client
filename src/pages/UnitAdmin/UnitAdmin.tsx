@@ -98,7 +98,6 @@ const UnitAdmin = () => {
                 <br />
                 <br />
                    <Table columns={columns} dataSource={rows} className="table1" />
-                
               </Content>
             </Layout>
           </Layout>

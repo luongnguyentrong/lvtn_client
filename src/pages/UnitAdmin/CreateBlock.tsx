@@ -48,7 +48,6 @@ const CreateBlock: React.FC = () => {
       } catch (error) {
       console.error('Error creating database:', error);
       }
-
       try {
         let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(Nameblock);
         let request : any=[]
@@ -137,7 +136,6 @@ const CreateBlock: React.FC = () => {
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
   const contentStyle: React.CSSProperties = {
-    // lineHeight: '120px',
     textAlign: 'center',
     color: token.colorTextTertiary,
     backgroundColor: token.colorFillAlter,
