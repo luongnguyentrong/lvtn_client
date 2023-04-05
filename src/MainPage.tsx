@@ -12,7 +12,7 @@ import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateTable from './Create-table/CreateTable';
-import Uploadfile from './Upload-file/Uploadfile';
+import Uploadfile from './Uploadfile/uploadfile';
 interface TableRow {
   [key: string]: any;
 }

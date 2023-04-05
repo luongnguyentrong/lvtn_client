@@ -1,7 +1,9 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'antd';
+import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography} from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
+import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space } from 'antd';
+import { message, Steps, Select } from 'antd';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined} from '@ant-design/icons';
 const { Search } = Input;
@@ -11,12 +13,18 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateTable from '../../Create-table/CreateTable';
 import CreateBlock from './CreateBlock';
+import Block from './Block';
+import './Unitadmin.css'
 interface TableRow {
   [key: string]: any;
 }
-
+interface VirtualFolder {
+  name: string;
+  files: string[];
+}
 
 const UnitAdmin = () => {
+  const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
@@ -24,32 +32,6 @@ const UnitAdmin = () => {
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
   const cancel = () => {setEditingKey('');};
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <>
-          <Button onClick={showModal}>
-            Tạo vùng dữ liệu
-          </Button>
-          <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <CreateBlock />
-          </Modal>
-        </>
-      ),
-    },
-    // {
-    //   key: '2',
-    //   label: (
-    //         <CreateTable />
-    //   ),
-    // }
-  ];
-
-//   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
-//     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-//     // setEditingKey(record.key);
-//   };
   const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
@@ -65,30 +47,149 @@ const UnitAdmin = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
-//   const isEditing = (record: TableRow) => record.key === editingKey;
-//   const save = async (key: React.Key) => {
-//     try {
-//       const row = (await form.validateFields()) as TableRow;
 
-//       const newRows = [...rows];
-//       const index = newRows.findIndex((item) => key === item.key);
-//       if (index > -1) {
-//         const item = newRows[index];
-//         newRows.splice(index, 1, {
-//           ...item,
-//           ...row,
-//         });
-//         setRows(newRows);
-//         setEditingKey('');
-//       } else {
-//         newRows.push(row);
-//         setRows(newRows);
-//         setEditingKey('');
-//       }
-//     } catch (errInfo) {
-//       console.log('Validate Failed:', errInfo);
-//     }
-//   };
+
+  const handleAddFolder = (folder: VirtualFolder) => {
+    setVirtualFolders([...virtualFolders, folder]);
+  };
+
+  interface AddFolderFormProps {
+    onSubmit: (folder: VirtualFolder) => void;
+  }
+   const AddFolderForm: React.FC<AddFolderFormProps> = ({ onSubmit }) => {
+    const [folderName, setFolderName] = useState("");
+  
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      onSubmit({ name: folderName, files: [] });
+      setFolderName("");
+    };
+  
+    return (
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Folder name"
+          value={folderName}
+          onChange={(e) => setFolderName(e.target.value)}
+        />
+        <button type="submit">Add Folder</button>
+      </form>
+    );
+  };
+  const CreateBlock: React.FC = () => {
+    const [TypeFile, setTypeFile] = useState<string>("");
+    const { TextArea } = Input;
+    const [Nameblock, setNameblock] = useState<string>("");
+    const [OutPut, setOutPut] = useState<string>("");
+    const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNameblock(event.target.value);
+  };
+  const outPutData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOutPut(event.target.value);
+  };
+  const handleChange = (value: string) => {
+    setTypeFile(value);
+    console.log(`selected ${value}`);
+  };
+const steps = [ 
+  {
+    title: 'First',
+    content:  <AddFolderForm onSubmit={handleAddFolder} />
+    // <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} onChange={handleNameBlockChange} />
+  },
+  {
+    title: 'Second',
+    content: <>
+        Chọn cách nhập dữ liệu
+    <Select
+    style={{ width: 120 }}
+    onChange={handleChange}
+    options={[
+      { value: 'Table', label: 'Table' },
+      { value: 'docx', label: 'docx' },
+      { value: 'pdf', label: 'pdf' },
+      { value: 'xlsx', label: 'xlsx'}
+    ]}
+  />
+    {TypeFile === 'Table' && <CreateTable/>}
+  </> ,
+  },
+  {
+    title: 'Last',
+    content: 
+  <div>
+    {/* <TextArea rows={4} />
+    <br />
+    <br />
+    <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu'  /> */}
+    <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu'  />
+    <Input type='text' placeholder='Nhập tiêu chí đầu ra dữ liệu' value={OutPut} onChange={outPutData} />
+    Chọn người nhập dữ liệu
+    <Select
+    style={{ width: 120, marginTop: "10px" }}
+    onChange={handleChange}
+    options={[
+      { value: 'Manh', label: 'Manh' },
+      { value: 'Luong', label: 'Luong' },
+      { value: 'Khoa', label: 'Khoa' }
+    ]}
+  />
+    </div> 
+  },
+];
+    
+  const { token } = theme.useToken();
+  const [current, setCurrent] = useState(0);
+
+  const next = () => {
+    setCurrent(current + 1);
+  };
+
+  const prev = () => {
+    setCurrent(current - 1);
+  };
+
+  const items = steps.map((item) => ({ key: item.title, title: item.title }));
+
+  const contentStyle: React.CSSProperties = {
+    // lineHeight: '120px',
+    textAlign: 'center',
+    color: token.colorTextTertiary,
+    backgroundColor: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    border: `1px dashed ${token.colorBorder}`,
+    padding:20,
+    marginTop:30,
+  };
+
+  return (
+    <> <div style={{width: "700px"}}>
+      <Steps current={current} items={items} />
+      <div style={contentStyle}>{steps[current].content}</div>
+      <div style={{ marginTop: 10 }}>
+        {current < steps.length - 1 && (
+          <Button type="primary" onClick={() => next()}>
+            Next
+          </Button>
+        )}
+        {current === steps.length - 1 && (
+          <Button type="primary" onClick={() => message.success('Processing complete!')}>
+            Done
+          </Button>
+        )}
+        {current > 0 && (
+          <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+            Previous
+          </Button>
+        )}
+      </div>
+      </div>
+    </>
+  );
+};
+  
+ 
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -107,84 +208,6 @@ const UnitAdmin = () => {
       return [];
     }
   }
-//   const handleAddData = async (e: any) => {
-//     e.preventDefault();
-//     const formValues = Object.values(formData);
-//     let k: any = {}
-//     let n: any = ref.current
-//     console.log(n[n.length - 1].id + 1)
-//     let kh: any = [n[n.length - 1].id + 1]
-//     console.log("kkkkk", k)
-//     k["name"] = name
-//     k["value"] = [...kh,...formValues]
-//     // formValues[0] = n[n.length-1]
-   
-//     try {
-//       await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-//     } catch (error) {
-//       console.error('Error creating table:', error);
-//     }
-//     let x: any = rows
-//     let z: any = []
-//     let zz: any = []
-//     z = Object.keys(columns).map(k => columns[k])
-//     for (const element of z) {
-//       zz.push(element["title"])
-//     }
-//     zz.pop()
-//     let zzz: any = {}
-//     zzz["key"] = count + 1;
-//     let i = 0;
-//     let z1 = [...kh, ...formValues]
-//     for (const ele of zz) {
-//       zzz[ele] = z1[i]
-//       i++
-//     }
-    
-//     x.push(zzz)
-//     setRows(x)
-//     let newCount: number = count + 1
-//     setCount(newCount);
-//   };
-//   const handleChange = (e: any) => {
-//     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
-//   };
-
-//   const handleDelete = async (key: React.Key) => {
-//     let k: number = Number(key) - 1
-//     if (ref.current && ref.current.length > 0) {
-//       const newRows: any = [];
-//       const entries = Object.entries(ref.current[k]);
-//       for (const ele of ref.current) {
-//         if (ele["key"] != key) {
-//           newRows.push(ele)
-//         }
-//       }
-//       let i: number = 1;
-//       for (const ele of newRows) {
-//         ele["key"] = i
-//         i++
-//       }
-//       setRows(newRows);
-//       setCount(count - 1);
-//       // console.log("Entries", entries)
-//       // console.log('rewrwrwe:', newRows[k]);
-//       let request: any = {}
-//       console.log(ref1.current)
-//       request["name"] = ref1.current
-//       request["col"] = [entries[1][0], entries[1][1]]
-//       console.log(request)
-//       try {
-//         await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
-//         console.log('Delete successfully!');
-//       } catch (error) {
-//         console.error('Error creating table:', error);
-//       }
-//     }
-
-
-//   };
 
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
@@ -199,46 +222,7 @@ const UnitAdmin = () => {
       const arr = data["body"];
       column = arr[0]
       row = arr[1]
-    //   let k: any = {
-    //     title: 'Delete',
-    //     dataIndex: 'Delete',
-    //     width: 200,
-    //     render: (_: any, record: { key: React.Key }) => (
-    //       <>
-    //         {row.length >= 1 ? (
-    //           <Popconfirm title="Bạn có chắc chắn xóa?" onConfirm={() => handleDelete(record.key)}>
-    //             <a>Delete</a>
-    //           </Popconfirm>
-    //         ) : null}
-    //       </>
-    //     ),
-    //   };
-    //   column.push(k)
-      // console.log(editingKey)
-    //   k = {
-    //     title: 'operation',
-    //     dataIndex: 'operation',
-    //     width: 200,
-    //     render: (_: any, record: { key: React.Key }) => (
-    //       <>
-    //         {isEditing(record) ? (
-    //           <span>
-    //             <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-    //               Save
-    //             </Typography.Link>
-    //             <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-    //               <a>Cancel</a>
-    //             </Popconfirm>
-    //           </span>
-    //         ) : (
-    //           <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-    //             Edit
-    //           </Typography.Link>
-    //         )}
-    //       </>
-    //     ),
-    //   }
-    //   column.push(k)
+  
       setCount(row.length)
       setRows(row)
       setColumns(column)
@@ -249,21 +233,13 @@ const UnitAdmin = () => {
       console.error('Failed', error);
     }
   };
-//   const mergedColumns = ref2.current.map((col) => {
-//     if (!col.editable) {
-//       return col;
-//     }
-//     return {
-//       ...col,
-//       onCell: (record: TableRow) => ({
-//         record,
-//         inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-//         dataIndex: col.dataIndex,
-//         title: col.title,
-//         editing: isEditing(record),
-//       }),
-//     };
-//   });
+  const nagative = useNavigate();
+
+  function handleClick(){
+    nagative("/Unitadmin/block")
+  }
+
+
   return (<Layout onLoad={getMenuItems}>
     <Header>
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
@@ -280,78 +256,50 @@ const UnitAdmin = () => {
       </Row>
     </Header>
 
-    <Content style={{ width: '80%', height: '1000px', margin: '20px 0px' }}>
-
+     <Content style={{ width: '80%', height: '1000px', margin: '20px 0px' }}>
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer }}>
-          <div>
-            <h1>Các dữ liệu quản lý</h1>
-            <Dropdown menu={{ items }} placement="bottomLeft" arrow trigger={['click']}>
-              <Button>+ Thêm mới</Button>
-            </Dropdown>
-          </div>
-          <Menu
-            onClick={onClick}
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            style={{ height: '100%', borderRight: 0 }}
-            items={data}
-          />
-        </Sider>
-        <Content style={{ width: '80%', height: '1000px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
           <Layout>
             <Layout style={{ padding: '0 24px 24px' }}>
               <Content
                 style={{
-                  width: 1290,
+                  width: 1400,
                   padding: 24,
                   margin: 0,
                   minHeight: 280,
                   background: colorBgContainer,
                 }}
               >
-                {/* <Button style={{ margin: '0px 10px 0px 1100px' }}>Phân tích</Button> */}
-                <br />
-                <br />
-                {/* <div style={{ display: "flex", alignItems: "center" }}>
-                  {colName1.map((field) => (
-                    <div key={field} className="form-field">
-                      <label htmlFor={field}><h4>{field}</h4></label>
-                      <input
-                        type="text"
-                        id={field}
-                        name={field}
-                        value={formData[field] || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  ))}
-                  <button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>
-                </div> */}
+                <div className='header'>
+                <h1>TẬP DỮ LIỆU</h1>
+                <div className='btn-wrapper'>
 
-                {/* <Form form={form} component={false}><Table 
-                  components={{
-                    body: {
-                      cell: EditableCell,
-                    },
-                  }}
-                  columns={mergedColumns} 
-                  dataSource={rows} 
-                  key={count}
-                  pagination={{
-                    onChange: cancel,
-                  }}/> */}
-                  {/* </Form> */}
-                   <Table columns={columns} dataSource={rows} className="table1" />
+                <Button onClick={showModal}>+ Thêm tập lưu trữ</Button>
+                <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                  <CreateBlock />
+                  </Modal>
+                </div>
+                </div>
+                <Divider />
+              
+                  <div>
+      <Space>
+        {virtualFolders.map((folder) => (
+          <Button className='btn' key={folder.name} onClick={handleClick}>
+             {folder.name}  
+             <span className='btn-text'>{folder.name} </span>
+          </Button>
+        ))}
+      </Space>
+    </div>
                 
               </Content>
             </Layout>
           </Layout>
         </Content>
       </Layout>
-    </Content>
-
+    </Content> 
+          
     <Footer >Footer</Footer>
 
   </Layout>
