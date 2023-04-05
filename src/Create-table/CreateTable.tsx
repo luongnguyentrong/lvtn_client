@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
+import React, { RefObject, useRef, useState } from 'react';
 import axios from 'axios';
 import './create.css'
 import { Button, message, Steps, theme, Input, Select } from 'antd';
 import { json } from 'stream/consumers';
+import CreateBlock from '../pages/UnitAdmin/CreateBlock';
 interface cols {
   colsname: string;
   type: string;
+  descript: string;
 }
 
-const CreateTable: React.FC = () => {
-  const [Tablename, setTableName] = useState<string>("");
-  const [fields, setFields] = useState<cols[]>([{ colsname: "", type: "" }]);
+interface Table {
+  name: string;
+  cols: string[];
+  des: string[];
+}
 
+interface IProps {
+  tablesInfo: Table[] 
+  setTablesInfo: React.Dispatch<React.SetStateAction<Table[]>>
+}
+
+const CreateTable = (props: IProps) => {
+  const formRef: RefObject<HTMLFormElement> = useRef(null);
+  const [Tablename, setTableName] = useState<string>("");
+  const [fields, setFields] = useState<cols[]>([{ colsname: "", type: "", descript: ""}]);
+  //const [tables, setTables] = useState<Table[]>([]);
   const handleFieldNameChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const newFields = [...fields];
     newFields[index].colsname = event.target.value;
@@ -23,8 +37,14 @@ const CreateTable: React.FC = () => {
     newFields[index].type = event.target.value;
     setFields(newFields);
   };
+  const handleDescriptChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const newFields = [...fields];
+    newFields[index].descript = event.target.value;
+    setFields(newFields);
+  };
+
   const handleAddField = () => {
-    setFields([...fields, { colsname: '', type: '' }]);
+    setFields([...fields, { colsname: '', type: '', descript: ''}]);
   };
 
   const handleRemoveField = (index: number) => {
@@ -37,48 +57,28 @@ const CreateTable: React.FC = () => {
     setTableName(event.target.value);
   };
 
-  const handleAddRow = () => {
-
-    // var request: any = {
-    // };
-    // var cols: any = {
-    // }
-    // for (var i in fields) {
-    //   cols[String(fields[i].colsname)] = fields[i].type;
-    // }
-    // request["name"] = name;
-    // request["cols"] = cols;
-    // try {
-    //   await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', request);
-    //   console.log(request);
-    //   console.log('Add row successfully');
-    // } catch (error) {
-    //   console.error('Add row failed', error);
-    // }
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    var request: any = {
-    };
-    var cols: any = {}
-    cols["ID"] = "SERIAL PRIMARY KEY"
+    var cols: string[] = []
+    let k : Table = {name: "", cols: [], des: []}
+    let sub: string[] = []
+    cols.push("ID SERIAL PRIMARY KEY")
+    sub.push("Id")
     for (var i in fields) {
-      cols[String(fields[i].colsname)] = fields[i].type;
+      cols.push(fields[i].colsname + " " + fields[i].type)
+      sub.push(fields[i].descript)
     }
-
-    request["name"] = Tablename;
-    request["cols"] = cols;
-    try {
-      await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/', request);
-      console.log(request);
-      console.log('Table created successfully!');
-    } catch (error) {
-      console.error('Error creating table:', error);
-    }
+    k.name = Tablename
+    k.cols = cols
+    k.des = sub
+    let newTables: Table[] = props.tablesInfo
+    newTables.push(k)
+    props.setTablesInfo(newTables)
+    setTableName("")
+    setFields([{ colsname: "", type: "" , descript: ""}])
   };
-
   return (
+    <div>
     <form  onSubmit={handleSubmit} className="create">
       <label style={{paddingLeft: "0px"}}> 
         Table name:
@@ -110,7 +110,7 @@ const CreateTable: React.FC = () => {
                 </select>
               </td>
               <td>
-                <Input  type="text"  />
+                <Input  type="text" value={field.descript} onChange={(event) => handleDescriptChange(index,event)}/>
               </td>
               <td>
                 {index > 0 && (
@@ -128,6 +128,22 @@ const CreateTable: React.FC = () => {
       </button>
       <button type="submit" className="createbtt">Create table</button>
     </form>
+     {props.tablesInfo.length >= 1 ? (
+        props.tablesInfo.map((table) => (
+          <div key={table.name} style={{ display: "flex", alignItems: "center" }}>
+            <h1 style={{ marginRight: "20px" }}>{table.name}:</h1>
+            <div style={{ display: "flex" }}>
+              {table.cols.map((col) => (
+                <span key={col} style={{ marginRight: "10px" }}>
+                  {col}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      ) : null}
+      
+    </div>
   );
 };
 

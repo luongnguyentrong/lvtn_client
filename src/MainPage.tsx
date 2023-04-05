@@ -89,7 +89,6 @@ const Main = () => {
             Tạo bảng dữ liệu
           </Button>
           <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <CreateTable />
           </Modal>
         </>
       ),
