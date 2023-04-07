@@ -160,6 +160,7 @@ const Main = () => {
     let n: any = ref.current
     console.log(n[n.length - 1].id + 1)
     let kh: any = [n[n.length - 1].id + 1]
+    console.log("kkkkk", k)
     k["name"] = name
     k["value"] = [...kh,...formValues]
     // formValues[0] = n[n.length-1]
@@ -353,7 +354,7 @@ const Main = () => {
                   background: colorBgContainer,
                 }}
               >
-                <Button style={{ margin: '0px 10px 0px 1100px' }}>Phân tích</Button>
+                <Button style={{ margin: '0px 10px 0px 1100px' }}>Chỉnh sửa</Button>
                 <br />
                 <br />
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -369,11 +370,9 @@ const Main = () => {
                       />
                     </div>
                   ))}
-                 {rows.length === 0 ? null : (<button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>) }
                 </div>
-              { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
-                  <Table 
+
+                <Form form={form} component={false}><Table 
                   components={{
                     body: {
                       cell: EditableCell,
@@ -386,7 +385,6 @@ const Main = () => {
                     onChange: cancel,
                   }}/>
                 </Form>
-                )}
               </Content>
             </Layout>
           </Layout>
