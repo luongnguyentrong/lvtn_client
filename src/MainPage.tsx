@@ -1,19 +1,18 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'antd';
+import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography, Upload } from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
+import { BellOutlined, UserOutlined} from '@ant-design/icons';
 import './index.css';
 import './App.css';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
-import Inside from './inside_folder/Inside';
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import type { ColumnsType } from 'antd/es/table';
 import { Modal } from 'antd';
 import CreateTable from './Create-table/CreateTable';
+import Uploadfile from './Uploadfile/uploadfile';
 interface TableRow {
   [key: string]: any;
 }
@@ -64,17 +63,26 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 const Main = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModal1Open, setIsModal1Open] = useState(false);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
-  const showModal = () => {setIsModalOpen(true);};
-  const handleOk = () => {setIsModalOpen(false);};
-  const handleCancel = () => {setIsModalOpen(false);};
-  const cancel = () => {setEditingKey('');};
+  const showModal = () => { setIsModalOpen(true); };
+  const showModal1 = () =>{setIsModal1Open(true);}
+  const handleOk = () => { setIsModalOpen(false); setIsModal1Open(false)};
+  const handleCancel = () => { setIsModalOpen(false); setIsModal1Open(false)};
+  const cancel = () => { setEditingKey(''); };
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: (
-        <div>uploadfile</div>
+        <>
+          <Button onClick={showModal1}>
+              Upload File
+          </Button>
+          <Modal title="Upload file" open={isModal1Open} onOk={handleOk} onCancel={handleCancel}>
+            <Uploadfile apiEndpoint={'http://localhost:5000/upload'}/>
+          </Modal>
+        </>
       ),
     },
     {
@@ -100,10 +108,10 @@ const Main = () => {
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-    setEditingKey(record.key);
+    // setEditingKey(record.key);
   };
   const [data, setData] = useState<ItemType[]>([])
-  const {token: { colorBgContainer },} = theme.useToken();
+  const { token: { colorBgContainer }, } = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
   const ref = useRef<TableRow[]>()
@@ -164,13 +172,13 @@ const Main = () => {
     const formValues = Object.values(formData);
     let k: any = {}
     let n: any = ref.current
-    console.log(n[n.length - 1].id + 1)
-    let kh: any = [n[n.length - 1].id + 1]
+    let kh: any = [1]
+    if (rows.length != 0) {
+      kh = [n[n.length - 1].id + 1]
+    }
     console.log("kkkkk", k)
     k["name"] = name
-    k["value"] = [...kh,...formValues]
-    // formValues[0] = n[n.length-1]
-   
+    k["value"] = [...kh, ...formValues]
     try {
       await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
     } catch (error) {
@@ -192,7 +200,7 @@ const Main = () => {
       zzz[ele] = z1[i]
       i++
     }
-    
+
     x.push(zzz)
     setRows(x)
     let newCount: number = count + 1
@@ -238,9 +246,13 @@ const Main = () => {
 
   };
 
+
+  const showFiles = async (e: any)=>{
+    e.preventDefault();
+  }
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
-    setTableName(e.key) 
+    setTableName(e.key)
     let row: TableRow[] = [];
     try {
       var request: any = {}
@@ -342,6 +354,7 @@ const Main = () => {
               <Button>+ Thêm mới</Button>
             </Dropdown>
           </div>
+          <Button onClick={showFiles}>Files</Button>
           <Menu
             onClick={onClick}
             mode="inline"
@@ -350,6 +363,8 @@ const Main = () => {
             style={{ height: '100%', borderRight: 0 }}
             items={data}
           />
+
+          
         </Sider>
         <Content style={{ width: '80%', height: '1000px', margin: '0 0' }}>
           <Layout>
@@ -382,18 +397,18 @@ const Main = () => {
                   <button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>
                 </div>
 
-                <Form form={form} component={false}><Table 
+                <Form form={form} component={false}><Table
                   components={{
                     body: {
                       cell: EditableCell,
                     },
                   }}
-                  columns={mergedColumns} 
-                  dataSource={rows} 
+                  columns={mergedColumns}
+                  dataSource={rows}
                   key={count}
                   pagination={{
                     onChange: cancel,
-                  }}/>
+                  }} />
                 </Form>
               </Content>
             </Layout>
