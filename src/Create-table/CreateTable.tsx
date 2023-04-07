@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Button, message, Steps, theme, Input, Select } from 'antd';
 import { json } from 'stream/consumers';
-import './create.css';
 interface cols {
   colsname: string;
   type: string;
@@ -78,16 +78,17 @@ const CreateTable: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="create">
-      <label>
+    <form  onSubmit={handleSubmit} className="create">
+      <label style={{paddingLeft: "0px"}}> 
         Table name:
-        <input type="text" value={Tablename} onChange={handleTableNameChange} />
+        <Input style={{width: "50%", paddingLeft: "0px"}}  type="text" value={Tablename} onChange={handleTableNameChange} />
       </label>
-      <table>
+      <table >
         <thead>
           <tr>
             <th>Field name</th>
             <th>Field type</th>
+            <th>Description</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -95,10 +96,10 @@ const CreateTable: React.FC = () => {
           {fields.map((field, index) => (
             <tr key={index}>
               <td>
-                <input type="text" value={field.colsname} onChange={(event) => handleFieldNameChange(index, event)} />
+                <Input  type="text" value={field.colsname} onChange={(event) => handleFieldNameChange(index, event)} />
               </td>
               <td>
-                <select value={field.type} onChange={(event) => handleFieldTypeChange(index, event)}>
+                <select  value={field.type} onChange={(event) => handleFieldTypeChange(index, event)}>
                   <option value="">-- Select Data Type --</option>
                   <option value="text">Text</option>
                   <option value="integer">Integer</option>
@@ -108,8 +109,11 @@ const CreateTable: React.FC = () => {
                 </select>
               </td>
               <td>
+                <Input  type="text"  />
+              </td>
+              <td>
                 {index > 0 && (
-                  <button type="button" onClick={() => handleRemoveField(index)}>
+                  <button  type="button" onClick={() => handleRemoveField(index)}>
                     Remove
                   </button>
                 )}
@@ -127,4 +131,3 @@ const CreateTable: React.FC = () => {
 };
 
 export default CreateTable;
-
