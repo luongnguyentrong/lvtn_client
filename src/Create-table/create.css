@@ -40,7 +40,7 @@ input[type="text"] {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #3f63a6;
     color: white;
     padding: 8px 16px;
     border: none;
@@ -50,5 +50,5 @@ button {
 }
 
 button:hover {
-    background-color: #3e8e41;
+    background-color: #1671aa;
 }

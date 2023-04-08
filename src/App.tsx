@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import Cookies from 'universal-cookie';
 import 'antd/dist/reset.css'
 import './index.css';
@@ -26,7 +25,7 @@ function getAuthParams() {
 }
 
 function App() {
-    return <UnitAdmin />
+    return <UnitAdmin/>
     const [mainRole, setMainRole] = useState<string>("")
     const navigate = useNavigate()
 
@@ -72,16 +71,16 @@ function App() {
         
     switch (mainRole) {
         case "admin":
-            return <Admin />
+            return <Admin/>
 
         case "unit_admin":
             return <UnitAdmin />
 
         case "unit_normal":
-            return <Normal />
+            return <Normal/>
 
         default:
-            return <Loading />
+            return <Loading/>
     }
 }
 

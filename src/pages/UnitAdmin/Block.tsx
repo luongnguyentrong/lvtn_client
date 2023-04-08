@@ -65,32 +65,6 @@ const Main = () => {
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
   const cancel = () => {setEditingKey('');};
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <div>uploadfile</div>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <div>Tạo văn bản</div>
-      ),
-    },
-    {
-      key: '3',
-      label: (
-        <>
-          <Button onClick={showModal}>
-            Tạo bảng dữ liệu
-          </Button>
-          <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-          </Modal>
-        </>
-      ),
-    },
-  ];
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
@@ -160,6 +134,7 @@ const Main = () => {
     let n: any = ref.current
     console.log(n[n.length - 1].id + 1)
     let kh: any = [n[n.length - 1].id + 1]
+    console.log("kkkkk", k)
     k["name"] = name
     k["value"] = [...kh,...formValues]
     // formValues[0] = n[n.length-1]
@@ -213,8 +188,6 @@ const Main = () => {
       }
       setRows(newRows);
       setCount(count - 1);
-      // console.log("Entries", entries)
-      // console.log('rewrwrwe:', newRows[k]);
       let request: any = {}
       console.log(ref1.current)
       request["name"] = ref1.current
@@ -227,8 +200,6 @@ const Main = () => {
         console.error('Error creating table:', error);
       }
     }
-
-
   };
 
   const onClick: MenuProps['onClick'] = async (e) => {
@@ -353,7 +324,7 @@ const Main = () => {
                   background: colorBgContainer,
                 }}
               >
-                <Button style={{ margin: '0px 10px 0px 1100px' }}>Phân tích</Button>
+                <Button style={{ margin: '0px 10px 0px 1100px' }}>Chỉnh sửa</Button>
                 <br />
                 <br />
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -369,11 +340,9 @@ const Main = () => {
                       />
                     </div>
                   ))}
-                 {rows.length === 0 ? null : (<button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>) }
                 </div>
-              { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
-                  <Table 
+
+                <Form form={form} component={false}><Table 
                   components={{
                     body: {
                       cell: EditableCell,
@@ -386,7 +355,6 @@ const Main = () => {
                     onChange: cancel,
                   }}/>
                 </Form>
-                )}
               </Content>
             </Layout>
           </Layout>
