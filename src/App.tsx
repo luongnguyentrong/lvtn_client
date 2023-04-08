@@ -25,7 +25,6 @@ function getAuthParams() {
 }
 
 function App() {
-    return <UnitAdmin/>
     const [mainRole, setMainRole] = useState<string>("")
     const navigate = useNavigate()
 
