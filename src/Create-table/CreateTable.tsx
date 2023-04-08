@@ -1,6 +1,5 @@
 import React, { RefObject, useRef, useState } from 'react';
 import axios from 'axios';
-import './create.css'
 import { Button, message, Steps, theme, Input, Select } from 'antd';
 import { json } from 'stream/consumers';
 import CreateBlock from '../pages/UnitAdmin/CreateBlock';

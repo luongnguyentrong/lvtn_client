@@ -1,6 +1,6 @@
 export function getUnit(): string {
     if (process.env.NODE_ENV === "development") {
-        return "hcmut"
+        return "master"
     }
 
     const arr = window.location.hostname.split(".")
