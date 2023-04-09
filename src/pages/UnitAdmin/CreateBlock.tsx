@@ -61,7 +61,7 @@ const CreateBlock: React.FC = () => {
         }
         //await axios.post(sql,request);
       } catch (error) {
-      console.error('Error creating database:', error);
+      console.error('Error', error);
       }
       try {
         let sql: any = "http://localhost:5000/add_des"
@@ -72,18 +72,15 @@ const CreateBlock: React.FC = () => {
         }
         //await axios.post(sql);
       } catch (error) {
-      console.error('Error creating database:', error);
+      console.error('Error', error);
       }
       try {
-        let sql: any = "http://localhost:5000/add_users"
-        let k: any = {
-          "name": nameBlock,
-          "display":"",
-          "descript": encodeURIComponent(InputDes)
-        }
-        //await axios.post(sql);
+        let url: any = "http://localhost:5000/add_users?block=" + nameBlock
+        let body: string[] = []
+       
+        //await axios.post(url,body);
       } catch (error) {
-      console.error('Error creating database:', error);
+      console.error('Error', error);
       }
 
   }
@@ -132,6 +129,7 @@ const CreateBlock: React.FC = () => {
       Chọn người nhập dữ liệu
       <Select
       style={{ width: "200px", marginTop: "10px" }}
+      onChange={handleUserChange}
       options={Users}
     />
       </div> 
