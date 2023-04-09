@@ -67,32 +67,6 @@ const Main = () => {
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
   const cancel = () => {setEditingKey('');};
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <div>uploadfile</div>
-      ),
-    },
-    {
-      key: '2',
-      label: (
-        <div>Tạo văn bản</div>
-      ),
-    },
-    {
-      key: '3',
-      label: (
-        <>
-          <Button onClick={showModal}>
-            Tạo bảng dữ liệu
-          </Button>
-          <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-          </Modal>
-        </>
-      ),
-    },
-  ];
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
@@ -155,45 +129,45 @@ const Main = () => {
       return [];
     }
   }
-  const handleAddData = async (e: any) => {
-    e.preventDefault();
-    const formValues = Object.values(formData);
-    let k: any = {}
-    let n: any = ref.current
-    console.log(n[n.length - 1].id + 1)
-    let kh: any = [n[n.length - 1].id + 1]
-    console.log("kkkkk", k)
-    k["name"] = name
-    k["value"] = [...kh,...formValues]
-    // formValues[0] = n[n.length-1]
+  // const handleAddData = async (e: any) => {
+  //   e.preventDefault();
+  //   const formValues = Object.values(formData);
+  //   let k: any = {}
+  //   let n: any = ref.current
+  //   console.log(n[n.length - 1].id + 1)
+  //   let kh: any = [n[n.length - 1].id + 1]
+  //   console.log("kkkkk", k)
+  //   k["name"] = name
+  //   k["value"] = [...kh,...formValues]
+  //   // formValues[0] = n[n.length-1]
    
-    try {
-      await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-    } catch (error) {
-      console.error('Error creating table:', error);
-    }
-    let x: any = rows
-    let z: any = []
-    let zz: any = []
-    z = Object.keys(columns).map(k => columns[k])
-    for (const element of z) {
-      zz.push(element["title"])
-    }
-    zz.pop()
-    let zzz: any = {}
-    zzz["key"] = count + 1;
-    let i = 0;
-    let z1 = [...kh, ...formValues]
-    for (const ele of zz) {
-      zzz[ele] = z1[i]
-      i++
-    }
+  //   try {
+  //     await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
+  //   } catch (error) {
+  //     console.error('Error creating table:', error);
+  //   }
+  //   let x: any = rows
+  //   let z: any = []
+  //   let zz: any = []
+  //   z = Object.keys(columns).map(k => columns[k])
+  //   for (const element of z) {
+  //     zz.push(element["title"])
+  //   }
+  //   zz.pop()
+  //   let zzz: any = {}
+  //   zzz["key"] = count + 1;
+  //   let i = 0;
+  //   let z1 = [...kh, ...formValues]
+  //   for (const ele of zz) {
+  //     zzz[ele] = z1[i]
+  //     i++
+  //   }
     
-    x.push(zzz)
-    setRows(x)
-    let newCount: number = count + 1
-    setCount(newCount);
-  };
+  //   x.push(zzz)
+  //   setRows(x)
+  //   let newCount: number = count + 1
+  //   setCount(newCount);
+  // };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -216,8 +190,6 @@ const Main = () => {
       }
       setRows(newRows);
       setCount(count - 1);
-      // console.log("Entries", entries)
-      // console.log('rewrwrwe:', newRows[k]);
       let request: any = {}
       console.log(ref1.current)
       request["name"] = ref1.current
@@ -230,8 +202,6 @@ const Main = () => {
         console.error('Error creating table:', error);
       }
     }
-
-
   };
 
   const onClick: MenuProps['onClick'] = async (e) => {

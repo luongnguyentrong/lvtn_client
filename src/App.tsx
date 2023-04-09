@@ -67,6 +67,7 @@ function App() {
             })
         }
     }, [])
+        
     switch (mainRole) {
         case "admin":
             return <Admin/>
