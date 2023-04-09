@@ -11,9 +11,7 @@ const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { Modal } from 'antd';
 import CreateTable from '../../Create-table/CreateTable';
-import CreateBlock from './CreateBlock';
-import Block from './Block';
-import './Unitadmin.css'
+// import CreateBlock from './UnitAdmin/CreateBlock';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 
 interface TableRow {
@@ -208,10 +206,6 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal}>+ Thêm tập lưu trữ</Button>
-                <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                  <CreateBlock />
-                </Modal>
               </div>
             </div>
             <Divider />

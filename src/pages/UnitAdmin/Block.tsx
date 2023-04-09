@@ -3,12 +3,14 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'ant
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
+import CreateBlock from './CreateBlock';
+import EditBlock from './EditBlock';
 interface TableRow {
   [key: string]: any;
 }
@@ -312,26 +314,28 @@ const Main = () => {
   });
   return (<Layout onLoad={getMenuItems}>
     <Header>
-      <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-        <Col className='Logo' span={6}>
-          <img src="./QAS.svg" alt="logo" />
-        </Col>
-        <Col className='Search-bar' span={12}>
-          <Search className='Search' placeholder="input search text" onSearch={onSearch} style={{ width: 500 }} />
-        </Col>
-        <Col className='Bellout' span={6}>
-          <BellOutlined className='bell' />
-          <Avatar className='Avartar' size={40} icon={<UserOutlined />} />
-        </Col>
-      </Row>
-    </Header>
+  <Row gutter={[16, 16]}>
+    <Col className="Logo" xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 4 }} lg={{ span: 4 }} style={{color: 'white'}}>
+      <img src="/logo.png" alt="logo" style={{ width: 34 }}  />
+    </Col>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 16 }} md={{ span: 16 }} lg={{ span: 12 }} style={{marginTop: '15px'}}>
+      <Search className="Search" placeholder="input search text" onSearch={onSearch} />
+    </Col>
+    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
+        <BellOutlined className="bell" size={120} style={{ marginRight: '20px', marginTop: '15px', color: 'white', fontSize: '24px'}} />
+        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: 'Blue'}} />
+      </div>
+    </Col>
+  </Row>
+</Header>
 
-    <Content style={{ width: '80%', height: '1000px', margin: '20px 0px' }}>
+    <Content style={{ width: '100%', height: '1000px', margin: '20px 0px 0px 0px' }}>
 
       <Layout>
         <Sider width={200} style={{ background: colorBgContainer }}>
           <div>
-            <h1>Các dữ liệu quản lý</h1>
+            <h1 style={{textAlign: 'center', fontSize:'20px'}}>Các dữ liệu quản lý</h1>
           </div>
           <Menu
             onClick={onClick}
@@ -342,19 +346,26 @@ const Main = () => {
             items={data}
           />
         </Sider>
-        <Content style={{ width: '80%', height: '1000px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
           <Layout>
             <Layout style={{ padding: '0 24px 24px' }}>
               <Content
                 style={{
-                  width: 1290,
-                  padding: 24,
-                  margin: 0,
-                  minHeight: 280,
+                  width: '100%',
+                  maxWidth: '1200px',
+                  padding: '24px',
+                  margin: '0 auto',
+                  minHeight: '280px',
                   background: colorBgContainer,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
                 }}
               >
-                <Button style={{ margin: '0px 10px 0px 1100px' }}>Chỉnh sửa</Button>
+                 <Button style={{ alignSelf: 'flex-end' }} onClick={showModal}><EditOutlined />Chỉnh sửa</Button>       {/* chỉnh sửa block đã tạo */}
+                <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                  <EditBlock />
+                </Modal>
                 <br />
                 <br />
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -371,8 +382,9 @@ const Main = () => {
                     </div>
                   ))}
                 </div>
-
-                <Form form={form} component={false}><Table 
+              { rows.length === 0 ? null : (
+                <Form form={form} component={false}>
+                  <Table 
                   components={{
                     body: {
                       cell: EditableCell,
@@ -385,12 +397,14 @@ const Main = () => {
                     onChange: cancel,
                   }}/>
                 </Form>
+                )}
               </Content>
             </Layout>
           </Layout>
         </Content>
       </Layout>
     </Content>
+
 
     <Footer >Footer</Footer>
 
