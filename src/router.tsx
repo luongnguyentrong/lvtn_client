@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
         element: <SSOCallback />
     },
     {
-        path: "/Unitadmin/block",
+        path: "/UnitAdmin/block",
         element: <Block />
     }
 ])

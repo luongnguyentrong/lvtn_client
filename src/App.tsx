@@ -7,7 +7,7 @@ import MainPage from './MainPage';
 import UnitAdmin from './pages/UnitAdmin/UnitAdmin';
 import Loading from './pages/Loading';
 import Admin from './pages/Admin';
-import Normal from './pages/Normal';
+import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
 import { useNavigate } from 'react-router-dom';
 
