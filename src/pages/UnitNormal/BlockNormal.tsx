@@ -11,6 +11,7 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateBlock from '../UnitAdmin/CreateBlock';
 import EditBlock from '../UnitAdmin/EditBlock';
+import { Link } from 'react-router-dom';
 import { FaFileExcel } from 'react-icons/fa';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
@@ -301,7 +302,9 @@ const Main = () => {
       }),
     };
   });
-  // const FileName = ({ name:string }) => <span>{name}.xlsx</span>;
+  const handleButtonClick = () => {
+    window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
+  };
   return (<Layout onLoad={getMenuItems}>
     <Header>
   <Row gutter={[16, 16]}>
@@ -337,8 +340,9 @@ const Main = () => {
           />
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
+    
             <Upload {...props}>
-               <Button icon={<UploadOutlined />}>Click to Upload</Button>
+               <Button icon={<UploadOutlined />} style={{margin:'10px 0px 10px 20px'}}>Click to Upload</Button>
              </Upload> 
             <div style={{cursor: 'pointer', borderStyle: 'ridge', width:'180px', height: '35px', margin: 'auto', borderRadius: '6px'}}>
             <FaFileExcel style={{
@@ -364,13 +368,11 @@ const Main = () => {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-  <Button style={{ marginRight: '10px' }}><AreaChartOutlined />Phân Tích</Button>                    {/*Xoa block */}
-  {/* <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         Chỉnh sửa block (table hoặc người được phân quyền) */}
+                  
+                  
+                  <Button style={{ marginRight: '10px' }} onClick={handleButtonClick}><AreaChartOutlined />Phân Tích</Button>   
+                
       </div>
-{/* <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-  <EditBlock />
-</Modal> */}
-
                 <br />
                 <br />
                 <div style={{ display: "flex", alignItems: "center" }}>
