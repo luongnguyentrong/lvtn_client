@@ -138,7 +138,7 @@ const UnitAdmin = () => {
   const nagative = useNavigate();
 
   function handleClick(){
-    nagative("/Unitadmin/block")
+    nagative("/UnitUser/BlockNormal")
   }
 
   // const onClick: MenuProps['onClick'] = async (e) => {
@@ -174,7 +174,7 @@ const UnitAdmin = () => {
       <img src="./QAS.svg" alt="logo" />
     </Col>
     <Col className="Unit-Admin" xs={{ span: 2}} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 4 }} style={{color: 'white'}}>
-      <div>Unit-Admin</div>
+      <div>Unit-User</div>
     </Col>
     <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 10 }} style={{marginTop: '15px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />

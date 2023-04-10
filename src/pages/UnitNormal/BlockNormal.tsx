@@ -3,19 +3,37 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'ant
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
-import CreateBlock from './CreateBlock';
-import EditBlock from './EditBlock';
+import CreateBlock from '../UnitAdmin/CreateBlock';
+import EditBlock from '../UnitAdmin/EditBlock';
 import { FaFileExcel } from 'react-icons/fa';
+import type { UploadProps } from 'antd';
+import { message, Upload } from 'antd';
 interface TableRow {
   [key: string]: any;
 }
-
+const props: UploadProps = {
+  name: 'file',
+  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+  headers: {
+    authorization: 'authorization-text',
+  },
+  onChange(info) {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -319,6 +337,9 @@ const Main = () => {
           />
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
+            <Upload {...props}>
+               <Button icon={<UploadOutlined />}>Click to Upload</Button>
+             </Upload> 
             <div style={{cursor: 'pointer', borderStyle: 'ridge', width:'180px', height: '35px', margin: 'auto', borderRadius: '6px'}}>
             <FaFileExcel style={{
               color: 'green', width: '25px', height: '25px', margin: '2px 0 0 45px', cursor: 'pointer'
@@ -343,12 +364,12 @@ const Main = () => {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-  <Button style={{ marginRight: '10px', color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
-  <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         {/* Chỉnh sửa block (table hoặc người được phân quyền) */}
-</div>
-<Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+  <Button style={{ marginRight: '10px' }}><AreaChartOutlined />Phân Tích</Button>                    {/*Xoa block */}
+  {/* <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         Chỉnh sửa block (table hoặc người được phân quyền) */}
+      </div>
+{/* <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
-</Modal>
+</Modal> */}
 
                 <br />
                 <br />

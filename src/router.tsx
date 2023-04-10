@@ -4,6 +4,7 @@ import App from "./App";
 import SSOCallback from "./components/SSOCallback"
 import Units from "./pages/Admin/Units";
 import Block from './pages/UnitAdmin/Block';
+import BlockNormal from "./pages/UnitNormal/BlockNormal";
 
 export const router = createBrowserRouter([
     {
@@ -23,5 +24,9 @@ export const router = createBrowserRouter([
     {
         path: "/UnitAdmin/block",
         element: <Block />
+    },
+    {
+        path: "/UnitUser/BlockNormal",
+        element: <BlockNormal />
     }
 ])
