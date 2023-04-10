@@ -26,9 +26,13 @@ const CreateBlock: React.FC = () => {
     const [Nameblock, setNameblock] = useState<string>("");
     const [InputDes,setInputDes] = useState<string>("string");
     const [Users,setUsers] = useState<User[]>([])
+    const [addUser,setAddUser] = useState<string>("")
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameblock(event.target.value);
   };
+    const handleUserChange = (value: string) => {
+      setAddUser(value) 
+    }
     const handleInputDes = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setInputDes(event.target.value);
   };
@@ -77,8 +81,8 @@ const CreateBlock: React.FC = () => {
       try {
         let url: any = "http://localhost:5000/add_users?block=" + nameBlock
         let body: string[] = []
-       
-        //await axios.post(url,body);
+        body.push(addUser)
+        await axios.post(url,body);
       } catch (error) {
       console.error('Error', error);
       }
@@ -113,12 +117,12 @@ const CreateBlock: React.FC = () => {
       style={{ width: 120 }}
       onChange={handleChange}
       options={[
-        { value: 'Table', label: 'Table' },
+        { value: 'table', label: 'table' },
         { value: 'docx', label: 'docx' },
         { value: 'pdf', label: 'pdf' }
       ]}
     />
-      {TypeFile === 'Table' && <CreateTable tablesInfo={tablesInfo} setTablesInfo={setTablesInfo}/>}
+      {TypeFile === 'table' && <CreateTable tablesInfo={tablesInfo} setTablesInfo={setTablesInfo}/>}
     </> ,
     },
     {
