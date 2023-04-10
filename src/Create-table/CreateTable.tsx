@@ -78,7 +78,7 @@ const CreateTable = (props: IProps) => {
   };
   return (
     <div>
-    <form  onSubmit={handleSubmit} className="create">
+    {/* <form  onSubmit={handleSubmit} className="create">
       <label style={{paddingLeft: "0px"}}> 
         Table name:
         <Input style={{width: "50%", paddingLeft: "0px"}}  type="text" value={Tablename} onChange={handleTableNameChange} />
@@ -126,7 +126,71 @@ const CreateTable = (props: IProps) => {
         Add field
       </button>
       <button type="submit" className="createbtt">Create table</button>
-    </form>
+    </form> */}
+   <form onSubmit={handleSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+  <label style={{paddingLeft: "0px", fontSize: "1.2rem", paddingTop: '10px'}}> 
+    Table name:
+    <Input style={{width: "50%", paddingLeft: "0px", marginLeft: "10px"}} type="text" value={Tablename} onChange={handleTableNameChange} />
+  </label>
+  <table style={{borderCollapse: "collapse", marginTop: "20px"}}>
+    <thead>
+      <tr style={{backgroundColor: "#ccc"}}>
+        <th style={{padding: "10px", textAlign: "left"}}>Field name</th>
+        <th style={{padding: "10px", textAlign: "left"}}>Field type</th>
+        <th style={{padding: "10px", textAlign: "left"}}>Description</th>
+        <th style={{padding: "10px", textAlign: "left"}}>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {fields.map((field, index) => (
+        <tr key={index} style={{backgroundColor: index % 2 === 0 ? "#f2f2f2" : "transparent"}}>
+          <td style={{padding: "10px"}}>
+            <Input type="text" value={field.colsname} onChange={(event) => handleFieldNameChange(index, event)} />
+          </td>
+          <td style={{padding: "10px"}}>
+            <select style={{
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+              backgroundColor: "#fff",
+              color: "#333",
+              fontSize: "14px",
+              height: '31px',
+              outline: "none",
+              minWidth: "150px"
+               }} value={field.type} onChange={(event) => handleFieldTypeChange(index, event)}>
+              <option value="">-- Select Data Type --</option>
+              <option value="text">Text</option>
+              <option value="integer">Integer</option>
+              <option value="boolean">Boolean</option>
+              <option value="serial">Autonumber</option>
+              <option value="date">Date</option>
+            </select>
+          </td>
+          <td style={{padding: "10px"}}>
+            <Input type="text" value={field.descript} onChange={(event) => handleDescriptChange(index,event)}/>
+          </td>
+          <td style={{padding: "10px"}}>
+            {index > 0 && (
+              <button type="button" onClick={() => handleRemoveField(index)} style={{backgroundColor: "#ff0000", color: "#fff", padding: "5px 10px", border: "none", borderRadius: "5px"}}>
+                Remove
+              </button>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <div style={{display: "flex", justifyContent: "space-between", width: "100%", marginTop: "20px"}}>
+    <button type="button" onClick={handleAddField} style={{backgroundColor: "#1a8cff", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "5px"}}>
+      Add field
+    </button>
+    <button type="submit" style={{backgroundColor: "#4CAF50", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "5px"}}>
+      Create table
+    </button>
+  </div>
+</form>
+
+
      {props.tablesInfo.length >= 1 ? (
         props.tablesInfo.map((table) => (
           <div key={table.name} style={{ display: "flex", alignItems: "center" }}>
