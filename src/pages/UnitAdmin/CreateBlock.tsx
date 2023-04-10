@@ -129,6 +129,7 @@ const CreateBlock: React.FC = () => {
       title: 'Last',
       content: 
     <div>
+      Nhập tiêu chí đầu ra dữ liệu
       <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu' value={InputDes} onChange={handleInputDes}/>
       Chọn người nhập dữ liệu
       <Select
