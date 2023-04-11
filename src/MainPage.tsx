@@ -396,7 +396,8 @@ const Main = () => {
                   <button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>
                 </div>
 
-                <Form form={form} component={false}><Table
+                <Form form={form} component={false}>
+                  <Table
                   components={{
                     body: {
                       cell: EditableCell,

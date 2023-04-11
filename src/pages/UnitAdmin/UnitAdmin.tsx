@@ -5,7 +5,7 @@ import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divide
 import { message, Steps, Select } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, DatabaseTwoTone} from '@ant-design/icons';
+import { BellOutlined, BellFilled, DatabaseTwoTone, UserOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -215,21 +215,20 @@ const UnitAdmin = () => {
 
 
   return (<Layout onLoad={handleShowBlock}>
-  <Header>
+  <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 2 }} style={{color: 'white'}}>
-      <img src="./QAS.svg" alt="logo" />
+    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
+      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
     </Col>
-    <Col className="Unit-Admin" xs={{ span: 2}} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 4 }} style={{color: 'white'}}>
-      <div>Unit-Admin</div>
-    </Col>
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 10 }} style={{marginTop: '15px'}}>
+    
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
-    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
-        <BellOutlined className="bell" size={120} style={{ marginRight: '20px', marginTop: '15px', color: 'white', fontSize: '24px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: 'Blue'}} />
+    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-Admin</h1>
       </div>
     </Col>
   </Row>
@@ -253,7 +252,7 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal}>+ Thêm tập lưu trữ</Button>
+                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}>+ Thêm tập lưu trữ</Button>
                 <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                   <CreateBlock />
                 </Modal>
@@ -261,7 +260,7 @@ const UnitAdmin = () => {
             </div>
             <Divider />
             <div>
-              <Space>
+              <Space size="large">
                 
                {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
                  <Button 
@@ -270,21 +269,23 @@ const UnitAdmin = () => {
                  onClick={handleClick} 
                  style={{ 
                    width: 'auto', 
-                   height: '100px', 
+                   height: '110px', 
                    display: 'flex', 
                    flexDirection: 'column', 
                    alignItems: 'center', 
-                   justifyContent: 'center' 
+                   justifyContent: 'center',
+                   boxShadow:'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
+                   borderWidth: '2px'
                  }}> 
                  <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
 
-                   <DatabaseTwoTone style={{ fontSize: '60px', marginBottom: '8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center' }}>{folder.name}Block Name</span> 
+                   <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
+                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}Block Name</span> 
 
                  </div>
 
                </Button>
-               ))): null}  
+               ))): null}
               </Space>
             </div>
           </Content>
