@@ -96,123 +96,12 @@ const UnitAdmin = () => {
     );
   };
 
-  // const getMenuItems = async (e: any) => {
-  //   e.preventDefault();
-  //   let item: Array<string> = [];
-  //   let items2: MenuProps['items'] = [];
-  //   try {
-  //     const response = await axios.get('http://localhost:5000/show');
-  //     const data1 = response.data;
-  //     item = data1["body"]
-  //     items2 = item.map((key) => ({
-  //       key,
-  //       label: `${key}`,
-  //     }));
-  //     setData(items2)
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //     return [];
-  //   }
-  // }
+ 
+  const navigate = useNavigate();
 
-  // const onClick: MenuProps['onClick'] = async (e) => {
-  //   let column: TableRow[] = [];
-  //   setTableName(e.key) 
-  //   let row: TableRow[] = [];
-  //   try {
-  //     var request: any = {}
-  //     request["name"] = e.key
-  //     console.log(request)
-  //     const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
-  //     const data = response.data; // extract the data from the response
-  //     const arr = data["body"];
-  //     column = arr[0]
-  //     row = arr[1]
-
-  // const getMenuItems = async (e: any) => {
-  //   e.preventDefault();
-  //   let item: Array<string> = [];
-  //   let items2: MenuProps['items'] = [];
-  //   try {
-  //     const response = await axios.get('http://localhost:5000/show');
-  //     const data1 = response.data;
-  //     item = data1["body"]
-  //     items2 = item.map((key) => ({
-  //       key,
-  //       label: `${key}`,
-  //     }));
-  //     setData(items2)
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //     return [];
-  //   }
-  // }
-
-  // const onClick: MenuProps['onClick'] = async (e) => {
-  //   let column: TableRow[] = [];
-  //   setTableName(e.key) 
-  //   let row: TableRow[] = [];
-  //   try {
-  //     var request: any = {}
-  //     request["name"] = e.key
-  //     console.log(request)
-  //     const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
-  //     const data = response.data; // extract the data from the response
-  //     const arr = data["body"];
-  //     column = arr[0]
-  //     row = arr[1]
-  
-  //     setCount(row.length)
-  //     setRows(row)
-  //     setColumns(column)
-  //     setColName(arr[2])
-  //     arr[2].shift()
-  //     setColName1(arr[2])
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //   }
-  // };
-  //     setCount(row.length)
-  //     setRows(row)
-  //     setColumns(column)
-  //     setColName(arr[2])
-  //     arr[2].shift()
-  //     setColName1(arr[2])
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //   }
-  // };
-  const nagative = useNavigate();
-
-  function handleClick(){
-    nagative("/Unitadmin/block")
+  function handleClick(value: any){
+    navigate("/Unitadmin/block", {state: value})
   }
-
-  // const onClick: MenuProps['onClick'] = async (e) => {
-  //   let column: TableRow[] = [];
-  //   setTableName(e.key) 
-  //   let row: TableRow[] = [];
-  //   try {
-  //     var request: any = {}
-  //     request["name"] = e.key
-  //     console.log(request)
-  //     const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
-  //     const data = response.data; // extract the data from the response
-  //     const arr = data["body"];
-  //     column = arr[0]
-  //     row = arr[1]
-  
-  //     setCount(row.length)
-  //     setRows(row)
-  //     setColumns(column)
-  //     setColName(arr[2])
-  //     arr[2].shift()
-  //     setColName1(arr[2])
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //   }
-  // };
-
 
   return (<Layout onLoad={handleShowBlock}>
   <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
@@ -266,7 +155,7 @@ const UnitAdmin = () => {
                  <Button 
                  className='btn' 
                  key={folder.name} 
-                 onClick={handleClick} 
+                 onClick={() => handleClick(folder.name)}
                  style={{ 
                    width: 'auto', 
                    height: '110px', 

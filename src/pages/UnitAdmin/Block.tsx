@@ -12,6 +12,7 @@ import { Modal } from 'antd';
 import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
 import { FaFileExcel } from 'react-icons/fa';
+import { useLocation } from "react-router-dom";
 interface TableRow {
   [key: string]: any;
 }
@@ -61,6 +62,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const Main = () => {
+  const location = useLocation();
+  const value = location.state;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
@@ -71,7 +74,6 @@ const Main = () => {
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-    // setEditingKey(record.key);
   };
   const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
@@ -117,7 +119,7 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show');
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -130,50 +132,11 @@ const Main = () => {
       return [];
     }
   }
-  // const handleAddData = async (e: any) => {
-  //   e.preventDefault();
-  //   const formValues = Object.values(formData);
-  //   let k: any = {}
-  //   let n: any = ref.current
-  //   console.log(n[n.length - 1].id + 1)
-  //   let kh: any = [n[n.length - 1].id + 1]
-  //   console.log("kkkkk", k)
-  //   k["name"] = name
-  //   k["value"] = [...kh,...formValues]
-  //   // formValues[0] = n[n.length-1]
-   
-  //   try {
-  //     await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-  //   } catch (error) {
-  //     console.error('Error creating table:', error);
-  //   }
-  //   let x: any = rows
-  //   let z: any = []
-  //   let zz: any = []
-  //   z = Object.keys(columns).map(k => columns[k])
-  //   for (const element of z) {
-  //     zz.push(element["title"])
-  //   }
-  //   zz.pop()
-  //   let zzz: any = {}
-  //   zzz["key"] = count + 1;
-  //   let i = 0;
-  //   let z1 = [...kh, ...formValues]
-  //   for (const ele of zz) {
-  //     zzz[ele] = z1[i]
-  //     i++
-  //   }
-    
-  //   x.push(zzz)
-  //   setRows(x)
-  //   let newCount: number = count + 1
-  //   setCount(newCount);
-  // };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
   const handleDelete = async (key: React.Key) => {
     let k: number = Number(key) - 1
     if (ref.current && ref.current.length > 0) {
@@ -210,56 +173,18 @@ const Main = () => {
     setTableName(e.key) 
     let row: TableRow[] = [];
     try {
-      var request: any = {}
-      request["name"] = e.key
-      console.log(request)
-      const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
+      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
       column = arr[0]
       row = arr[1]
-      let k: any = {
-        title: 'Delete',
-        dataIndex: 'Delete',
-        width: 200,
-        render: (_: any, record: { key: React.Key }) => (
-          <>
-            {row.length >= 1 ? (
-              <Popconfirm title="Bạn có chắc chắn xóa?" onConfirm={() => handleDelete(record.key)}>
-                <a>Delete</a>
-              </Popconfirm>
-            ) : null}
-          </>
-        ),
-      };
-      column.push(k)
-      console.log(editingKey)
-      k = {
-        title: 'operation',
-        dataIndex: 'operation',
-        width: 200,
-        render: (_: any, record: { key: React.Key }) => (
-          <>
-            {isEditing(record) ? (
-              <span>
-                <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                  Save
-                </Typography.Link>
-                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                  <a>Cancel</a>
-                </Popconfirm>
-              </span>
-            ) : (
-              <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-                Edit
-              </Typography.Link>
-            )}
-          </>
-        ),
-      }
-      column.push(k)
+      const transformedList = row.map(({ key, row }) => ({
+        key,
+        ...row
+      }));
       setCount(row.length)
-      setRows(row)
+      setRows(transformedList)
       setColumns(column)
       setColName(arr[2])
       arr[2].shift()
@@ -368,21 +293,8 @@ const Main = () => {
                     </div>
                   ))}
                 </div>
-              { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
-                  <Table 
-                  components={{
-                    body: {
-                      cell: EditableCell,
-                    },
-                  }}
-                  columns={mergedColumns} 
-                  dataSource={rows} 
-                  key={count}
-                  pagination={{
-                    onChange: cancel,
-                  }}/>
-                </Form>
+              {rows.length === 0 ? null : (
+                <Table dataSource={rows} columns={columns}/>
                 )}
               </Content>
             </Layout>
