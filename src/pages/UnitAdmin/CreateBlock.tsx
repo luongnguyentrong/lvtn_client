@@ -45,12 +45,12 @@ const CreateBlock: React.FC = () => {
     nameBlock = nameBlock + "_"+Nameblock
       try {
         let sql: any = "http://localhost:5000/create_block?name=" + encodeURIComponent(nameBlock);
-        //await axios.post(sql);
+        await axios.post(sql);
       } catch (error) {
       console.error('Error creating database:', error);
       }
       try {
-        let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(Nameblock);
+        let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(nameBlock);
         let request : any=[]
         for (var i in tablesInfo){
           let k: Table ={
@@ -63,7 +63,8 @@ const CreateBlock: React.FC = () => {
           k.des = tablesInfo[i].des
           request.push(k)
         }
-        //await axios.post(sql,request);
+        console.log(request)
+        await axios.post(sql,request);
       } catch (error) {
       console.error('Error', error);
       }
@@ -74,7 +75,7 @@ const CreateBlock: React.FC = () => {
           "display":"",
           "descript": encodeURIComponent(InputDes)
         }
-        //await axios.post(sql);
+        await axios.post(sql,k);
       } catch (error) {
       console.error('Error', error);
       }

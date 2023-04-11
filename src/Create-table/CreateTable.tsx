@@ -135,9 +135,9 @@ const CreateTable = (props: IProps) => {
     <Button  onClick={handleAddField} style={{backgroundColor: "#1a8cff", color: "#fff", border: "none", borderRadius: "5px",marginLeft:'7px'}}>
       Add field
     </Button>
-    <Button style={{backgroundColor: "#4CAF50", color: "#fff", marginRight:'7px', border: "none", borderRadius: "5px"}}>
+    <button type="submit" style={{backgroundColor: "#4CAF50", color: "#fff", marginRight:'7px', border: "none", borderRadius: "5px"}}>
       Create table
-    </Button>
+    </button>
   </div>
 </form>
 

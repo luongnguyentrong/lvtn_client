@@ -174,15 +174,17 @@ const Main = () => {
     let row: TableRow[] = [];
     try {
       let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
-      console.log(url)
       const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
-      console.log(arr)
       column = arr[0]
       row = arr[1]
+      const transformedList = row.map(({ key, row }) => ({
+        key,
+        ...row
+      }));
       setCount(row.length)
-      setRows(row)
+      setRows(transformedList)
       setColumns(column)
       setColName(arr[2])
       arr[2].shift()
@@ -289,21 +291,8 @@ const Main = () => {
                     </div>
                   ))}
                 </div>
-              { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
-                  <Table 
-                  components={{
-                    body: {
-                      cell: EditableCell,
-                    },
-                  }}
-                  columns={mergedColumns} 
-                  dataSource={rows} 
-                  key={count}
-                  pagination={{
-                    onChange: cancel,
-                  }}/>
-                </Form>
+              {rows.length === 0 ? null : (
+                <Table dataSource={rows} columns={columns}/>
                 )}
               </Content>
             </Layout>
