@@ -3,7 +3,7 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'ant
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
+import { BellFilled, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -306,18 +306,20 @@ const Main = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
   };
   return (<Layout onLoad={getMenuItems}>
-    <Header>
+    <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 4 }} lg={{ span: 4 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 34 }}  />
+    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
+      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
     </Col>
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 16 }} md={{ span: 16 }} lg={{ span: 12 }} style={{marginTop: '15px'}}>
+    
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
-    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
-        <BellOutlined className="bell" size={120} style={{ marginRight: '20px', marginTop: '15px', color: 'white', fontSize: '24px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: 'Blue'}} />
+    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-Admin</h1>
       </div>
     </Col>
   </Row>

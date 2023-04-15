@@ -254,10 +254,8 @@ const Main = () => {
     setTableName(e.key)
     let row: TableRow[] = [];
     try {
-      var request: any = {}
-      request["name"] = e.key
-      console.log(request)
-      const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
+      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_"+value
+      const response = await axios.post('http://localhost:5000/show_inside?block_name=hcmut_meta&table_name=user_permission');
       const data = response.data; // extract the data from the response
       const arr = data["body"];
       column = arr[0]
@@ -396,7 +394,8 @@ const Main = () => {
                   <button type="submit" className="add-row-button" onClick={handleAddData}>Add new row</button>
                 </div>
 
-                <Form form={form} component={false}><Table
+                <Form form={form} component={false}>
+                  <Table
                   components={{
                     body: {
                       cell: EditableCell,
