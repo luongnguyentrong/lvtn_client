@@ -30,8 +30,10 @@ const UnitAdmin = () => {
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
   const showModal = () => {setIsModalOpen(true);};
-  const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
   const cancel = () => {setEditingKey('');};
   const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
@@ -48,9 +50,11 @@ const UnitAdmin = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
+  
   const handleShowBlock = async () => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders');
+      console.log(response);
       const response1 = response.data["body"].map((str: string) => {
       return str.replace('hcmut_', '');
       });
@@ -115,9 +119,9 @@ const UnitAdmin = () => {
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
+        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '10px', color: 'black', fontSize: '28px'}} />
         <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-Admin</h1>
+        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
@@ -142,7 +146,12 @@ const UnitAdmin = () => {
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
                 <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}>+ Thêm tập lưu trữ</Button>
-                <Modal width={750} title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onOk={handleOk}  onCancel={handleCancel}
+                  footer={[
+                    <Button key="OK" type="primary" onClick={handleOk}>
+                      OK
+                    </Button>,
+  ]}>
                   <CreateBlock />
                 </Modal>
               </div>
@@ -169,7 +178,7 @@ const UnitAdmin = () => {
                  <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
 
                    <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}Block Name</span> 
+                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}</span> 
 
                  </div>
 

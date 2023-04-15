@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { FaFileExcel } from 'react-icons/fa';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
+import './Block-N.css'
 interface TableRow {
   [key: string]: any;
 }
@@ -80,13 +81,14 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const Main = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
-  const showModal = () => {setIsModalOpen(true);};
-  const handleOk = () => {setIsModalOpen(false);};
-  const handleCancel = () => {setIsModalOpen(false);};
   const cancel = () => {setEditingKey('');};
+
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const showModal2 = () => {setIsModalOpen2(true);};
+  const handleOk2 = () => {setIsModalOpen2(false);};
+  const handleCancel2 = () => {setIsModalOpen2(false);};
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
@@ -319,7 +321,7 @@ const Main = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
         <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-Admin</h1>
+        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-User</h1>
       </div>
     </Col>
   </Row>
@@ -342,15 +344,18 @@ const Main = () => {
           />
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
-    
+            <button onClick={showModal2} className='DataRequire'>Tiêu chí dữ liệu đầu ra</button>
+            <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
+                  footer={[
+                    <Button key="OK" type="primary" onClick={handleOk2}>
+                      OK
+                    </Button>,
+  ]}>
+              <div>Làm t báo cáo</div> 
+                </Modal>
             <Upload {...props}>
-               <Button icon={<UploadOutlined />} style={{margin:'10px 0px 10px 20px'}}>Click to Upload</Button>
+               <Button icon={<UploadOutlined />} style={{margin:'10px 0px 10px 25px'}}>Click to Upload</Button>
              </Upload> 
-            <div style={{cursor: 'pointer', borderStyle: 'ridge', width:'180px', height: '35px', margin: 'auto', borderRadius: '6px'}}>
-            <FaFileExcel style={{
-              color: 'green', width: '25px', height: '25px', margin: '2px 0 0 45px', cursor: 'pointer'
-          }}/> File báo cáo
-          </div>
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
