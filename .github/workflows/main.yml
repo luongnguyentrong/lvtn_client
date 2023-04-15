@@ -8,11 +8,21 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build_deploy:
+  build_and_publish_image:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
+
+    # set permission for this job
+    permissions:
+      contents: read
+      packages: write
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -20,28 +30,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Login to GitHub Container Registry 
+        uses: docker/login-action@v2
         with:
-          node-version: '16.x'
-          cache: 'npm'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Install yarn
-        run: npm install --save-dev yarn
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Build
-        run: yarn build
-
-      - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@main
-        env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            ARGS: "-rlgoDzvc -i --delete"
-            SOURCE: "dist/"
-            REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-            REMOTE_USER: ${{ secrets.REMOTE_USER }}
-            TARGET: ${{ secrets.REMOTE_TARGET }}
-            EXCLUDE: "/dist/, /node_modules/"
+      - name: Build and push Docker image
+        uses: docker/build-push-action
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
