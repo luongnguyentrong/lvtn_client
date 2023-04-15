@@ -135,10 +135,10 @@ const UnitAdmin = () => {
   //     console.error('Failed', error);
   //   }
   // };
-  const nagative = useNavigate();
+  const navigate = useNavigate();
 
-  function handleClick(){
-    nagative("/UnitUser/BlockNormal")
+  function handleClick(value: any){
+    navigate("/UnitUser/BlockNormal", {state: value})
   }
 
   // const onClick: MenuProps['onClick'] = async (e) => {
@@ -181,7 +181,7 @@ const UnitAdmin = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
         <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-Admin</h1>
+        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-User</h1>
       </div>
     </Col>
   </Row>
@@ -209,32 +209,32 @@ const UnitAdmin = () => {
             </div>
             <Divider />
             <div>
-              <Space>
+              <Space size="large">
                 
                {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
                  <Button 
                  className='btn' 
                  key={folder.name} 
-                 onClick={handleClick} 
+                 onClick={() => handleClick(folder.name)}
                  style={{ 
                    width: 'auto', 
-                   height: '100px', 
+                   height: '110px', 
                    display: 'flex', 
                    flexDirection: 'column', 
                    alignItems: 'center', 
-                   justifyContent: 'center' 
+                   justifyContent: 'center',
+                   boxShadow:'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
+                   borderWidth: '2px'
                  }}> 
                  <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
 
-                   <DatabaseTwoTone style={{ fontSize: '60px', marginBottom: '8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center' }}>{folder.name}Block Name</span> 
+                   <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
+                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}</span> 
 
                  </div>
 
                </Button>
-               
-                
-               ))): null}  
+               ))): null}
               </Space>
             </div>
           </Content>

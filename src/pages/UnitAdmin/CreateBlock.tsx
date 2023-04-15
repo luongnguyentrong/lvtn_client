@@ -24,7 +24,7 @@ const CreateBlock: React.FC = () => {
     const { TextArea } = Input;
     const [tablesInfo, setTablesInfo] = useState<Table[]>([])
     const [Nameblock, setNameblock] = useState<string>("");
-    const [InputDes,setInputDes] = useState<string>("string");
+    const [InputDes,setInputDes] = useState<string>("");
     const [Users,setUsers] = useState<User[]>([])
     const [addUser,setAddUser] = useState<string>("")
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,6 +79,7 @@ const CreateBlock: React.FC = () => {
       } catch (error) {
       console.error('Error', error);
       }
+      message.success('Processing complete!');
       try {
         let url: any = "http://localhost:5000/add_users?block=" + nameBlock
         let body: string[] = []
@@ -87,8 +88,9 @@ const CreateBlock: React.FC = () => {
       } catch (error) {
       console.error('Error', error);
       }
-
+      
   }
+
   async function getUsers(){
     try {
         let sql: any = "http://localhost:5000/show_user?name=hcmut";
