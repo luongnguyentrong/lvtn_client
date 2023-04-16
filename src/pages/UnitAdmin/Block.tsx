@@ -11,7 +11,6 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
-import { FaFileExcel } from 'react-icons/fa';
 import { useLocation } from "react-router-dom";
 import './block.css'
 interface TableRow {

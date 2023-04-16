@@ -5,17 +5,28 @@ import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divide
 import { message, Steps, Select } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { BellOutlined, BellFilled, DatabaseTwoTone, UserOutlined} from '@ant-design/icons';
+import { BellOutlined, BellFilled, DatabaseTwoTone, UserOutlined,EllipsisOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { Modal } from 'antd';
-import CreateTable from '../../Create-table/CreateTable';
 import CreateBlock from './CreateBlock';
-import Block from './Block';
-import './Unitadmin.css'
-import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
+import './Unitadmin.css';
 
+const items: MenuProps['items'] = [
+  {
+    key: '1',
+    label: (
+      <div>chỉnh sửa</div>
+    ),
+  },
+  {
+    key: '2',
+    label: (
+      <div>Xóa</div>
+    ),
+  },
+];
 
 interface TableRow {
   [key: string]: any;
@@ -28,14 +39,12 @@ const UnitAdmin = () => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
   const showModal = () => {setIsModalOpen(true);};
   const handleCancel = () => {setIsModalOpen(false);};
   const handleOk = () => {
     setIsModalOpen(false);
+
   };
-  const cancel = () => {setEditingKey('');};
-  const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -46,10 +55,6 @@ const UnitAdmin = () => {
   const [columns, setColumns] = useState<TableRow[]>([]);
   const ref2 = useRef<TableRow[]>()
   ref2.current = columns
-  const [colName, setColName] = useState([]);
-  const [count, setCount] = useState(0);
-  const [formData, setFormData] = useState({});
-  const [colName1, setColName1] = useState([]);
   
   const handleShowBlock = async () => {
     try {
@@ -70,9 +75,6 @@ const UnitAdmin = () => {
        return [];
      }
   }
-  const handleAddFolder = (folder: VirtualFolder) => {
-    setVirtualFolders([...virtualFolders, folder]);
-  };
 
   interface AddFolderFormProps {
     onSubmit: (folder: VirtualFolder) => void;
@@ -148,7 +150,10 @@ const UnitAdmin = () => {
                 <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}>+ Thêm tập lưu trữ</Button>
                 <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onOk={handleOk}  onCancel={handleCancel}
                   footer={[
-                    <Button key="OK" type="primary" onClick={handleOk}>
+                    <Button key="OK" type="primary" onClick={() => {
+                      handleOk();
+                      handleShowBlock();
+                    }}>
                       OK
                     </Button>,
   ]}>
@@ -161,29 +166,38 @@ const UnitAdmin = () => {
               <Space size="large">
                 
                {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
-                 <Button 
-                 className='btn' 
-                 key={folder.name} 
-                 onClick={() => handleClick(folder.name)}
-                 style={{ 
-                   width: 'auto', 
-                   height: '110px', 
-                   display: 'flex', 
-                   flexDirection: 'column', 
-                   alignItems: 'center', 
+                 <div
+                 className='btn'
+                 key={folder.name}
+                 style={{
+                   width: 'auto',
+                   height: '110px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   alignItems: 'center',
                    justifyContent: 'center',
-                   boxShadow:'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
-                   borderWidth: '2px'
-                 }}> 
-                 <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
-
-                   <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}</span> 
-
-                 </div>
-
-               </Button>
-               ))): null}
+                   boxShadow: 'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
+                   borderWidth: '2px',
+                   minWidth: '100px',
+                   borderStyle: 'ridge',
+                   position: 'relative'
+                 }}
+               >
+                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                 <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
+                   <button style={{position: 'absolute', top: 0, right: 0, backgroundColor:'white', border:'none', cursor:'pointer'}}>
+                    <h1 className='Edit' style={{ margin:'-1px -4px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
+                   </button>
+                  </Dropdown>
+                  <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
+                   <DatabaseTwoTone  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
+                   <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}dsaaaaaaaaaaaa</span>
+                </div> </div>
+               </div>
+               
+               ))): (
+                <div>Loading folders...</div>
+              )}
               </Space>
             </div>
           </Content>
