@@ -74,7 +74,7 @@ const Main = () => {
   const handleCancel = () => {setIsModalOpen(false);};
 
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const showModal2 = () => {setIsModalOpen2(true);};
+  const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
   const handleOk2 = () => {setIsModalOpen2(false);};
   const handleCancel2 = () => {setIsModalOpen2(false);};
 
@@ -98,6 +98,7 @@ const Main = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
+  const [criteria, setCriteria] = useState("");
   const isEditing = (record: TableRow) => record.key === editingKey;
   const save = async (key: React.Key) => {
     try {
@@ -122,6 +123,17 @@ const Main = () => {
       console.log('Validate Failed:', errInfo);
     }
   };
+  const handleCriteria = async ()=>{
+    try {
+      const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
+      console.log(response)
+      let crit: any = decodeURIComponent(response.data["body"])
+      setCriteria(crit)
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
+  }
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -216,6 +228,7 @@ const Main = () => {
       }),
     };
   });
+
   // const FileName = ({ name:string }) => <span>{name}.xlsx</span>;
   return (<Layout onLoad={getMenuItems}>
     <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
@@ -261,7 +274,7 @@ const Main = () => {
                       OK
                     </Button>,
   ]}>
-              <div>Làm t báo cáo</div> 
+              <div>{criteria}</div> 
                 </Modal>
           </div>
         </Sider>

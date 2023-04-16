@@ -19,7 +19,15 @@ interface Table {
   des: string[];
 }
 
-const CreateBlock: React.FC = () => {
+interface VirtualFolder {
+  name: string;
+}
+
+interface IProps {
+  folders: VirtualFolder[]
+}
+
+const CreateBlock: React.FC<IProps> = (props: IProps) => {
     const [TypeFile, setTypeFile] = useState<string>("");
     const { TextArea } = Input;
     const [tablesInfo, setTablesInfo] = useState<Table[]>([])
@@ -50,6 +58,7 @@ const CreateBlock: React.FC = () => {
       console.error('Error creating database:', error);
       }
       try {
+        console.log(nameBlock)
         let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(nameBlock);
         let request : any=[]
         for (var i in tablesInfo){
@@ -146,9 +155,30 @@ const CreateBlock: React.FC = () => {
     
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
-
+  const [messageApi, contextHolder] = message.useMessage();
+  const error = (message: any) => {
+    messageApi.open({
+      type: 'error',
+      content: message,
+    });
+  };
+  
   const next = () => {
-    setCurrent(current + 1);
+    if (current == 0){
+      let flag :any = 0;
+      for (var x of props.folders){
+          if (x.name == Nameblock){
+              error("Tên tập dữ liệu đã tồn tại")
+              flag = 1
+          }
+      }
+      if(Nameblock ==""){
+        error("Tên tập dữ liệu không được để trống")
+        flag = 1
+      }
+      if (flag == 0) {setCurrent(current + 1);}
+    }
+    else {setCurrent(current + 1);}
   };
 
   
@@ -168,7 +198,7 @@ const CreateBlock: React.FC = () => {
     marginTop:30,
   };
   return (
-    <> <div style={{width: "700px"}}>
+    <>{contextHolder} <div style={{width: "700px"}}>
       <Steps current={current} items={items} />
       <div style={contentStyle}>{ steps[current].content}</div>
       <div style={{ marginTop: 10 }}>

@@ -21,6 +21,13 @@ interface IProps {
 }
 
 const CreateTable = (props: IProps) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const error = (message: any) => {
+    messageApi.open({
+      type: 'error',
+      content: message,
+    });
+  };
   const formRef: RefObject<HTMLFormElement> = useRef(null);
   const [Tablename, setTableName] = useState<string>("");
   const [fields, setFields] = useState<cols[]>([{ colsname: "", type: "", descript: ""}]);
@@ -58,6 +65,12 @@ const CreateTable = (props: IProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    for (var x of props.tablesInfo){
+      if (x.name == Tablename){
+          error("Tên table đã tồn tại")
+          return
+      }
+    }
     var cols: string[] = []
     let k : Table = {name: "", cols: [], des: []}
     let sub: string[] = []
@@ -79,6 +92,7 @@ const CreateTable = (props: IProps) => {
 
   return (
     <div>
+      {contextHolder} 
    <form onSubmit={handleSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
   <label style={{paddingLeft: "0px", fontSize: "1.2rem", paddingTop: '10px'}}> 
     Table name:

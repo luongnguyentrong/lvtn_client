@@ -45,7 +45,7 @@ const UnitAdmin = () => {
     setIsModalOpen(false);
 
   };
-  const {token: { colorBgContainer },} = theme.useToken();
+  const {token: { colorBgContainer },} = theme.useToken();  
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
   const ref = useRef<TableRow[]>()
@@ -157,7 +157,7 @@ const UnitAdmin = () => {
                       OK
                     </Button>,
   ]}>
-                  <CreateBlock />
+                  <CreateBlock folders={virtualFolders}/>
                 </Modal>
               </div>
             </div>
