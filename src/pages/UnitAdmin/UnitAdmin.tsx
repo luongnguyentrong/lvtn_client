@@ -38,10 +38,6 @@ interface VirtualFolder {
 interface IProps {
   folders: VirtualFolder[]
 }
-const gridStyle: React.CSSProperties = {
-  width: '25%',
-  textAlign: 'center',
-};
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
 
