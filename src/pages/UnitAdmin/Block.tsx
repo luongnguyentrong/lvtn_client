@@ -11,7 +11,6 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
-import { FaFileExcel } from 'react-icons/fa';
 import { useLocation } from "react-router-dom";
 import './block.css'
 interface TableRow {
@@ -137,6 +136,7 @@ const Main = () => {
   }
   const getMenuItems = async (e: any) => {
     e.preventDefault();
+    console.log("sadsa")
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
@@ -305,7 +305,7 @@ const Main = () => {
 
                 <br />
                 <br />
-                <div style={{ display: "flex", alignItems: "center" }}>
+                {/* <div style={{ display: "flex", alignItems: "center" }}>
                   {colName1.map((field) => (
                     <div key={field} className="form-field">
                       <label htmlFor={field}><h4>{field}</h4></label>
@@ -318,9 +318,22 @@ const Main = () => {
                       />
                     </div>
                   ))}
-                </div>
-              {rows.length === 0 ? null : (
-                <Table dataSource={rows} columns={columns}/>
+                </div> */}
+                { rows.length === 0 ? null : (
+                <Form form={form} component={false}>
+                  <Table 
+                  components={{
+                    body: {
+                      cell: EditableCell,
+                    },
+                  }}
+                  columns={mergedColumns} 
+                  dataSource={rows} 
+                  key={count}
+                  pagination={{
+                    onChange: cancel,
+                  }} bordered />
+                </Form>
                 )}
               </Content>
             </Layout>
