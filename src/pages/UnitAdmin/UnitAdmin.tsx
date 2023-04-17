@@ -41,33 +41,7 @@ interface IProps {
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
 
-const DeleteBLock = () => {
-  confirm({
-    title: 'Xóa tập dữ liệu',
-    icon: <ExclamationCircleFilled />,
-    content: 'Bạn có chắc chắn muốn xóa tập dữ liệu này?',
-    onOk() {
-      console.log('OK');
-    },
-    onCancel() {
-      console.log('Cancel');
-    },
-  });
-};
-const items: MenuProps['items'] = [
-  {
-    key: '1',
-    label: (
-      <div><EditOutlined /> chỉnh sửa</div>
-    ),
-  },
-  {
-    key: '2',
-    label: (
-      <div style={{cursor:'pointer'}} onClick={DeleteBLock}><DeleteOutlined />  Xóa</div>
-    ),
-  },
-];
+
 
 interface TableRow {
   [key: string]: any;
@@ -80,9 +54,13 @@ const UnitAdmin = () => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {setIsModalOpen(true);};
-  const handleCancel = () => {setIsModalOpen(false);};
+  const [resetKey, setResetKey] = useState(0);
+  const handleCancel = () => {setIsModalOpen(false); setResetKey(resetKey +1)};
   const {token: { colorBgContainer },} = theme.useToken();  
-
+  const [deleteBlock,setDeleteBlock] = useState("")
+  function handleDeleteBlock(name: any){
+    setDeleteBlock(name)
+  }
   const handleShowBlock = async () => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders');
@@ -102,7 +80,40 @@ const UnitAdmin = () => {
        return [];
      }
   }
-
+  const DeleteBLock = () => {
+    confirm({
+      title: 'Xóa tập dữ liệu',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn có chắc chắn muốn xóa tập dữ liệu này?',
+      async onOk() {
+        console.log(deleteBlock);
+        try {
+          await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+        }
+        catch (error) {
+          console.error('Failed', error);
+        }
+        handleShowBlock();
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <div><EditOutlined /> chỉnh sửa</div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div style={{ cursor: 'pointer' }} onClick={DeleteBLock}><DeleteOutlined />  Xóa</div>
+      ),
+    },
+  ];
   const navigate = useNavigate();
 
   function handleClick(value: any){
@@ -152,7 +163,7 @@ const UnitAdmin = () => {
                 <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
                   footer={[
                     ]}>
-                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen}/>
+                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey }/>
                 </Modal>
               </div>
             </div>
@@ -164,7 +175,7 @@ const UnitAdmin = () => {
                  key={folder.name}
               >
                  <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
-                   <button style={{position: 'absolute', top: 0, right: 0, backgroundColor:'transparent', border:'none', cursor:'pointer'}}>
+                        <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} onClick={() => handleDeleteBlock(folder.name)}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
                    </button>
                   </Dropdown>
@@ -178,7 +189,6 @@ const UnitAdmin = () => {
                 <div>Loading folders...</div>
               )}
               </Card>
-              
             </div>
           </Content>
         </Layout>

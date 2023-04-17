@@ -27,6 +27,7 @@ interface IProps {
   folders: VirtualFolder[]
   Modal: boolean
   setModal: React.Dispatch<React.SetStateAction<boolean>>
+  key: number
   // reset: boolean
 }
 
@@ -49,6 +50,9 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameblock(event.target.value);
   };
+    const handleLoad = () =>{
+      setCurrent(0)
+    }
     const handleUserChange = (value: string) => {
       setAddUser(value) 
     }
@@ -214,7 +218,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     marginTop:30,
   };
   return (
-    <>{contextHolder} <div style={{width: "700px"}}>
+    <>{contextHolder}<div key ={props.key} style={{width: "700px"}}>
       <Steps current={current} items={items} />
       <div style={contentStyle}>{ steps[current].content}</div>
       <div style={{ marginTop: 10 }}>
