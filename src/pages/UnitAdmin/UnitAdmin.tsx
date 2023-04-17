@@ -81,9 +81,6 @@ const UnitAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {setIsModalOpen(true);};
   const handleCancel = () => {setIsModalOpen(false);};
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
   const {token: { colorBgContainer },} = theme.useToken();  
 
   const handleShowBlock = async () => {
@@ -151,11 +148,11 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}>+ Thêm tập lưu trữ</Button>
-                <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onOk={handleOk}  onCancel={handleCancel}
-                  footer={[]}
-  >
-                  <CreateBlock folders={virtualFolders}/>
+                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}> Thêm tập lưu trữ</Button>
+                <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
+                  footer={[
+                    ]}>
+                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen}/>
                 </Modal>
               </div>
             </div>

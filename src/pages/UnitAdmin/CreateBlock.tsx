@@ -25,6 +25,9 @@ interface VirtualFolder {
 
 interface IProps {
   folders: VirtualFolder[]
+  Modal: boolean
+  setModal: React.Dispatch<React.SetStateAction<boolean>>
+  // reset: boolean
 }
 
 const CreateBlock: React.FC<IProps> = (props: IProps) => {
@@ -35,6 +38,14 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     const [InputDes,setInputDes] = useState<string>("");
     const [Users,setUsers] = useState<User[]>([])
     const [addUser,setAddUser] = useState<string>("")
+    const [current, setCurrent] = useState(0);
+    // if (props.reset == true) {
+    //   setTablesInfo([])
+    //   setCurrent(0)
+    //   setUsers([])
+    //   setNameblock("")
+    //   setInputDes("")
+    // }
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameblock(event.target.value);
   };
@@ -97,7 +108,12 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
       } catch (error) {
       console.error('Error', error);
       }
-      
+    props.setModal(false)
+    setNameblock("")
+    setTablesInfo([])
+    setCurrent(0)
+    setInputDes("")
+    setUsers([])
   }
 
   async function getUsers(){
@@ -154,7 +170,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
   ];
     
   const { token } = theme.useToken();
-  const [current, setCurrent] = useState(0);
+ 
   const [messageApi, contextHolder] = message.useMessage();
   const error = (message: any) => {
     messageApi.open({
