@@ -162,8 +162,7 @@ const UnitAdmin = () => {
                   {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
                  <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
                  key={folder.name}
-                  // style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-                  >
+              >
                  <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
                    <button style={{position: 'absolute', top: 0, right: 0, backgroundColor:'transparent', border:'none', cursor:'pointer'}}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
@@ -174,7 +173,6 @@ const UnitAdmin = () => {
                    <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
                 </div> 
                 </Card.Grid>
-              
                
                ))): (
                 <div>Loading folders...</div>
