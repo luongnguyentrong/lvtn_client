@@ -5,7 +5,7 @@ import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divide
 import { message, Steps, Select } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { BellFilled, DatabaseTwoTone, UserOutlined,EllipsisOutlined, ExclamationCircleFilled,DeleteOutlined,EditOutlined } from '@ant-design/icons';
+import { BellOutlined, DatabaseTwoTone, UserOutlined,EllipsisOutlined, ExclamationCircleFilled,DeleteOutlined,EditOutlined } from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -42,7 +42,6 @@ interface IProps {
 const { confirm } = Modal;
 
 
-
 interface TableRow {
   [key: string]: any;
 }
@@ -58,9 +57,22 @@ const UnitAdmin = () => {
   const handleCancel = () => {setIsModalOpen(false); setResetKey(resetKey +1)};
   const {token: { colorBgContainer },} = theme.useToken();  
   const [deleteBlock,setDeleteBlock] = useState("")
+  const [EditBlockName,setEditBlockName] = useState("");
+
+  const [open, setOpen] = useState(false);
+
+  const showEditBlock = () =>{
+    setOpen(true);
+  }
+
+  // function BlockName(name: any){
+  //   setEditBlockName(name);
+  // }
+
   function handleDeleteBlock(name: any){
     setDeleteBlock(name)
   }
+
   const handleShowBlock = async () => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders');
@@ -80,15 +92,43 @@ const UnitAdmin = () => {
        return [];
      }
   }
+  let k = 1;
+  const ChangeBlockName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEditBlockName(event.target.value);
+    // setDeleteBlock(event.target.value);
+  };
+  // const EditBlock = () => {
+  //   confirm({
+  //     title: 'Sửa tên tập dữ liệu',
+  //     icon: <EditOutlined />,
+  //     content: <Input type="text" placeholder={deleteBlock} onChange={ChangeBlockName} />,
+  //      onOk() {
+  //       try {
+  //         // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+  //       }
+  //       catch (error) {
+  //         console.error('Failed', error);
+  //       }
+  //       console.log(deleteBlock);
+  //     },
+  //     onCancel() {
+  //       console.log('Cancel');
+  //     },
+  //   });
+  // };
+
   const DeleteBLock = () => {
     confirm({
       title: 'Xóa tập dữ liệu',
       icon: <ExclamationCircleFilled />,
       content: 'Bạn có chắc chắn muốn xóa tập dữ liệu này?',
+      okText: 'Có',
+      okType: 'danger',
+      cancelText: 'Không',
       async onOk() {
-        console.log(deleteBlock);
+        console.log("asdad");
         try {
-          await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+          // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
         }
         catch (error) {
           console.error('Failed', error);
@@ -104,7 +144,44 @@ const UnitAdmin = () => {
     {
       key: '1',
       label: (
-        <div><EditOutlined /> chỉnh sửa</div>
+        <div>
+        <div onClick={showEditBlock}>  <EditOutlined /> chỉnh sửa</div>
+        <Modal    
+          title='Sửa tên tập dữ liệu'
+          open={open}
+          onOk={async () => {setOpen(false);
+            try {
+              console.log(EditBlockName);
+              // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+            }
+            catch (error) {
+              console.error('Failed', error);
+            }
+          }
+        }
+          onCancel={() => {setOpen(false);}}
+          maskClosable={false}
+          mask={false}
+          wrapClassName="custom-modal"
+          footer={[
+              <Button key="Hủy" onClick={() => {setOpen(false)}}>Hủy</Button>,
+              <Button key="Submit" type='primary' 
+              onClick={async () => {setOpen(false);
+                try {
+                  console.log(EditBlockName);
+                  // await axios.delete('http://localhost:5000/delete?block=hcmut_' + EditBlockName);
+                }
+                catch (error) {
+                  console.error('Failed', error);
+                }
+              }}>
+              Lưu</Button>
+          ]}
+        >
+          Tên
+          <Input type="text" placeholder={deleteBlock} onChange={ChangeBlockName} />
+        </Modal>
+        </div>
       ),
     },
     {
@@ -121,31 +198,32 @@ const UnitAdmin = () => {
   }
   
 
-  return (<Layout onLoad={handleShowBlock}>
-  <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+  return (<Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
+  <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell" style={{ marginRight: '20px', marginTop: '10px', color: '#FF4500', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-<Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
+<Content style={{ width: '100%', height: '1000px', margin: '20px 0px'}}>
   <Layout>
-    <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+    <Content style={{ width: '100%', height: '1000px',backgroundColor:'#E8E8E8' }}>
       <Layout>
-        <Layout style={{ padding: '0 24px 24px' }}>
+        <Layout style={{ padding: '0 24px 24px', backgroundColor:'#E8E8E8' }}>
           <Content
             style={{
               width: '100%',
@@ -196,8 +274,6 @@ const UnitAdmin = () => {
     </Content>
   </Layout>
 </Content>
-
-    <Footer >Footer</Footer>
 
   </Layout>
   );

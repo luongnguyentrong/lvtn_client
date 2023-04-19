@@ -24,3 +24,8 @@
 .bell {
     display: inline !important;
 }
+
+.custom-modal .ant-modal-content {
+    border: 1px solid rgb(170, 170, 170);
+    box-shadow: rgba(221, 221, 221, 0.2) 0px 3px 3px;
+}

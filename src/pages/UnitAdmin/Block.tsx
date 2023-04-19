@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'antd';
+import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography, Space } from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
@@ -13,8 +13,14 @@ import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
 import { useLocation } from "react-router-dom";
 import './block.css'
+
+
 interface TableRow {
   [key: string]: any;
+  key: string;
+  name: string;
+  age: number;
+  address: string;
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -79,10 +85,7 @@ const Main = () => {
   const handleCancel2 = () => {setIsModalOpen2(false);};
 
   const cancel = () => {setEditingKey('');};
-
-  const edit = (record: Partial<TableRow> & { key: React.Key }) => {
-    form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-  };
+  
   const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
@@ -99,7 +102,15 @@ const Main = () => {
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
   const [criteria, setCriteria] = useState("");
+
   const isEditing = (record: TableRow) => record.key === editingKey;
+
+  const edit = (record: Partial<TableRow> & { key: React.Key }) => {
+    form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
+    console.log(record.key);
+    setEditingKey(record.key);
+  };
+  
   const save = async (key: React.Key) => {
     try {
       const row = (await form.validateFields()) as TableRow;
@@ -123,6 +134,7 @@ const Main = () => {
       console.log('Validate Failed:', errInfo);
     }
   };
+
   const handleCriteria = async ()=>{
     try {
       const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
@@ -136,7 +148,6 @@ const Main = () => {
   }
   const getMenuItems = async (e: any) => {
     e.preventDefault();
-    console.log("sadsa")
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
@@ -181,7 +192,7 @@ const Main = () => {
       request["col"] = [entries[1][0], entries[1][1]]
       console.log(request)
       try {
-        await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
+        // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
         console.log('Delete successfully!');
       } catch (error) {
         console.error('Error creating table:', error);
@@ -204,6 +215,29 @@ const Main = () => {
         key,
         ...row
       }));
+      let k: any = {
+        title: 'operation',
+        dataIndex: 'operation',
+        width: 200,
+        render: (_: any, record:TableRow) => {
+          const editable = isEditing(record);
+          return editable ? (
+            <span>
+              <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
+                Save
+              </Typography.Link>
+              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                <a>Cancel</a>
+              </Popconfirm>
+            </span>
+          ) : (
+            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+              Edit
+            </Typography.Link>
+          );
+        }
+      };
+      column.push(k)
       setCount(row.length)
       setRows(transformedList)
       setColumns(column)
@@ -229,8 +263,51 @@ const Main = () => {
       }),
     };
   });
+  const handleAddData = async (e: any) => {
+    // e.preventDefault();
+    // const formValues = Object.values(formData);
+    // let k: any = {}
+    // let n: any = ref.current
+    // let kh: any = [1]
+    // if (rows.length != 0) {
+    //   kh = [n[n.length - 1].id + 1]
+    // }
+    // console.log("kkkkk", k)
+    // k["name"] = name
+    // k["value"] = [...kh, ...formValues]
+    // try {
+    //   // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
+    // } catch (error) {
+    //   console.error('Error creating table:', error);
+    // }
+    // let x: any = rows
+    // let z: any = []
+    // let zz: any = []
+    // z = Object.keys(columns).map(k => columns[k])
+    // for (const element of z) {
+    //   zz.push(element["title"])
+    // }
+    // zz.pop()
+    // let zzz: any = {}
+    // zzz["key"] = count + 1;
+    // let i = 0;
+    // let z1 = [...kh, ...formValues]
+    // for (const ele of zz) {
+    //   zzz[ele] = z1[i]
+    //   i++
+    // }
 
-  // const FileName = ({ name:string }) => <span>{name}.xlsx</span>;
+    // x.push(zzz)
+    // setRows(x)
+    // let newCount: number = count + 1
+    // setCount(newCount);
+  };
+  const [NewRow, setNewRow] = useState(false);
+  
+  const addrow = () =>{
+    setNewRow(true);
+  }
+
   return (<Layout onLoad={getMenuItems}>
     <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
   <Row gutter={[16, 16]}>
@@ -251,10 +328,10 @@ const Main = () => {
   </Row>
 </Header>
 
-    <Content style={{ width: '100%', height: '1000px', margin: '20px 0px 0px 0px' }}>
+    <Content style={{ width: '100%', maxHeight: '1000px', margin: '20px 0px 0px 0px' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'690px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
@@ -279,23 +356,22 @@ const Main = () => {
                 </Modal>
           </div>
         </Sider>
-        <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '690px', margin: '0 0' }}>
           <Layout>
             <Layout style={{ padding: '0 0px 0px' }}>
               <Content
                 style={{
                   width: '100%',
-                  maxWidth: '1280px',
+                  maxWidth: '1200px',
                   padding: '24px',
                   margin: '0 0px 0px 25px',
-                  minHeight: '280px',
+                  minHeight: '600px',
                   background: colorBgContainer,
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
   <Button style={{ marginRight: '10px', color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
   <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         {/* Chỉnh sửa block (table hoặc người được phân quyền) */}
 </div>
@@ -303,24 +379,7 @@ const Main = () => {
   <EditBlock />
 </Modal>
 
-                <br />
-                <br />
-                {/* <div style={{ display: "flex", alignItems: "center" }}>
-                  {colName1.map((field) => (
-                    <div key={field} className="form-field">
-                      <label htmlFor={field}><h4>{field}</h4></label>
-                      <input
-                        type="text"
-                        id={field}
-                        name={field}
-                        value={formData[field] || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  ))}
-                </div> */}
-                { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
+                <Form form={form} component={false} >
                   <Table 
                   components={{
                     body: {
@@ -330,11 +389,46 @@ const Main = () => {
                   columns={mergedColumns} 
                   dataSource={rows} 
                   key={count}
-                  pagination={{
-                    onChange: cancel,
-                  }} bordered />
+                  pagination={false}
+                  scroll={{x: 400, y : 350}}
+                  bordered 
+                  style={{borderStyle:'groove'}}/>
                 </Form>
-                )}
+                {NewRow ? (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {colName1.map((field) => (
+                    <div key={field} className="form-field">
+                      <label htmlFor={field}><h4>{field}</h4></label>
+                      <Input
+                        type="text"
+                        id={field}
+                        name={field}
+                        value={formData[field] || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  ))}
+                  <div style={{marginTop: '23px'}}>
+                  <button type="submit" 
+                  style={{backgroundColor: "#4CAF50", 
+                  color: "#fff", 
+                  margin:'0 7px', 
+                  border: "none", 
+                  borderRadius: "5px",
+                  height: '32px',
+                  width: '60px',
+                  cursor: 'pointer'
+                  }} 
+                  onClick={() =>{handleAddData; setNewRow(false)}}>
+                    Add
+                  </button>
+                  <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
+                  </div>
+                </div>
+                ) : null
+                } 
+                {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
+                
               </Content>
             </Layout>
           </Layout>
@@ -342,11 +436,195 @@ const Main = () => {
       </Layout>
     </Content>
 
-
-    <Footer >Footer</Footer>
-
   </Layout>
   );
 };
 
 export default Main;
+
+// import React, { useState } from 'react';
+// import { Form, Input, InputNumber, Popconfirm, Table, Typography } from 'antd';
+
+// interface Item {
+//   key: string;
+//   name: string;
+//   age: number;
+//   address: string;
+// }
+
+// const originData: Item[] = [];
+// for (let i = 0; i < 100; i++) {
+//   originData.push({
+//     key: i.toString(),
+//     name: `Edward ${i}`,
+//     age: 32,
+//     address: `London Park no. ${i}`,
+//   });
+// }
+// interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+//   editing: boolean;
+//   dataIndex: string;
+//   title: any;
+//   inputType: 'number' | 'text';
+//   record: Item;
+//   index: number;
+//   children: React.ReactNode;
+// }
+
+// const EditableCell: React.FC<EditableCellProps> = ({
+//   editing,
+//   dataIndex,
+//   title,
+//   inputType,
+//   record,
+//   index,
+//   children,
+//   ...restProps
+// }) => {
+//   const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+
+//   return (
+//     <td {...restProps}>
+//       {editing ? (
+//         <Form.Item
+//           name={dataIndex}
+//           style={{ margin: 0 }}
+//           rules={[
+//             {
+//               required: true,
+//               message: `Please Input ${title}!`,
+//             },
+//           ]}
+//         >
+//           {inputNode}
+//         </Form.Item>
+//       ) : (
+//         children
+//       )}
+//     </td>
+//   );
+// };
+
+// const App: React.FC = () => {
+//   const [form] = Form.useForm();
+//   const [data, setData] = useState(originData);
+//   const [editingKey, setEditingKey] = useState('');
+
+//   const isEditing = (record: Item) => record.key === editingKey;
+
+//   const edit = (record: Partial<Item> & { key: React.Key }) => {
+//     form.setFieldsValue({ name: '', age: '', address: '', ...record });
+//     setEditingKey(record.key);
+//    // console.log(record.key);
+//     console.log(record.key === editingKey);
+//   };
+
+//   const cancel = () => {
+//     setEditingKey('');
+//   };
+
+//   const save = async (key: React.Key) => {
+//     try {
+//       const row = (await form.validateFields()) as Item;
+
+//       const newData = [...data];
+//       const index = newData.findIndex((item) => key === item.key);
+//       if (index > -1) {
+//         const item = newData[index];
+//         newData.splice(index, 1, {
+//           ...item,
+//           ...row,
+//         });
+//         setData(newData);
+//         setEditingKey('');
+//       } else {
+//         newData.push(row);
+//         setData(newData);
+//         setEditingKey('');
+//       }
+//     } catch (errInfo) {
+//       console.log('Validate Failed:', errInfo);
+//     }
+//   };
+
+//   const columns = [
+//     {
+//       title: 'name',
+//       dataIndex: 'name',
+//       width: '25%',
+//       editable: true,
+//     },
+//     {
+//       title: 'age',
+//       dataIndex: 'age',
+//       width: '15%',
+//       editable: true,
+//     },
+//     {
+//       title: 'address',
+//       dataIndex: 'address',
+//       width: '40%',
+//       editable: true,
+//     },
+//     {
+//       title: 'operation',
+//       dataIndex: 'operation',
+//       render: (_: any, record: Item) => {
+//        // console.log(isEditing(record));
+//         const editable = isEditing(record);
+//        console.log(editable);
+//         return editable ? (
+//           <span>
+//             <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
+//               Save
+//             </Typography.Link>
+//             <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+//               <a>Cancel</a>
+//             </Popconfirm>
+//           </span>
+//         ) : (
+//           <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+//             Edit
+//           </Typography.Link>
+//         );
+//       },
+//     },
+//   ];
+
+//   const mergedColumns = columns.map((col) => {
+//     if (!col.editable) {
+//       return col;
+//     }
+//     return {
+//       ...col,
+//       onCell: (record: Item) => ({
+//         record,
+//         inputType: col.dataIndex === 'age' ? 'number' : 'text',
+//         dataIndex: col.dataIndex,
+//         title: col.title,
+//         editing: isEditing(record),
+//       }),
+//     };
+//   });
+
+//   return (
+//     <Form form={form} component={false}>
+//       <Table
+//         components={{
+//           body: {
+//             cell: EditableCell,
+//           },
+//         }}
+//         bordered
+//         dataSource={data}
+//         columns={mergedColumns}
+//         rowClassName="editable-row"
+//         pagination={{
+//           onChange: cancel,
+//         }}
+//       />
+//     </Form>
+//   );
+// };
+
+// export default App;

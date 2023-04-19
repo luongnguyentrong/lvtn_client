@@ -40,15 +40,10 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     const [Users,setUsers] = useState<User[]>([])
     const [addUser,setAddUser] = useState<string>("")
     const [current, setCurrent] = useState(0);
-    // if (props.reset == true) {
-    //   setTablesInfo([])
-    //   setCurrent(0)
-    //   setUsers([])
-    //   setNameblock("")
-    //   setInputDes("")
-    // }
+  
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameblock(event.target.value);
+    console.log(Nameblock);
   };
     const handleLoad = () =>{
       setCurrent(0)
