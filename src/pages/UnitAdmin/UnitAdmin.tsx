@@ -38,10 +38,6 @@ interface VirtualFolder {
 interface IProps {
   folders: VirtualFolder[]
 }
-const gridStyle: React.CSSProperties = {
-  width: '25%',
-  textAlign: 'center',
-};
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
 
@@ -175,8 +171,9 @@ const UnitAdmin = () => {
             <div>
                 <Card>
                   {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
-                 <Card.Grid style={{width:'25%', textAlign:'center',position: 'relative'}}
-                 key={folder.name}>
+                 <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
+                 key={folder.name}
+              >
                  <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
                         <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} onClick={() => handleDeleteBlock(folder.name)}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
@@ -186,7 +183,8 @@ const UnitAdmin = () => {
                    <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
                    <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
                 </div> 
-                </Card.Grid> 
+                </Card.Grid>
+               
                ))): (
                 <div>Loading folders...</div>
               )}
