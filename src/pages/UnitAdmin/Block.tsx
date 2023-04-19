@@ -75,7 +75,16 @@ const Main = () => {
 
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
-  const handleOk2 = () => {setIsModalOpen2(false);};
+  const handleOk2 = async () => {
+    setIsModalOpen2(false);
+    try {
+      await axios.post('http://localhost:5000/edit_criteria?block=hcmut_' + value+'&new=' +encodeURIComponent(inputValue));
+    } catch (error) {
+      console.error('Failed', error);
+    }
+    setIsEditing1(false)
+  };
+
   const handleCancel2 = () => {setIsModalOpen2(false);};
 
   const cancel = () => {setEditingKey('');};
@@ -99,6 +108,8 @@ const Main = () => {
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
   const [criteria, setCriteria] = useState("");
+  const [isEditing1, setIsEditing1] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const isEditing = (record: TableRow) => record.key === editingKey;
   const save = async (key: React.Key) => {
     try {
@@ -214,6 +225,23 @@ const Main = () => {
       console.error('Failed', error);
     }
   };
+  const handleButtonClick = () => {
+    if (isEditing1 == true){
+        setCriteria(inputValue)
+    }
+    else{
+      setInputValue(criteria)
+    }
+    
+    setIsEditing1(!isEditing1);
+    // setInputValue(criteria);
+  };
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
+  // const handleInputBlur = () => {
+  //   setIsEditing1(false);
+  // };
   const mergedColumns = ref2.current.map((col) => {
     if (!col.editable) {
       return col;
@@ -274,8 +302,18 @@ const Main = () => {
                     <Button key="OK" type="primary" onClick={handleOk2}>
                       OK
                     </Button>,
-  ]}>
-              <div>{criteria}</div> 
+                  ]}>
+                    <Button onClick={handleButtonClick}><EditOutlined/>Chỉnh sửa</Button> 
+                  {isEditing1 ? (
+                    <Input
+                      placeholder={criteria}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                      // onBlur={handleInputBlur}
+                    />
+                  ) : (
+                    <div>{criteria}</div>
+                  )}
                 </Modal>
           </div>
         </Sider>
