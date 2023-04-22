@@ -3,7 +3,7 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography, Space } fr
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellFilled, UserOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -164,9 +164,10 @@ const Main = () => {
       const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
       const data1 = response.data;
       item = data1["body"]
-      items2 = item.map((key) => ({
+      items2 = item.map((key) => ({ 
         key,
         label: `${key}`,
+        icon: <TableOutlined/>
       }));
       setData(items2)
     } catch (error) {
@@ -335,30 +336,31 @@ const Main = () => {
     setNewRow(true);
   }
 
-  return (<Layout onLoad={getMenuItems}>
-    <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+  return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+   <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-    <Content style={{ width: '100%', maxHeight: '1000px', margin: '20px 0px 0px 0px' }}>
+    <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'690px' }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
@@ -385,7 +387,6 @@ const Main = () => {
                       placeholder={criteria}
                       value={inputValue}
                       onChange={handleInputChange}
-                      // onBlur={handleInputBlur}
                     />
                   ) : (
                     <div>{criteria}</div>
@@ -393,16 +394,16 @@ const Main = () => {
                 </Modal>
           </div>
         </Sider>
-        <Content style={{ width: '100%', height: '690px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
           <Layout>
-            <Layout style={{ padding: '0 0px 0px' }}>
+            <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content
                 style={{
                   width: '100%',
                   maxWidth: '1200px',
                   padding: '24px',
                   margin: '0 0px 0px 25px',
-                  minHeight: '600px',
+                  minHeight: '700px',
                   background: colorBgContainer,
                   display: 'flex',
                   flexDirection: 'column',
@@ -427,7 +428,7 @@ const Main = () => {
                   dataSource={rows} 
                   key={count}
                   pagination={false}
-                  scroll={{x: 400, y : 350}}
+                  scroll={{x: 400, y : 550}}
                   bordered 
                   style={{borderStyle:'groove'}}/>
                 </Form>

@@ -3,7 +3,7 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'ant
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellFilled, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -14,10 +14,16 @@ import EditBlock from '../UnitAdmin/EditBlock';
 import { Link } from 'react-router-dom';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
+import { useLocation } from "react-router-dom";
 import './Block-N.css'
 interface TableRow {
   [key: string]: any;
+  key: string;
+  name: string;
+  age: number;
+  address: string;
 }
+
 const props: UploadProps = {
   name: 'file',
   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
@@ -83,16 +89,21 @@ const Main = () => {
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
   const cancel = () => {setEditingKey('');};
-
+  const [isEditing1, setIsEditing1] = useState(false);
+  const [criteria, setCriteria] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const showModal2 = () => {setIsModalOpen2(true);};
+  const [inputValue, setInputValue] = useState('');
   const handleOk2 = () => {setIsModalOpen2(false);};
   const handleCancel2 = () => {setIsModalOpen2(false);};
+  const [NewRow, setNewRow] = useState(false);
 
   const edit = (record: Partial<TableRow> & { key: React.Key }) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-    // setEditingKey(record.key);
+    setEditingKey(record.key);
   };
+
+  const location = useLocation();
+  const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
@@ -108,7 +119,12 @@ const Main = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
+  const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
+  const addrow = () =>{
+    setNewRow(true);
+  }
   const isEditing = (record: TableRow) => record.key === editingKey;
+  
   const save = async (key: React.Key) => {
     try {
       const row = (await form.validateFields()) as TableRow;
@@ -137,7 +153,7 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show');
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -224,62 +240,50 @@ const Main = () => {
       }
     }
   };
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
 
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key) 
     let row: TableRow[] = [];
     try {
-      var request: any = {}
-      request["name"] = e.key
-      console.log(request)
-      const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
+      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
       column = arr[0]
       row = arr[1]
+      const transformedList = row.map(({ key, row }) => ({
+        key,
+        ...row
+      }));
       let k: any = {
-        title: 'Delete',
-        dataIndex: 'Delete',
-        width: 200,
-        render: (_: any, record: { key: React.Key }) => (
-          <>
-            {row.length >= 1 ? (
-              <Popconfirm title="Bạn có chắc chắn xóa?" onConfirm={() => handleDelete(record.key)}>
-                <a>Delete</a>
-              </Popconfirm>
-            ) : null}
-          </>
-        ),
-      };
-      column.push(k)
-      console.log(editingKey)
-      k = {
         title: 'operation',
         dataIndex: 'operation',
         width: 200,
-        render: (_: any, record: { key: React.Key }) => (
-          <>
-            {isEditing(record) ? (
-              <span>
-                <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                  Save
-                </Typography.Link>
-                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                  <a>Cancel</a>
-                </Popconfirm>
-              </span>
-            ) : (
-              <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-                Edit
+        render: (_: any, record:TableRow) => {
+          const editable = isEditing(record);
+          return editable ? (
+            <span>
+              <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
+                Save
               </Typography.Link>
-            )}
-          </>
-        ),
-      }
+              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                <a>Cancel</a>
+              </Popconfirm>
+            </span>
+          ) : (
+            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+              Edit
+            </Typography.Link>
+          );
+        }
+      };
       column.push(k)
       setCount(row.length)
-      setRows(row)
+      setRows(transformedList)
       setColumns(column)
       setColName(arr[2])
       arr[2].shift()
@@ -287,6 +291,45 @@ const Main = () => {
     } catch (error) {
       console.error('Failed', error);
     }
+  };
+  const handleAddData = async (e: any) => {
+    // e.preventDefault();
+    // const formValues = Object.values(formData);
+    // let k: any = {}
+    // let n: any = ref.current
+    // let kh: any = [1]
+    // if (rows.length != 0) {
+    //   kh = [n[n.length - 1].id + 1]
+    // }
+    // console.log("kkkkk", k)
+    // k["name"] = name
+    // k["value"] = [...kh, ...formValues]
+    // try {
+    //   // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
+    // } catch (error) {
+    //   console.error('Error creating table:', error);
+    // }
+    // let x: any = rows
+    // let z: any = []
+    // let zz: any = []
+    // z = Object.keys(columns).map(k => columns[k])
+    // for (const element of z) {
+    //   zz.push(element["title"])
+    // }
+    // zz.pop()
+    // let zzz: any = {}
+    // zzz["key"] = count + 1;
+    // let i = 0;
+    // let z1 = [...kh, ...formValues]
+    // for (const ele of zz) {
+    //   zzz[ele] = z1[i]
+    //   i++
+    // }
+
+    // x.push(zzz)
+    // setRows(x)
+    // let newCount: number = count + 1
+    // setCount(newCount);
   };
   const mergedColumns = ref2.current.map((col) => {
     if (!col.editable) {
@@ -306,30 +349,43 @@ const Main = () => {
   const handleButtonClick = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
   };
-  return (<Layout onLoad={getMenuItems}>
-    <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+  const handleCriteria = async ()=>{
+    try {
+      const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
+      console.log(response)
+      let crit: any = decodeURIComponent(response.data["body"])
+      setCriteria(crit)
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
+  }
+
+  return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+   <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-User</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-    <Content style={{ width: '100%', height: '1000px', margin: '20px 0px 0px 0px' }}>
+    <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
@@ -343,60 +399,43 @@ const Main = () => {
           />
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
-            <button onClick={showModal2} className='DataRequire'>Tiêu chí dữ liệu đầu ra</button>
+            <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
             <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
                   footer={[
                     <Button key="OK" type="primary" onClick={handleOk2}>
                       OK
                     </Button>,
-  ]}>
-              <div>Làm t báo cáo</div> 
+                  ]}>
+                    <Button onClick={handleButtonClick}><EditOutlined/>Chỉnh sửa</Button> 
+                  {isEditing1 ? (
+                    <Input
+                      placeholder={criteria}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <div>{criteria}</div>
+                  )}
                 </Modal>
-            <Upload {...props}>
-               <Button icon={<UploadOutlined />} style={{margin:'10px 0px 10px 25px'}}>Click to Upload</Button>
-             </Upload> 
           </div>
         </Sider>
-        <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
           <Layout>
-            <Layout style={{ padding: '0 0px 0px' }}>
+            <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content
                 style={{
                   width: '100%',
-                  maxWidth: '1280px',
+                  maxWidth: '1200px',
                   padding: '24px',
                   margin: '0 0px 0px 25px',
-                  minHeight: '280px',
+                  minHeight: '700px',
                   background: colorBgContainer,
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  
-                  
-                  <Button style={{ marginRight: '10px' }} onClick={handleButtonClick}><AreaChartOutlined />Phân Tích</Button>   
-                
-      </div>
-                <br />
-                <br />
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {colName1.map((field) => (
-                    <div key={field} className="form-field">
-                      <label htmlFor={field}><h4>{field}</h4></label>
-                      <input
-                        type="text"
-                        id={field}
-                        name={field}
-                        value={formData[field] || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  ))}
-                </div>
-              { rows.length === 0 ? null : (
-                <Form form={form} component={false}>
+
+                <Form form={form} component={false} >
                   <Table 
                   components={{
                     body: {
@@ -406,20 +445,52 @@ const Main = () => {
                   columns={mergedColumns} 
                   dataSource={rows} 
                   key={count}
-                  pagination={{
-                    onChange: cancel,
-                  }}/>
+                  pagination={false}
+                  scroll={{x: 400, y : 550}}
+                  bordered 
+                  style={{borderStyle:'groove'}}/>
                 </Form>
-                )}
+                {NewRow ? (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {colName1.map((field) => (
+                    <div key={field} className="form-field">
+                      <label htmlFor={field}><h4>{field}</h4></label>
+                      <Input
+                        type="text"
+                        id={field}
+                        name={field}
+                        value={formData[field] || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  ))}
+                  <div style={{marginTop: '23px'}}>
+                  <button type="submit" 
+                  style={{backgroundColor: "#4CAF50", 
+                  color: "#fff", 
+                  margin:'0 7px', 
+                  border: "none", 
+                  borderRadius: "5px",
+                  height: '32px',
+                  width: '60px',
+                  cursor: 'pointer'
+                  }} 
+                  onClick={() =>{handleAddData; setNewRow(false)}}>
+                    Add
+                  </button>
+                  <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
+                  </div>
+                </div>
+                ) : null
+                } 
+                {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
+                
               </Content>
             </Layout>
           </Layout>
         </Content>
       </Layout>
     </Content>
-
-
-    <Footer >Footer</Footer>
 
   </Layout>
   );

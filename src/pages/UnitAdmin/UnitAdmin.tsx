@@ -126,9 +126,8 @@ const UnitAdmin = () => {
       okType: 'danger',
       cancelText: 'Không',
       async onOk() {
-        console.log("asdad");
         try {
-          // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+          await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
         }
         catch (error) {
           console.error('Failed', error);
@@ -152,7 +151,7 @@ const UnitAdmin = () => {
           onOk={async () => {setOpen(false);
             try {
               console.log(EditBlockName);
-              // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+              await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
             }
             catch (error) {
               console.error('Failed', error);
@@ -169,7 +168,7 @@ const UnitAdmin = () => {
               onClick={async () => {setOpen(false);
                 try {
                   console.log(EditBlockName);
-                  // await axios.delete('http://localhost:5000/delete?block=hcmut_' + EditBlockName);
+                  await axios.delete('http://localhost:5000/delete?block=hcmut_' + EditBlockName);
                 }
                 catch (error) {
                   console.error('Failed', error);
