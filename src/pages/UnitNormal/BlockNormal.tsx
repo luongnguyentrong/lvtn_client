@@ -1,21 +1,19 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'antd';
+import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
+import { Input, Button, Avatar, Tooltip , Menu, theme, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
-import CreateBlock from '../UnitAdmin/CreateBlock';
-import EditBlock from '../UnitAdmin/EditBlock';
-import { Link } from 'react-router-dom';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
 import './Block-N.css'
+import { red } from '@ant-design/colors';
 interface TableRow {
   [key: string]: any;
   key: string;
@@ -297,21 +295,32 @@ const Main = () => {
         ...row
       }));
       let k: any = {
-        title: 'operation',
-        dataIndex: 'operation',
+        title: 'Actions',
+        dataIndex: 'Actions',
         width: 200,
         render: (_: any, record:TableRow) => (
           <>
-          <Button onClick={()=> {showEditRecord(record)}}>
-            Edit
-          </Button>
-          <Button onClick={()=> DeleteRerord()}>
-            Delete
-          </Button>
+        <Tooltip title='Edit' color='#646464'>
+          <button
+            onClick={() => showEditRecord(record)}
+            className='ButtonEdit'
+          >
+              <EditOutlined style={{ fontSize: '20px', color: '#767676' }} />
+          </button>
+        </Tooltip>
+        <Tooltip title='Delete' color='#646464'>
+          <button 
+            onClick={()=> DeleteRerord()}
+            className='ButtonDelete'
+          >
+            <DeleteOutlined style={{ fontSize: '20px', color: '#767676' }} />
+          </button>
+        </Tooltip>
           </>
       )
       };
       column.push(k)
+      column[0].width = 50;
       setCount(row.length)
       setRows(transformedList)
       setColumns(column)
@@ -391,7 +400,10 @@ const Main = () => {
     }
   }
   const arr1 = Object.keys(currentRecord);
-   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
+  const arr3 = arr1;
+  arr3.pop();
+  arr3.shift();
+  const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
   return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -515,10 +527,11 @@ const Main = () => {
                 ) : null
                 } 
                 {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
-                <Modal title="Edit Record" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
+
+          <Modal title="Edit Record" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
-                arr1 && arr1.map((field:any) => (
+                arr3 && arr3.map((field:any) => (
                     <div key={field} className="form-field">
                         <label htmlFor={field}><h4>{field}</h4></label>
                         <Input

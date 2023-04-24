@@ -43,3 +43,37 @@
 .DataRequire:disabled:hover {
     box-shadow: none;
 }
+
+.ButtonEdit {
+    margin-right: 20px;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.ButtonEdit:hover {
+    background-color: rgb(214, 214, 214);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ButtonDelete {
+    margin-right: 20px;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.ButtonDelete:hover {
+    background-color: rgb(214, 214, 214);
+    border-radius: 50%;
+    cursor: pointer;
+}
