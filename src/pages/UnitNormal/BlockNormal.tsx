@@ -270,7 +270,7 @@ const Main = () => {
       request["col"] = [entries[1][0], entries[1][1]]
       console.log(request)
       try {
-        await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
+        // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
         console.log('Delete successfully!');
       } catch (error) {
         console.error('Error creating table:', error);
