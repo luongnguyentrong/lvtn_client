@@ -245,7 +245,7 @@ const Main = () => {
       request["col"] = [entries[1][0], entries[1][1]]
       console.log(request)
       try {
-        await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
+        // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
         console.log('Delete successfully!');
       } catch (error) {
         console.error('Error creating table:', error);
@@ -515,7 +515,7 @@ const Main = () => {
                 ) : null
                 } 
                 {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
-                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
+                <Modal title="Edit Record" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
                 arr1 && arr1.map((field:any) => (
