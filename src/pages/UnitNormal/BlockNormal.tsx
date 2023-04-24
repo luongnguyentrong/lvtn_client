@@ -180,7 +180,6 @@ const Main = () => {
   }
   const handleAddData = async () => {
     const formValues = Object.values(formData);
-    console.log(formData)
     let k: any = {}
     let n: any = ref.current
     let kh: any = [1]
@@ -189,7 +188,14 @@ const Main = () => {
     }
     k["name"] = name
     k["value"] = [...kh, ...formValues]
+    k["col"] = colName
     console.log("kkkkk", k)
+    try {
+      axios.post('http://localhost:5000/add_data?block=hcmut_' + value, k);
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
     let x: any = rows
     let z: any = []
     let zz: any = []
@@ -213,6 +219,25 @@ const Main = () => {
     setFormData({})
     setNewRow(false)
   };
+  const handleEditData = async () =>{
+    const formValues = Object.values(formData2);
+    let k: any = {}
+    k["table"] = name
+    k["cond"] = currentRecord["id"]
+    k["change"] = formData2
+    try {
+      axios.post('http://localhost:5000/edit_row?block=hcmut_' + value,k);
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
+    let x: number = currentRecord["key"] - 1
+    for (const key in formData2) {
+      if (formData2.hasOwnProperty(key)) {
+        rows[x][key] = (formData2 as any)[key];
+      }
+    }
+  }
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -303,7 +328,7 @@ const Main = () => {
         width: 200,
         render: (_: any, record: TableRow) => (
           <>
-            <Button>
+            <Button onClick={() => { showEditRecord(record)}}>
               Edit
             </Button>
             <Button>
@@ -355,7 +380,10 @@ const Main = () => {
     }
   }
   const arr1 = Object.keys(currentRecord);
-   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
+  const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
+  const arr3 = arr1
+  arr3.pop()
+  arr3.shift()
   return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -479,10 +507,10 @@ const Main = () => {
                 ) : null
                 } 
                 {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
-                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
+                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
-                arr1 && arr1.map((field:any) => (
+                arr3 && arr3.map((field:any) => (
                     <div key={field} className="form-field">
                         <label htmlFor={field}><h4>{field}</h4></label>
                         <Input
