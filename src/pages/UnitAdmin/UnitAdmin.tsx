@@ -97,25 +97,6 @@ const UnitAdmin = () => {
     setEditBlockName(event.target.value);
     // setDeleteBlock(event.target.value);
   };
-  // const EditBlock = () => {
-  //   confirm({
-  //     title: 'Sửa tên tập dữ liệu',
-  //     icon: <EditOutlined />,
-  //     content: <Input type="text" placeholder={deleteBlock} onChange={ChangeBlockName} />,
-  //      onOk() {
-  //       try {
-  //         // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
-  //       }
-  //       catch (error) {
-  //         console.error('Failed', error);
-  //       }
-  //       console.log(deleteBlock);
-  //     },
-  //     onCancel() {
-  //       console.log('Cancel');
-  //     },
-  //   });
-  // };
 
   const DeleteBLock = () => {
     confirm({
@@ -197,7 +178,8 @@ const UnitAdmin = () => {
   }
   
 
-  return (<Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
+  return (
+  <Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
   <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -252,7 +234,8 @@ const UnitAdmin = () => {
                  key={folder.name}
               >
                  <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
-                        <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} onClick={() => handleDeleteBlock(folder.name)}>
+                  <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} 
+                    onClick={() => handleDeleteBlock(folder.name)}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
                    </button>
                   </Dropdown>
