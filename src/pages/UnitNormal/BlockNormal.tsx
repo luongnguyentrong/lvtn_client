@@ -3,7 +3,7 @@ import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'ant
 const { Header, Footer, Content, Sider } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, AreaChartOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -120,6 +120,13 @@ const Main = () => {
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
+
+  const [EditRecord, setEditRecord] = useState(false);
+
+  const [currentRecord, setCurrentRecord] = useState<any>({});
+
+  const [formData2, setFormData2] = useState({});
+
   const addrow = () =>{
     setNewRow(true);
   }
@@ -159,6 +166,7 @@ const Main = () => {
       items2 = item.map((key) => ({
         key,
         label: `${key}`,
+        icon: <TableOutlined/>
       }));
       setData(items2)
     } catch (error) {
@@ -209,6 +217,10 @@ const Main = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+  const handleChange2 = (e: any) => {
+    const { name, value } = e.target;
+    setFormData2({ ...formData2, [name]: value });
+  };
 
   const handleDelete = async (key: React.Key) => {
     let k: number = Number(key) - 1
@@ -240,10 +252,35 @@ const Main = () => {
       }
     }
   };
+  const DeleteRerord = () => {
+    Modal.confirm({
+      title: 'Xóa dòng',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn có chắc chắn muốn xóa dòng dữ liệu này?',
+      okText: 'Có',
+      okType: 'danger',
+      cancelText: 'Không',
+      async onOk() {
+        try {
+          // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+        }
+        catch (error) {
+          console.error('Failed', error);
+        }
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
   const handleInputChange = (event: any) => {
     setInputValue(event.target.value);
   };
 
+  const showEditRecord = (record: TableRow) => {
+    setCurrentRecord(record);
+    setEditRecord(true);
+};
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key) 
@@ -263,23 +300,16 @@ const Main = () => {
         title: 'operation',
         dataIndex: 'operation',
         width: 200,
-        render: (_: any, record:TableRow) => {
-          const editable = isEditing(record);
-          return editable ? (
-            <span>
-              <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                Save
-              </Typography.Link>
-              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                <a>Cancel</a>
-              </Popconfirm>
-            </span>
-          ) : (
-            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-              Edit
-            </Typography.Link>
-          );
-        }
+        render: (_: any, record:TableRow) => (
+          <>
+          <Button onClick={()=> {showEditRecord(record)}}>
+            Edit
+          </Button>
+          <Button onClick={()=> DeleteRerord()}>
+            Delete
+          </Button>
+          </>
+      )
       };
       column.push(k)
       setCount(row.length)
@@ -360,7 +390,8 @@ const Main = () => {
       return [];
     }
   }
-
+  const arr1 = Object.keys(currentRecord);
+   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
   return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -484,7 +515,22 @@ const Main = () => {
                 ) : null
                 } 
                 {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
-                
+                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
+            <div>
+                {
+                arr1 && arr1.map((field:any) => (
+                    <div key={field} className="form-field">
+                        <label htmlFor={field}><h4>{field}</h4></label>
+                        <Input
+                            type="text"
+                            id={field}
+                            name={field}
+                            onChange={handleChange2}
+                        />
+                    </div>
+                ))}
+            </div>
+          </Modal>
               </Content>
             </Layout>
           </Layout>
