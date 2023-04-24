@@ -18,10 +18,10 @@ import { useLocation } from "react-router-dom";
 import './Block-N.css'
 interface TableRow {
   [key: string]: any;
-  key: string;
-  name: string;
-  age: number;
-  address: string;
+  // key: string;
+  // name: string;
+  // age: number;
+  // address: string;
 }
 
 const props: UploadProps = {
@@ -97,11 +97,14 @@ const Main = () => {
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
 
-  const edit = (record: Partial<TableRow> & { key: React.Key }) => {
+  const edit = (record: TableRow) => {
     form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
     setEditingKey(record.key);
+    console.log(record)
+    // console.log(record.key)
+    // setEditable(true)
   };
-
+  // console.log(editingKey);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -119,6 +122,7 @@ const Main = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
+  // const [editable, setEditable] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
   const addrow = () =>{
     setNewRow(true);
@@ -166,45 +170,41 @@ const Main = () => {
       return [];
     }
   }
-  // const handleAddData = async (e: any) => {
-  //   e.preventDefault();
-  //   const formValues = Object.values(formData);
-  //   let k: any = {}
-  //   let n: any = ref.current
-  //   console.log(n[n.length - 1].id + 1)
-  //   let kh: any = [n[n.length - 1].id + 1]
-  //   console.log("kkkkk", k)
-  //   k["name"] = name
-  //   k["value"] = [...kh,...formValues]
-  //   // formValues[0] = n[n.length-1]
-   
-  //   try {
-  //     await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-  //   } catch (error) {
-  //     console.error('Error creating table:', error);
-  //   }
-  //   let x: any = rows
-  //   let z: any = []
-  //   let zz: any = []
-  //   z = Object.keys(columns).map(k => columns[k])
-  //   for (const element of z) {
-  //     zz.push(element["title"])
-  //   }
-  //   zz.pop()
-  //   let zzz: any = {}
-  //   zzz["key"] = count + 1;
-  //   let i = 0;
-  //   let z1 = [...kh, ...formValues]
-  //   for (const ele of zz) {
-  //     zzz[ele] = z1[i]
-  //     i++
-  //   }
-    
-  //   x.push(zzz)
-  //   setRows(x)
-  //   let newCount: number = count + 1
-  //   setCount(newCount);
-  // };
+  const handleAddData = async () => {
+    const formValues = Object.values(formData);
+    console.log(formData)
+    let k: any = {}
+    let n: any = ref.current
+    let kh: any = [1]
+    if (rows.length != 0) {
+      kh = [n[n.length - 1].id + 1]
+    }
+    k["name"] = name
+    k["value"] = [...kh, ...formValues]
+    console.log("kkkkk", k)
+    let x: any = rows
+    let z: any = []
+    let zz: any = []
+    z = Object.keys(columns).map(k => columns[k])
+    for (const element of z) {
+      zz.push(element["title"])
+    }
+    zz.pop()
+    let zzz: any = {}
+    zzz["key"] = count + 1;
+    let i = 0;
+    let z1 = [...kh, ...formValues]
+    for (const ele of zz) {
+      zzz[ele] = z1[i]
+      i++
+    }
+    x.push(zzz)
+    setRows(x)
+    let newCount: number = count + 1
+    setCount(newCount);
+    setFormData({})
+    setNewRow(false)
+  };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -228,7 +228,7 @@ const Main = () => {
       setRows(newRows);
       setCount(count - 1);
       let request: any = {}
-      console.log(ref1.current)
+      // console.log(ref1.current)
       request["name"] = ref1.current
       request["col"] = [entries[1][0], entries[1][1]]
       console.log(request)
@@ -255,36 +255,31 @@ const Main = () => {
       const arr = data["body"];
       column = arr[0]
       row = arr[1]
-      const transformedList = row.map(({ key, row }) => ({
+      const   transformedList = row.map(({ key, row }) => ({
         key,
         ...row
       }));
+      // setColumns(column)
       let k: any = {
         title: 'operation',
         dataIndex: 'operation',
         width: 200,
-        render: (_: any, record:TableRow) => {
-          const editable = isEditing(record);
-          return editable ? (
-            <span>
-              <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                Save
-              </Typography.Link>
-              <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                <a>Cancel</a>
-              </Popconfirm>
-            </span>
-          ) : (
-            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+        render: (_: any, record: TableRow) => (
+          <>
+            <Button>
               Edit
-            </Typography.Link>
-          );
-        }
+            </Button>
+            <Button>
+              Delete
+            </Button>
+          </>
+        )
       };
       column.push(k)
       setCount(row.length)
-      setRows(transformedList)
       setColumns(column)
+      setRows(transformedList)
+      
       setColName(arr[2])
       arr[2].shift()
       setColName1(arr[2])
@@ -292,60 +287,22 @@ const Main = () => {
       console.error('Failed', error);
     }
   };
-  const handleAddData = async (e: any) => {
-    // e.preventDefault();
-    // const formValues = Object.values(formData);
-    // let k: any = {}
-    // let n: any = ref.current
-    // let kh: any = [1]
-    // if (rows.length != 0) {
-    //   kh = [n[n.length - 1].id + 1]
-    // }
-    // console.log("kkkkk", k)
-    // k["name"] = name
-    // k["value"] = [...kh, ...formValues]
-    // try {
-    //   // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-    // } catch (error) {
-    //   console.error('Error creating table:', error);
-    // }
-    // let x: any = rows
-    // let z: any = []
-    // let zz: any = []
-    // z = Object.keys(columns).map(k => columns[k])
-    // for (const element of z) {
-    //   zz.push(element["title"])
-    // }
-    // zz.pop()
-    // let zzz: any = {}
-    // zzz["key"] = count + 1;
-    // let i = 0;
-    // let z1 = [...kh, ...formValues]
-    // for (const ele of zz) {
-    //   zzz[ele] = z1[i]
-    //   i++
-    // }
-
-    // x.push(zzz)
-    // setRows(x)
-    // let newCount: number = count + 1
-    // setCount(newCount);
-  };
-  const mergedColumns = ref2.current.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: TableRow) => ({
-        record,
-        inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
+  // const mergedColumns = ref2.current.map((col) => {
+  //   // console.log(columns)
+  //   if (!col.editable) {
+  //     return col;
+  //   }
+  //   return {
+  //     ...col,
+  //     onCell: (record: TableRow) => ({
+  //       record,
+  //       inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
+  //       dataIndex: col.dataIndex,
+  //       title: col.title,
+  //       editing: isEditing(record),
+  //     }),
+  //   };
+  // });
   const handleButtonClick = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
   };
@@ -435,19 +392,19 @@ const Main = () => {
                 }}
               >
 
-                <Form form={form} component={false} >
+                <Form form={form} component={false}>
                   <Table 
                   components={{
                     body: {
                       cell: EditableCell,
                     },
                   }}
-                  columns={mergedColumns} 
+                  columns={columns} 
                   dataSource={rows} 
                   key={count}
                   pagination={false}
                   scroll={{x: 400, y : 550}}
-                  bordered 
+                  bordered
                   style={{borderStyle:'groove'}}/>
                 </Form>
                 {NewRow ? (
@@ -465,7 +422,7 @@ const Main = () => {
                     </div>
                   ))}
                   <div style={{marginTop: '23px'}}>
-                  <button type="submit" 
+                  <button
                   style={{backgroundColor: "#4CAF50", 
                   color: "#fff", 
                   margin:'0 7px', 
@@ -475,7 +432,7 @@ const Main = () => {
                   width: '60px',
                   cursor: 'pointer'
                   }} 
-                  onClick={() =>{handleAddData; setNewRow(false)}}>
+                  onClick={handleAddData}>
                     Add
                   </button>
                   <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
