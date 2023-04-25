@@ -94,12 +94,6 @@ const Main = () => {
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
 
-  // const edit = (record: TableRow) => {
-  //   form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-  //   setEditingKey(record.key);
-  //   console.log(record)
-    
-  // };
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -117,7 +111,6 @@ const Main = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
-  // const [editable, setEditable] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
 
   const [EditRecord, setEditRecord] = useState(false);
@@ -129,31 +122,6 @@ const Main = () => {
   const addrow = () =>{
     setNewRow(true);
   }
-  // const isEditing = (record: TableRow) => record.key === editingKey;
-  
-  // const save = async (key: React.Key) => {
-  //   try {
-  //     const row = (await form.validateFields()) as TableRow;
-
-  //     const newRows = [...rows];
-  //     const index = newRows.findIndex((item) => key === item.key);
-  //     if (index > -1) {
-  //       const item = newRows[index];
-  //       newRows.splice(index, 1, {
-  //         ...item,
-  //         ...row,
-  //       });
-  //       setRows(newRows);
-  //       setEditingKey('');
-  //     } else {
-  //       newRows.push(row);
-  //       setRows(newRows);
-  //       setEditingKey('');
-  //     }
-  //   } catch (errInfo) {
-  //     console.log('Validate Failed:', errInfo);
-  //   }
-  // };
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -215,7 +183,7 @@ const Main = () => {
     setNewRow(false)
   };
   const handleEditData = async () =>{
-    const formValues = Object.values(formData2);
+    // const formValues = Object.values(formData2);
     let k: any = {}
     k["table"] = name
     k["cond"] = currentRecord["id"]
@@ -243,37 +211,7 @@ const Main = () => {
     setFormData2({ ...formData2, [name]: value });
   };
 
-  const handleDelete = async (key: React.Key) => {
-    let k: number = Number(key) - 1
-    if (ref.current && ref.current.length > 0) {
-      const newRows: any = [];
-      const entries = Object.entries(ref.current[k]);
-      for (const ele of ref.current) {
-        if (ele["key"] != key) {
-          newRows.push(ele)
-        }
-      }
-      let i: number = 1;
-      for (const ele of newRows) {
-        ele["key"] = i
-        i++
-      }
-      setRows(newRows);
-      setCount(count - 1);
-      let request: any = {}
-      // console.log(ref1.current)
-      request["name"] = ref1.current
-      request["col"] = [entries[1][0], entries[1][1]]
-      console.log(request)
-      try {
-        // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
-        console.log('Delete successfully!');
-      } catch (error) {
-        console.error('Error creating table:', error);
-      }
-    }
-  };
-  const DeleteRerord = () => {
+  const DeleteRerord = async (record: TableRow) => {
     Modal.confirm({
       title: 'Xóa dòng',
       icon: <ExclamationCircleFilled />,
@@ -283,11 +221,21 @@ const Main = () => {
       cancelText: 'Không',
       async onOk() {
         try {
-          // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+          let url: any = 'http://localhost:5000/delete_row?block=hcmut_' + value +'&table=' + ref1.current + '&id=' + record.id;
+          await axios.delete(url);
         }
         catch (error) {
           console.error('Failed', error);
         }
+        let sup: TableRow[] = ref.current?.filter(row => row.id !== 10000000) || [];
+        if (record) {
+          sup.splice(sup.indexOf(record), 1);
+          sup.forEach((obj: TableRow, index: number) => {
+            obj.key = index + 1;
+          });
+        }
+        setRows(sup)
+        console.log(sup)
       },
       onCancel() {
         console.log('Cancel');
@@ -304,7 +252,7 @@ const Main = () => {
 };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
-    setTableName(e.key) 
+    setTableName(e.key)
     let row: TableRow[] = [];
     try {
       let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
@@ -334,7 +282,7 @@ const Main = () => {
         </Tooltip>
         <Tooltip title='Delete' color='#646464'>
           <button 
-            onClick={()=> DeleteRerord()}
+            onClick={()=> DeleteRerord(record)}
             className='ButtonDelete'
           >
             <DeleteOutlined style={{ fontSize: '20px', color: '#767676' }} />
@@ -347,6 +295,7 @@ const Main = () => {
       column[0].width = 50;
       setCount(row.length)
       setColumns(column)
+      // console.log(transformedList)
       setRows(transformedList)
       
       setColName(arr[2])
