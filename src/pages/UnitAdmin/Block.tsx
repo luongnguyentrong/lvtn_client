@@ -1,9 +1,9 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography, Space } from 'antd';
-const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Layout, Row, Col, InputNumber, Form } from 'antd';
+const { Header, Content, Sider } = Layout;
+import { Input, Button, Avatar, Menu, theme, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined,ExclamationCircleFilled ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined,ExclamationCircleFilled,ExportOutlined ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -13,6 +13,12 @@ import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
 import { useLocation } from "react-router-dom";
 import './block.css'
+import { Excel } from "antd-table-saveas-excel";
+
+interface IExcelColumn{
+  title: string;
+  dataIndex:string;
+}
 
 interface TableRow {
   [key: string]: any;
@@ -118,34 +124,6 @@ const Main: React.FC = () => {
     }
     setIsEditing1(false)
   };
-
-  // const edit = (record: TableRow) => {
-  //   form.setFieldsValue({...record});
-  // };
-   
-  // const save = async (key: React.Key) => {
-  //   try {
-  //     const row = (await form.validateFields()) as TableRow;
-
-  //     const newRows = [...rows];
-  //     const index = newRows.findIndex((item) => key === item.key);
-  //     if (index > -1) {
-  //       const item = newRows[index];
-  //       newRows.splice(index, 1, {
-  //         ...item,
-  //         ...row,
-  //       });
-  //       setRows(newRows);
-  //       setEditingKey('');
-  //     } else {
-  //       newRows.push(row);
-  //       setRows(newRows);
-  //       setEditingKey('');
-  //     }
-  //   } catch (errInfo) {
-  //     console.log('Validate Failed:', errInfo);
-  //   }
-  // };
 
   const handleCriteria = async ()=>{
     try {
@@ -257,22 +235,7 @@ const Main: React.FC = () => {
         key,
         ...row
       }));
-      let k: any = {
-        title: 'operation',
-        dataIndex: 'operation',
-        width: 200,
-        render: (_: any, record:TableRow) => (
-            <>
-            <Button onClick={()=> {showEditRecord(record)}}>
-              Edit
-            </Button>
-            <Button onClick={()=> DeleteRerord()}>
-              Delete
-            </Button>
-            </>
-        )
-      };
-      column.push(k)
+      column[0].width = 50;
       setCount(row.length)
       setRows(transformedList)
       setColumns(column)
@@ -301,21 +264,21 @@ const Main: React.FC = () => {
     setInputValue(event.target.value);
   };
   
-  const mergedColumns = ref2.current.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: TableRow) => ({
-        record,
-        inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-        dataIndex: col.dataIndex,
-        title: col.title,
-    //    editing: isEditing(record),
-      }),
-    };
-  });
+  // const mergedColumns = ref2.current.map((col) => {
+  //   if (!col.editable) {
+  //     return col;
+  //   }
+  //   return {
+  //     ...col,
+  //     onCell: (record: TableRow) => ({
+  //       record,
+  //       inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
+  //       dataIndex: col.dataIndex,
+  //       title: col.title,
+  //   //    editing: isEditing(record),
+  //     }),
+  //   };
+  // });
   const handleAddData = async (e: any) => {
     // e.preventDefault();
     // const formValues = Object.values(formData);
@@ -356,14 +319,27 @@ const Main: React.FC = () => {
     // setCount(newCount);
   };
   const [NewRow, setNewRow] = useState(false);
-  
   const addrow = () =>{
     setNewRow(true);
   }
    const arr1 = Object.keys(currentRecord);
    const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
-
-  return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+   
+   const excelColumns: IExcelColumn[] = columns.map(column => ({
+    title: column.title,
+    dataIndex: column.dataIndex
+  }));
+   const ExportExcel = () => {
+    const excel = new Excel();
+    excel
+      .addSheet("test")
+      .addColumns(excelColumns)
+      .addDataSource(rows, {
+        str2Percent: true
+      })
+      .saveAs(`${name}.xlsx`);
+  };
+return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -394,8 +370,8 @@ const Main: React.FC = () => {
           <Menu
             onClick={onClick}
             mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
+            defaultSelectedKeys={['table3']}
+            defaultOpenKeys={['table3']}
             style={{ height: '200px', borderRight: 0 }}
             items={data}
           />
@@ -436,10 +412,12 @@ const Main: React.FC = () => {
                   flexDirection: 'column',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
-  <Button style={{ marginRight: '10px', color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
-  <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         {/* Chỉnh sửa block (table hoặc người được phân quyền) */}
-</div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
+            <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+            <Button onClick={showModal} style={{ marginRight: '10px'}}><EditOutlined />Chỉnh sửa</Button>  
+            
+            <Button style={{ color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
+          </div>
 <Modal width={750} title="Chỉnh sửa tập dữ liệu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
 </Modal>
@@ -451,12 +429,12 @@ const Main: React.FC = () => {
                         cell: EditableCell,
                       },
                     }}
-                    columns={mergedColumns} 
+                    columns={columns} 
                     dataSource={rows} 
                     key={count}
                     pagination={false}
                     bordered 
-                    style={{borderStyle:'groove', minWidth: '500px'}} // set a minimum width to prevent the table from becoming too small
+                    size="small"
                     scroll={{ y: 500}} // enable horizontal scrolling
                   />
               </Form>
@@ -493,7 +471,10 @@ const Main: React.FC = () => {
                 </div>
                 ) : null
                 } 
-                {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
+                {/* {NewRow ? null : (
+                <button onClick={addrow} className='addrow'>
+                     <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
+                </button>)} */}
                 
           <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
             <div>

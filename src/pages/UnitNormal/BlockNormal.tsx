@@ -1,9 +1,9 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, {useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form,} from 'antd';
-const { Header, Footer, Content, Sider } = Layout;
+const { Header,Content, Sider } = Layout;
 import { Input, Button, Avatar, Tooltip , Menu, theme, Table } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -12,14 +12,15 @@ import { Modal } from 'antd';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
+import { Excel } from "antd-table-saveas-excel";
 import './Block-N.css'
-import { red } from '@ant-design/colors';
+
+interface IExcelColumn{
+  title: string;
+  dataIndex:string;
+}
 interface TableRow {
   [key: string]: any;
-  // key: string;
-  // name: string;
-  // age: number;
-  // address: string;
 }
 
 const props: UploadProps = {
@@ -85,8 +86,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 const Main = () => {
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
-  const cancel = () => {setEditingKey('');};
   const [isEditing1, setIsEditing1] = useState(false);
   const [criteria, setCriteria] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
@@ -95,14 +94,12 @@ const Main = () => {
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
 
-  const edit = (record: TableRow) => {
-    form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-    setEditingKey(record.key);
-    console.log(record)
-    // console.log(record.key)
-    // setEditable(true)
-  };
-  // console.log(editingKey);
+  // const edit = (record: TableRow) => {
+  //   form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
+  //   setEditingKey(record.key);
+  //   console.log(record)
+    
+  // };
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -132,31 +129,31 @@ const Main = () => {
   const addrow = () =>{
     setNewRow(true);
   }
-  const isEditing = (record: TableRow) => record.key === editingKey;
+  // const isEditing = (record: TableRow) => record.key === editingKey;
   
-  const save = async (key: React.Key) => {
-    try {
-      const row = (await form.validateFields()) as TableRow;
+  // const save = async (key: React.Key) => {
+  //   try {
+  //     const row = (await form.validateFields()) as TableRow;
 
-      const newRows = [...rows];
-      const index = newRows.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newRows[index];
-        newRows.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setRows(newRows);
-        setEditingKey('');
-      } else {
-        newRows.push(row);
-        setRows(newRows);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
+  //     const newRows = [...rows];
+  //     const index = newRows.findIndex((item) => key === item.key);
+  //     if (index > -1) {
+  //       const item = newRows[index];
+  //       newRows.splice(index, 1, {
+  //         ...item,
+  //         ...row,
+  //       });
+  //       setRows(newRows);
+  //       setEditingKey('');
+  //     } else {
+  //       newRows.push(row);
+  //       setRows(newRows);
+  //       setEditingKey('');
+  //     }
+  //   } catch (errInfo) {
+  //     console.log('Validate Failed:', errInfo);
+  //   }
+  // };
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -236,6 +233,7 @@ const Main = () => {
       }
     }
   }
+  
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -323,7 +321,7 @@ const Main = () => {
       let k: any = {
         title: 'Actions',
         dataIndex: 'Actions',
-        width: 200,
+        width: 150,
         render: (_: any, record: TableRow) => (
           <>
         <Tooltip title='Edit' color='#646464'>
@@ -358,22 +356,6 @@ const Main = () => {
       console.error('Failed', error);
     }
   };
-  // const mergedColumns = ref2.current.map((col) => {
-  //   // console.log(columns)
-  //   if (!col.editable) {
-  //     return col;
-  //   }
-  //   return {
-  //     ...col,
-  //     onCell: (record: TableRow) => ({
-  //       record,
-  //       inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-  //       dataIndex: col.dataIndex,
-  //       title: col.title,
-  //       editing: isEditing(record),
-  //     }),
-  //   };
-  // });
   const handleButtonClick = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
   };
@@ -392,8 +374,25 @@ const Main = () => {
   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
   const arr3 = arr1
   arr3.pop()
-  arr3.shift()
-  return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+  arr3.shift();
+  
+  const newColumns = columns.slice(0, -1);
+  const excelColumns: IExcelColumn[] = newColumns.map(column => ({
+    title: column.title,
+    dataIndex: column.dataIndex
+  }));
+   const ExportExcel = () => {
+    const excel = new Excel();
+    excel
+      .addSheet("test")
+      .addColumns(excelColumns)
+      .addDataSource(rows, {
+        str2Percent: true
+      })
+      .saveAs(`${name}.xlsx`);
+  };
+  console.log(columns);
+return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -457,7 +456,7 @@ const Main = () => {
               <Content
                 style={{
                   width: '100%',
-                  maxWidth: '1200px',
+                  maxWidth: '1230px',
                   padding: '24px',
                   margin: '0 0px 0px 25px',
                   minHeight: '700px',
@@ -466,7 +465,9 @@ const Main = () => {
                   flexDirection: 'column',
                 }}
               >
-
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'15px' }}>
+            <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+          </div>
                 <Form form={form} component={false}>
                   <Table 
                   components={{
@@ -478,9 +479,10 @@ const Main = () => {
                   dataSource={rows} 
                   key={count}
                   pagination={false}
-                  scroll={{x: 400, y : 550}}
+                  scroll={{ y: 500 }}
                   bordered
-                  style={{borderStyle:'groove'}}/>
+                  size="small"
+                  />
                 </Form>
                 {NewRow ? (
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -514,8 +516,11 @@ const Main = () => {
                   </div>
                 </div>
                 ) : null
-                } 
-                {NewRow ? null : (<Button onClick={addrow} style={{ width: 'fit-content',  marginLeft: 'auto'}}>Add new row</Button>)}
+                }
+                {NewRow ? null : (
+                <button onClick={addrow} className='addrow'>
+                     <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
+                </button>)}
                 <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
