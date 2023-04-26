@@ -1,6 +1,8 @@
+import Cookies from "universal-cookie"
+
 export function getUnit(): string {
     if (process.env.NODE_ENV === "development") {
-        return "hcmut"
+        return "master"
     }
 
     const arr = window.location.hostname.split(".")
@@ -14,6 +16,21 @@ export function getUnit(): string {
     }
 
     return ""
+}
+
+export function getBearerHeader() {
+    const cookies = new Cookies()
+    const access_token = cookies.get("access_token")
+
+    if (access_token) {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        return config
+    }
 }
 
 export function getAPIHost(): string {

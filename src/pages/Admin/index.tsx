@@ -1,5 +1,5 @@
 import React from 'react';
-import { SettingOutlined, BellOutlined, UserOutlined, LineChartOutlined, ApartmentOutlined, TeamOutlined } from '@ant-design/icons';
+import { SettingOutlined, HomeOutlined, BellOutlined, UserOutlined, LineChartOutlined, ApartmentOutlined, TeamOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Badge, Avatar, Layout, Menu, Row, Col, Input } from 'antd';
 import Content from './Content';
@@ -22,18 +22,34 @@ const menu_items: MenuProps['items'] = [UserOutlined, SettingOutlined, BellOutli
 
 const navs = [
     {
-        label: "Dashboard",
-        icon: LineChartOutlined,
+        label: "Trang chủ",
+        icon: HomeOutlined,
         path: "/dashboard",
     },
     {
-        label: "Đơn vị",
+        label: "Đơn vị con",
         icon: ApartmentOutlined,
         path: "/units",
+        children: [
+            {
+                key: "child_1",
+                icon: React.createElement(ApartmentOutlined),
+                label: "Sơ đồ tổ chức"
+            },
+            {
+                key: "child_2",
+                icon: React.createElement(ApartmentOutlined),
+                label: "Sơ đồ tổ chức"
+            }
+        ]
     },
     {
         label: "Quản lý người dùng",
         icon: TeamOutlined,
+    }, 
+    {
+        label: "Cài đặt",
+        icon: SettingOutlined,
     }
 ]
 
@@ -43,6 +59,7 @@ const sider_items: MenuProps['items'] = navs.map(
             key: `slider_items_${index}`,
             icon: React.createElement(obj.icon),
             label: obj.label,
+            children: obj.children
         };
     },
 );
@@ -76,12 +93,14 @@ const App: React.FC = () => {
     const navigate = useNavigate()
 
     const handleSiderClick: MenuProps["onClick"] = (e) => {
-        if (e.key === "slider_items_1")
+        if (e.key === "slider_items_0")
+            navigate("/")
+        else if (e.key === "slider_items_1")
             navigate("/units")
     }
 
     return (
-        <Layout>
+        <Layout style={{ minHeight: '100%' }}>
             <Layout.Sider style={siderStyles} >
                 <Menu
                     mode="inline"
