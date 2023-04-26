@@ -152,7 +152,6 @@ const Main = () => {
     k["name"] = name
     k["value"] = [...kh, ...formValues]
     k["col"] = colName
-    console.log("kkkkk", k)
     try {
       axios.post('http://localhost:5000/add_data?block=hcmut_' + value, k);
     } catch (error) {
@@ -265,27 +264,26 @@ const Main = () => {
         key,
         ...row
       }));
-      // setColumns(column)
       let k: any = {
         title: 'Actions',
         dataIndex: 'Actions',
-        width: 150,
+        width: 110,
         render: (_: any, record: TableRow) => (
           <>
-        <Tooltip title='Edit' color='#646464'>
+        <Tooltip title='Edit' placement="left" color='#646464'>
           <button
-            onClick={() => showEditRecord(record)}
+            onClick={() => {showEditRecord(record), console.log(record)}}
             className='ButtonEdit'
           >
-              <EditOutlined style={{ fontSize: '20px', color: '#767676' }} />
+              <EditOutlined />
           </button>
         </Tooltip>
-        <Tooltip title='Delete' color='#646464'>
+        <Tooltip title='Delete' placement="right" color='#646464'>
           <button 
             onClick={()=> DeleteRerord(record)}
             className='ButtonDelete'
           >
-            <DeleteOutlined style={{ fontSize: '20px', color: '#767676' }} />
+            <DeleteOutlined/>
           </button>
         </Tooltip>
           </>
@@ -295,9 +293,7 @@ const Main = () => {
       column[0].width = 50;
       setCount(row.length)
       setColumns(column)
-      // console.log(transformedList)
       setRows(transformedList)
-      
       setColName(arr[2])
       arr[2].shift()
       setColName1(arr[2])
@@ -311,7 +307,6 @@ const Main = () => {
   const handleCriteria = async ()=>{
     try {
       const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
-      console.log(response)
       let crit: any = decodeURIComponent(response.data["body"])
       setCriteria(crit)
     } catch (error) {
@@ -340,7 +335,6 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-  console.log(columns);
 return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>

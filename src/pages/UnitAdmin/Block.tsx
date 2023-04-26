@@ -107,14 +107,12 @@ const Main: React.FC = () => {
   const [criteria, setCriteria] = useState("");
   const [isEditing1, setIsEditing1] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  // const [editingKey, setEditingKey] = useState<any>("");
   const [ValueEdit, setValueEdit] = useState<any>();
 
   const [EditRecord, setEditRecord] = useState(false);
 
   const [currentRecord, setCurrentRecord] = useState<any>({});
 
-  // const isEditing = (record: TableRow) => record.id === editingKey;
   const handleOk2 = async () => {
     setIsModalOpen2(false);
     try {
@@ -186,36 +184,7 @@ const Main: React.FC = () => {
       },
     });
   };
-  // const handleDelete = async (key: React.Key) => {
-  //   let k: number = Number(key) - 1
-  //   if (ref.current && ref.current.length > 0) {
-  //     const newRows: any = [];
-  //     const entries = Object.entries(ref.current[k]);
-  //     for (const ele of ref.current) {
-  //       if (ele["key"] != key) {
-  //         newRows.push(ele)
-  //       }
-  //     }
-  //     let i: number = 1;
-  //     for (const ele of newRows) {
-  //       ele["key"] = i
-  //       i++
-  //     }
-  //     setRows(newRows);
-  //     setCount(count - 1);
-  //     let request: any = {}
-  //     console.log(ref1.current)
-  //     request["name"] = ref1.current
-  //     request["col"] = [entries[1][0], entries[1][1]]
-  //     console.log(request)
-  //     try {
-  //       // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
-  //       console.log('Delete successfully!');
-  //     } catch (error) {
-  //       console.error('Error creating table:', error);
-  //     }
-  //   }
-  // };
+
   const showEditRecord = (record: TableRow) => {
     setCurrentRecord(record);
     setEditRecord(true);
@@ -246,8 +215,6 @@ const Main: React.FC = () => {
       console.error('Failed', error);
     }
   };
- // console.log(colName);
-
 
   const handleButtonClick = () => {
     if (isEditing1 == true){
@@ -264,21 +231,6 @@ const Main: React.FC = () => {
     setInputValue(event.target.value);
   };
   
-  // const mergedColumns = ref2.current.map((col) => {
-  //   if (!col.editable) {
-  //     return col;
-  //   }
-  //   return {
-  //     ...col,
-  //     onCell: (record: TableRow) => ({
-  //       record,
-  //       inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-  //       dataIndex: col.dataIndex,
-  //       title: col.title,
-  //   //    editing: isEditing(record),
-  //     }),
-  //   };
-  // });
   const handleAddData = async (e: any) => {
     // e.preventDefault();
     // const formValues = Object.values(formData);
@@ -317,6 +269,28 @@ const Main: React.FC = () => {
     // setRows(x)
     // let newCount: number = count + 1
     // setCount(newCount);
+  };
+
+  const DeleteTable = () => {
+    Modal.confirm({
+      title: 'Xóa bảng dữ liệu',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn có chắc chắn muốn xóa bảng dữ liệu này?',
+      okText: 'Có',
+      okType: 'danger',
+      cancelText: 'Không',
+      async onOk() {
+        try {
+          
+        }
+        catch (error) {
+          console.error('Failed', error);
+        }
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   };
   const [NewRow, setNewRow] = useState(false);
   const addrow = () =>{
@@ -414,9 +388,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
               >
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
-            <Button onClick={showModal} style={{ marginRight: '10px'}}><EditOutlined />Chỉnh sửa</Button>  
-            
-            <Button style={{ color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
+            <Button style={{ color: 'red'}} onClick={DeleteTable}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
           </div>
 <Modal width={750} title="Chỉnh sửa tập dữ liệu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
