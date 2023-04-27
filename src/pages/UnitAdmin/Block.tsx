@@ -287,8 +287,6 @@ const Main: React.FC = () => {
         catch (error) {
           console.error('Failed', error);
         }
-        // console.log(data)
-        // console.log(name)
         const filteredArr = data.filter((obj) => obj.label !== name);
         setData(filteredArr)
       },
