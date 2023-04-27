@@ -21,7 +21,11 @@ interface VirtualFolder {
   name: string;
 }
 
-const UnitAdmin = () => {
+interface IProps {
+  name : string;
+}
+
+const Normal = (props: IProps) => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -47,7 +51,7 @@ const UnitAdmin = () => {
   const [colName1, setColName1] = useState([]);
   const handleShowBlock = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/show_folders');
+      const response = await axios.get('http://localhost:5000/show_folders_normal?user='+props.name);
       const response1 = response.data["body"].map((str: string) => {
       return str.replace('hcmut_', '');
       });
@@ -63,9 +67,7 @@ const UnitAdmin = () => {
        return [];
      }
   }
-  const handleAddFolder = (folder: VirtualFolder) => {
-    setVirtualFolders([...virtualFolders, folder]);
-  };
+ 
   const navigate = useNavigate();
 
   function handleClick(value: any){
@@ -143,4 +145,4 @@ const UnitAdmin = () => {
   );
 };
 
-export default UnitAdmin;
+export default Normal;

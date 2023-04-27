@@ -37,7 +37,7 @@ const CreateTable = (props: IProps) => {
     newFields[index].colsname = event.target.value;
     setFields(newFields);
   };
-
+  
   const handleFieldTypeChange = (index: number, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newFields = [...fields];
     newFields[index].type = event.target.value;

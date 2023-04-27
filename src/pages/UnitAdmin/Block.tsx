@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 import './block.css'
 import { Excel } from "antd-table-saveas-excel";
 import CreateTable from '../../Create-table/CreateTable';
+import { create } from 'domain';
 
 interface IExcelColumn{
   title: string;
@@ -81,7 +82,7 @@ const Main: React.FC = () => {
   }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {setIsModalOpen(true);};
+  // const showModal = () => {setIsModalOpen(true);};
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
 
@@ -95,6 +96,8 @@ const Main: React.FC = () => {
   // const cancel = () => {setEditingKey('');};
   
   const [data, setData] = useState<ItemType[]>([])
+  // const ref3 = useRef<ItemType[]>([])
+  // ref3.current = data
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -113,8 +116,6 @@ const Main: React.FC = () => {
   const [criteria, setCriteria] = useState("");
   const [isEditing1, setIsEditing1] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [ValueEdit, setValueEdit] = useState<any>();
-  const [tablesInfo, setTablesInfo] = useState<Table[]>([])
 
   const [EditRecord, setEditRecord] = useState(false);
 
@@ -150,7 +151,7 @@ const Main: React.FC = () => {
       const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
       const data1 = response.data;
       item = data1["body"]
-      items2 = item.map((key) => ({ 
+      items2 = item.map((key) => ({
         key,
         label: `${key}`,
         icon: <TableOutlined/>
@@ -171,32 +172,6 @@ const Main: React.FC = () => {
     setFormData2({ ...formData2, [name]: value });
   };
   
-  const DeleteRerord = () => {
-    Modal.confirm({
-      title: 'Xóa dòng',
-      icon: <ExclamationCircleFilled />,
-      content: 'Bạn có chắc chắn muốn xóa dòng dữ liệu này?',
-      okText: 'Có',
-      okType: 'danger',
-      cancelText: 'Không',
-      async onOk() {
-        try {
-          // await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
-        }
-        catch (error) {
-          console.error('Failed', error);
-        }
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
-  };
-
-  const showEditRecord = (record: TableRow) => {
-    setCurrentRecord(record);
-    setEditRecord(true);
-};
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key) 
@@ -204,8 +179,8 @@ const Main: React.FC = () => {
     try {
       let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
       const response = await axios.get(url);
-      const data = response.data; // extract the data from the response
-      const arr = data["body"];
+      const data1 = response.data; // extract the data from the response
+      const arr = data1["body"];
       column = arr[0]
       row = arr[1]
       const transformedList = row.map(({ key, row }) => ({
@@ -240,46 +215,37 @@ const Main: React.FC = () => {
     setInputValue(event.target.value);
   };
   
-  const handleAddData = async (e: any) => {
-    // e.preventDefault();
-    // const formValues = Object.values(formData);
-    // let k: any = {}
-    // let n: any = ref.current
-    // let kh: any = [1]
-    // if (rows.length != 0) {
-    //   kh = [n[n.length - 1].id + 1]
-    // }
-    // console.log("kkkkk", k)
-    // k["name"] = name
-    // k["value"] = [...kh, ...formValues]
-    // try {
-    //   // await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/add', k);
-    // } catch (error) {
-    //   console.error('Error creating table:', error);
-    // }
-    // let x: any = rows
-    // let z: any = []
-    // let zz: any = []
-    // z = Object.keys(columns).map(k => columns[k])
-    // for (const element of z) {
-    //   zz.push(element["title"])
-    // }
-    // zz.pop()
-    // let zzz: any = {}
-    // zzz["key"] = count + 1;
-    // let i = 0;
-    // let z1 = [...kh, ...formValues]
-    // for (const ele of zz) {
-    //   zzz[ele] = z1[i]
-    //   i++
-    // }
+  const handleAddTable = async () => {
+    let sql: any = "http://localhost:5000/create_tables?name=hcmut_" + value;
+    let request: any = []
+    for (var i in createtable) {
+      let k: Table = {
+        name: '',
+        cols: [],
+        des: []
+      }
+      k.name = createtable[i].name
+      k.cols = createtable[i].cols
+      k.des = createtable[i].des
+      request.push(k)
+    }
+    try {
+      await axios.post(sql, request);
+    }
+    catch (error) {
+      console.error('Failed', error);
+    }
 
-    // x.push(zzz)
-    // setRows(x)
-    // let newCount: number = count + 1
-    // setCount(newCount);
-  };
-
+    const newTable: ItemType = {
+      "key": createtable[0].name,
+      "label": createtable[0].name,
+      "icon": <TableOutlined />
+    }
+    const sup: ItemType[] = [...data];
+    sup.push(newTable)
+    setData(sup)
+    setcreatetable([])
+  }
   const DeleteTable = () => {
     Modal.confirm({
       title: 'Xóa bảng dữ liệu',
@@ -290,14 +256,15 @@ const Main: React.FC = () => {
       cancelText: 'Không',
       async onOk() {
         try {
-          //console.log("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
-          //await axios.delete("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
+          await axios.delete("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
         }
         catch (error) {
           console.error('Failed', error);
         }
         const filteredArr = data.filter((obj) => obj.label !== name);
         setData(filteredArr)
+        setRows([])
+        setColumns([])
       },
       onCancel() {
         console.log('Cancel');
@@ -358,7 +325,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
           <Modal
             title="Thêm bảng"
             open={ShowAddModal}
-            onOk={()=>setShowAddModal(false)}
+            onOk={()=>{setShowAddModal(false),handleAddTable()}}
             onCancel={()=> setShowAddModal(false)}
           > 
           <CreateTable tablesInfo={createtable} setTablesInfo={setcreatetable} /></Modal>
@@ -456,8 +423,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                   height: '32px',
                   width: '60px',
                   cursor: 'pointer'
-                  }} 
-                  onClick={handleAddData}>
+                  }} >
                     Add
                   </button>
                   <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
