@@ -24,11 +24,14 @@ interface TableRow {
 }
 
 const props: UploadProps = {
-  name: 'file',
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  headers: {
-    authorization: 'authorization-text',
+  name: 'upload',
+  method: "POST",
+  headers:{
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST"
   },
+  action: 'http://localhost:5000/upload_files',
   onChange(info) {
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
@@ -391,6 +394,15 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                     <div>{criteria}</div>
                   )}
                 </Modal>
+  
+            <form method="POST" action="http://localhost:5000/upload_files" encType="multipart/form-data">
+              <input type="file" name="upload" />
+              <input type="submit" />
+            </form>
+          
+          {/* <Upload {...props}>
+            <Button icon={<UploadOutlined />}>Upload</Button>
+          </Upload> */}
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>

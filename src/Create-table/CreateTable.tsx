@@ -37,7 +37,7 @@ const CreateTable = (props: IProps) => {
     newFields[index].colsname = event.target.value;
     setFields(newFields);
   };
-
+  
   const handleFieldTypeChange = (index: number, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newFields = [...fields];
     newFields[index].type = event.target.value;
@@ -96,7 +96,7 @@ const CreateTable = (props: IProps) => {
    <form onSubmit={handleSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
   <label style={{paddingLeft: "0px", fontSize: "1.2rem", paddingTop: '10px'}}> 
     Table name:
-    <Input style={{width: "50%", paddingLeft: "0px", marginLeft: "10px"}} type="text" value={Tablename} onChange={handleTableNameChange} />
+    <Input style={{width: "50%",  marginLeft: "10px"}} type="text" value={Tablename} onChange={handleTableNameChange} />
   </label>
   <table style={{borderCollapse: "collapse", marginTop: "20px"}}>
     <thead>
