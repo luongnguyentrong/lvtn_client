@@ -133,11 +133,11 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
   }, []);
   const steps = [ 
     {
-      title: 'First',
+      title: 'Bước 1',
       content: <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} onChange={handleNameBlockChange} />
     },
     {
-      title: 'Second',
+      title: 'Bước 2',
       content: <>
           Chọn cách nhập dữ liệu
       <Select
@@ -153,7 +153,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     </> ,
     },
     {
-      title: 'Last',
+      title: 'Bước cuối',
       content: 
     <div>
       Nhập tiêu chí đầu ra dữ liệu
@@ -219,17 +219,17 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
       <div style={{ marginTop: 10 }}>
         {current < steps.length - 1 && (
           <Button type="primary" onClick={() => next()}>
-            Next
+            Tiếp tục
           </Button>
         )}
         {current === steps.length - 1 && (
           <Button type="primary" onClick={handleDone}>
-            Done
+            Xong
           </Button>
         )}
         {current > 0 && (
           <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-            Previous
+            Quay lại
           </Button>
         )}
       </div>

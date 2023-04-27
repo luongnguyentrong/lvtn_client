@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form } from 'antd';
 const { Header, Content, Sider } = Layout;
-import { Input, Button, Avatar, Menu, theme, Table } from 'antd';
+import { Input, Button, Avatar, Menu, theme, Table,Divider } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined,ExclamationCircleFilled,ExportOutlined ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined,ExclamationCircleFilled,PlusCircleOutlined,ExportOutlined ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -341,6 +341,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
+          <Button style={{marginLeft:'35px', backgroundColor:'#4BAE16', color:'white'}}><PlusCircleOutlined />Thêm bảng</Button>
           <Menu
             onClick={onClick}
             mode="inline"
@@ -350,6 +351,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
             items={data}
           />
           <div>
+          <Divider />
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
             <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
             <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
@@ -388,7 +390,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
               >
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
-            <Button style={{ color: 'red'}} onClick={DeleteTable}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
+            <Button style={{ color: 'red'}} onClick={DeleteTable}><DeleteOutlined />Xóa</Button>                    {/*Xoa Table */}
           </div>
 <Modal width={750} title="Chỉnh sửa tập dữ liệu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
