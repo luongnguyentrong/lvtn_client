@@ -1,5 +1,5 @@
-import { Avatar, Card, Layout, Space, Tag, Typography, theme } from "antd"
-import { HomeOutlined, CrownFilled, TeamOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Layout, Space, Tag, Typography, theme } from "antd"
+import { HomeOutlined, CrownFilled, TeamOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 
 
@@ -46,7 +46,9 @@ export default function () {
 
             <Layout>
                 <Layout.Content style={{ margin: "16px" }}>
-                    <Card title="Tập dữ liệu">
+                    <Card title="Tập dữ liệu" extra={<Button type="primary" onClick={() => {
+                        navigate("/new")
+                    }} icon={<PlusOutlined />}>Tạo dữ liệu mới</Button>}>
                         <Card.Grid style={gridStyle} onClick={() => {
                             navigate("/blocks/1")
                         }}>
