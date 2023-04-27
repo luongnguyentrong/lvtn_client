@@ -281,11 +281,16 @@ const Main: React.FC = () => {
       cancelText: 'Không',
       async onOk() {
         try {
-          
+          //console.log("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
+          //await axios.delete("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
         }
         catch (error) {
           console.error('Failed', error);
         }
+        // console.log(data)
+        // console.log(name)
+        const filteredArr = data.filter((obj) => obj.label !== name);
+        setData(filteredArr)
       },
       onCancel() {
         console.log('Cancel');
