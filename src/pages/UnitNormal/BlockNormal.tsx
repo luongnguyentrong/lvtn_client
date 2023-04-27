@@ -1,7 +1,7 @@
 import React, {useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
-import { Input, Button, Avatar, Tooltip , Menu, theme, Table } from 'antd';
+import { Input, Button, Avatar, Tooltip , Menu, theme, Table,Divider } from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
@@ -23,23 +23,23 @@ interface TableRow {
   [key: string]: any;
 }
 
-const props: UploadProps = {
-  name: 'file',
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  headers: {
-    authorization: 'authorization-text',
-  },
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+// const props: UploadProps = {
+//   name: 'file',
+//   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+//   headers: {
+//     authorization: 'authorization-text',
+//   },
+//   onChange(info) {
+//     if (info.file.status !== 'uploading') {
+//       console.log(info.file, info.fileList);
+//     }
+//     if (info.file.status === 'done') {
+//       message.success(`${info.file.name} file uploaded successfully`);
+//     } else if (info.file.status === 'error') {
+//       message.error(`${info.file.name} file upload failed.`);
+//     }
+//   },
+// };
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -118,7 +118,7 @@ const Main = () => {
   const [currentRecord, setCurrentRecord] = useState<any>({});
 
   const [formData2, setFormData2] = useState({});
-
+  const [function_table,setfunction_table] = useState(false);
   const addrow = () =>{
     setNewRow(true);
   }
@@ -175,6 +175,7 @@ const Main = () => {
       i++
     }
     x.push(zzz)
+    console.log(x);
     setRows(x)
     let newCount: number = count + 1
     setCount(newCount);
@@ -300,6 +301,7 @@ const Main = () => {
     } catch (error) {
       console.error('Failed', error);
     }
+    setfunction_table(true)
   };
   const handleButtonClick = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
@@ -317,8 +319,14 @@ const Main = () => {
   const arr1 = Object.keys(currentRecord);
   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
   const arr3 = arr1
-  arr3.pop()
-  arr3.shift();
+  const index = arr3.indexOf('key')
+  if (index > -1){
+    arr3.splice(index,1)
+  }
+  const index2 = arr3.indexOf('id')
+  if (index > -1){
+    arr3.splice(index2,1)
+  }
   
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
@@ -372,6 +380,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
             items={data}
           />
           <div>
+          <Divider />
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
             <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
             <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
@@ -391,6 +400,9 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                     <div>{criteria}</div>
                   )}
                 </Modal>
+              {/* <Upload {...props}>
+                <Button icon={<UploadOutlined />} style={{marginLeft:'23px'}}>Click to Upload</Button>
+              </Upload> */}
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
@@ -409,7 +421,9 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'15px' }}>
+          {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'5px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+          </div>) : null} 
           </div>
                 <Form form={form} component={false}>
                   <Table 

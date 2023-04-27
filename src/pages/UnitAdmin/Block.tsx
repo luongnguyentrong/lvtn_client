@@ -120,7 +120,7 @@ const Main: React.FC = () => {
 
   const [currentRecord, setCurrentRecord] = useState<any>({});
   const [createtable, setcreatetable] = useState<Table[]>([]);
-
+  const [function_table,setfunction_table] = useState(false);
   const handleOk2 = async () => {
     setIsModalOpen2(false);
     try {
@@ -222,6 +222,7 @@ const Main: React.FC = () => {
     } catch (error) {
       console.error('Failed', error);
     }
+    setfunction_table(true)
   };
 
   const handleButtonClick = () => {
@@ -324,7 +325,6 @@ const Main: React.FC = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-  console.log(createtable);
 return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -365,8 +365,8 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
           <Menu
             onClick={onClick}
             mode="inline"
-            defaultSelectedKeys={['table3']}
-            defaultOpenKeys={['table3']}
+            defaultSelectedKeys={['1']}
+            defaultOpenKeys={['sub1']}
             style={{ height: '200px', borderRight: 0 }}
             items={data}
           />
@@ -408,10 +408,10 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                   flexDirection: 'column',
                 }}
               >
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
+          {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
             <Button style={{ color: 'red'}} onClick={DeleteTable}><DeleteOutlined />Xóa</Button>                    {/*Xoa Table */}
-          </div>
+          </div>) : null}  
 <Modal width={750} title="Chỉnh sửa tập dữ liệu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
 </Modal>
