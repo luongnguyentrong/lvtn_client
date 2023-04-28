@@ -1,11 +1,55 @@
 import { Button, Divider, Empty, Layout, Steps, Typography, message, theme } from "antd"
-import { useState } from "react";
-import Define from "./Steps/Define";
+import { useEffect, useState } from "react";
 import DefineData from "./Steps/DefineData";
+import { useLocation } from "react-router-dom";
+
+export interface ITable {
+    id: string
+    type: "table"
+    name: string
+    description: string
+    columns: Array<{
+        id: string
+        name: string
+        data_type: string,
+        description: string
+    }>
+}
+
+export interface IFolder {
+    type: "folder",
+    name: "string"
+}
+
+interface IBlock {
+    name: string
+    description: string
+    items: Array<ITable | IFolder>
+}
 
 export default function () {
     const { token } = theme.useToken();
     const [current, setCurrent] = useState(0);
+    const location = useLocation()
+    const [blockData, setBlockData] = useState<IBlock | undefined>()
+
+    useEffect(() => {
+        if (location.state.block) {
+            setBlockData(location.state.block)
+        }
+    }, [])
+
+    const onDefineSuccess = (data: any) => {
+        if (blockData !== undefined) {
+            setBlockData({
+                ...blockData,
+                items: [
+                    ...blockData.items,
+                    data
+                ]
+            })
+        }
+    }
 
     const next = () => {
         setCurrent(current + 1);
@@ -26,15 +70,11 @@ export default function () {
 
     const items = [
         {
-            title: 'Thông tin chung',
-            content: <Define />,
-        },
-        {
             title: 'Định nghĩa dữ liệu',
-            content: <DefineData />,
+            content: <DefineData onDefineSuccess={onDefineSuccess} items={blockData === undefined ? [] : blockData.items} />,
         },
         {
-            title: 'Last',
+            title: 'Khởi tạo dữ liệu',
             content: 'Last-content',
         },
     ];

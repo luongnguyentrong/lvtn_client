@@ -1,8 +1,129 @@
-import { Button, Card, Empty, Form, Input, InputNumber, Modal, Select, Space } from "antd";
-import { TableOutlined, PlusOutlined, FolderAddOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Empty, Form, Space, Table, TableProps } from "antd";
+import { TableOutlined, FolderAddOutlined } from '@ant-design/icons';
 import { useState } from "react";
+import uniqid from 'uniqid';
 
-export default function () {
+
+import { ITable, IFolder } from '../NewBlock'
+import DefineSheet from "../Modals/DefineSheet";
+import { TableColumnsType } from 'antd'
+
+
+interface IProps {
+    onDefineSuccess: (data: any) => void
+    items: Array<IFolder | ITable>
+}
+
+interface DataType {
+    key: React.Key;
+    name: string;
+    age: number;
+    address: string;
+}
+
+const columns: TableColumnsType<DataType> = [
+    {
+        title: 'Name',
+        dataIndex: 'name',
+        filters: [
+            {
+                text: 'Joe',
+                value: 'Joe',
+            },
+            {
+                text: 'Category 1',
+                value: 'Category 1',
+                children: [
+                    {
+                        text: 'Yellow',
+                        value: 'Yellow',
+                    },
+                    {
+                        text: 'Pink',
+                        value: 'Pink',
+                    },
+                ],
+            },
+            {
+                text: 'Category 2',
+                value: 'Category 2',
+                children: [
+                    {
+                        text: 'Green',
+                        value: 'Green',
+                    },
+                    {
+                        text: 'Black',
+                        value: 'Black',
+                    },
+                ],
+            },
+        ],
+        filterMode: 'tree',
+        filterSearch: true,
+        onFilter: (value: string, record) => record.name.includes(value),
+        width: '30%',
+    },
+    {
+        title: 'Age',
+        dataIndex: 'age',
+        sorter: (a, b) => a.age - b.age,
+    },
+    {
+        title: 'Address',
+        dataIndex: 'address',
+        filters: [
+            {
+                text: 'London',
+                value: 'London',
+            },
+            {
+                text: 'New York',
+                value: 'New York',
+            },
+        ],
+        onFilter: (value: string, record: DataType) => record.address.startsWith(value),
+        filterSearch: true,
+        width: '40%',
+    },
+];
+
+const data: DataType[] = [
+    {
+        key: '1',
+        name: 'John Brown',
+        age: 32,
+        address: 'New York No. 1 Lake Park',
+    },
+    {
+        key: '2',
+        name: 'Jim Green',
+        age: 42,
+        address: 'London No. 1 Lake Park',
+    },
+    {
+        key: '3',
+        name: 'Joe Black',
+        age: 32,
+        address: 'Sydney No. 1 Lake Park',
+    },
+    {
+        key: '4',
+        name: 'Jim Red',
+        age: 32,
+        address: 'London No. 2 Lake Park',
+    },
+];
+
+function DisplayItems(props: { items: Array<IFolder | ITable> }) {
+    const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
+    };
+
+    return <Table columns={columns} dataSource={data} onChange={onChange} />;
+}
+
+export default function (props: IProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
 
@@ -11,20 +132,22 @@ export default function () {
     };
 
     const handleOk = () => {
-        setIsModalOpen(false);
+        form.validateFields().then((res: ITable | IFolder | undefined) => {
+            if (res && res.type === "table") {
+                if (res.id === undefined) {
+                    res.id = uniqid()
+                }
+            }
+
+            props.onDefineSuccess(res)
+            setIsModalOpen(false);
+        })
     };
 
     const handleCancel = () => {
         setIsModalOpen(false);
     };
 
-    const onFinish = (values: any) => {
-        console.log('Received values of form:', values);
-    };
-
-    const handleChange = () => {
-        form.setFieldsValue({ sights: [] });
-    };
 
     return <div style={{ padding: "16px" }}>
         <Card extra={
@@ -37,113 +160,10 @@ export default function () {
                 </Button>
             </Space>}>
 
-            <Empty />
+            {props.items.length === 0 ? <Empty /> : <DisplayItems items={props.items} />}
+
         </Card>
 
-        <Modal title="Định nghĩa table" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <Form
-                name="dynamic_form_item"
-                onFinish={onFinish}
-                style={{ maxWidth: 600 }}
-                layout="vertical"
-            >
-                <Form.Item
-                    label="Tên table"
-                    name="table_display_name"
-                    rules={[{ required: true, message: 'Hãy điền tên của table' }]}>
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    label="Mã table"
-                    name="table_name"
-                    rules={[{ required: true, message: 'Hãy điền mã của table' }]}>
-                    <Input />
-                </Form.Item>
-
-
-                <Form.List
-                    name="columns"
-                    rules={[
-                        {
-                            validator: async (_, names) => {
-                                if (!names || names.length < 2) {
-                                    return Promise.reject(new Error('Table phải có ít nhất một column!'));
-                                }
-                            },
-                        },
-                    ]}
-                >
-                    {(fields, { add, remove }, { errors }) => (
-                        <>
-                            {fields.map((field, index) => (
-                                <Form.Item
-                                    label={index === 0 ? 'Định nghĩa column' : ''}
-                                    required={false}
-                                    key={field.key}
-
-                                    rules={[
-                                        {
-                                            required: true,
-                                            whitespace: true,
-                                            message: "Please input passenger's name or delete this field.",
-                                        },
-                                    ]}
-                                >
-                                    <Space>
-                                        <Form.Item
-                                            name={['column', 'name']}
-                                            noStyle
-                                            rules={[{ required: true, message: 'Hãy điền tên cột!' }]}
-                                        >
-                                            <Input placeholder="Tên cột" />
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name={['column', 'type']}
-                                            noStyle
-                                            rules={[{ required: true, message: 'Hãy điền tên cột!' }]}
-                                        >
-                                            <Select placeholder="Select province">
-                                                <Select.Option value="Zhejiang">Zhejiang</Select.Option>
-                                                <Select.Option value="Jiangsu">Jiangsu</Select.Option>
-                                            </Select>
-                                        </Form.Item>
-
-                                        <Form.Item
-                                            name={['column', 'description']}
-                                            noStyle
-                                        >
-                                            <Input placeholder="Mô tả" />
-                                        </Form.Item>
-
-                                        <MinusCircleOutlined
-                                            className="dynamic-delete-button"
-                                            onClick={() => remove(field.name)}
-                                        />
-                                    </Space>
-                                </Form.Item>
-                            ))}
-                            <Form.Item>
-                                <Button
-                                    type="dashed"
-                                    onClick={() => add()}
-                                    icon={<PlusOutlined />}
-                                >
-                                    Add field
-                                </Button>
-                                <Form.ErrorList errors={errors} />
-                            </Form.Item>
-                        </>
-                    )}
-                </Form.List>
-
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
-                </Form.Item>
-            </Form>
-        </Modal>
-    </div>
+        <DefineSheet form={form} isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} />
+    </div >
 }
