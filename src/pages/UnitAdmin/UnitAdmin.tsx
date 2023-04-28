@@ -129,16 +129,6 @@ const UnitAdmin = () => {
         <Modal    
           title='Sửa tên tập dữ liệu'
           open={open}
-          onOk={async () => {setOpen(false);
-            try {
-              console.log(EditBlockName);
-              await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
-            }
-            catch (error) {
-              console.error('Failed', error);
-            }
-          }
-        }
           onCancel={() => {setOpen(false);}}
           maskClosable={false}
           mask={false}

@@ -122,6 +122,7 @@ const Main = () => {
 
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
+  const [ListFile, setListFile] = useState([]);
   const addrow = () =>{
     setNewRow(true);
   }
@@ -346,6 +347,28 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
+  const [fileName, setFileName] = useState('');
+
+  function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+    }
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    // You can add your own code here to handle the form submission
+    // For example, you can use the Fetch API to send an AJAX request to the server
+  }
+  const ShowListFile =  async() => {
+    const x = [];
+    try {
+      const reponse = ""
+    } catch (error) {
+      
+    }
+  }
 return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -403,15 +426,13 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                     <div>{criteria}</div>
                   )}
                 </Modal>
-  
-            <form method="POST" action="http://localhost:5000/upload_files" encType="multipart/form-data">
-              <input type="file" name="upload" />
-              <input type="submit" />
-            </form>
-          
-          {/* <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Upload</Button>
-          </Upload> */}
+              <form method="POST" action="http://localhost:5000/upload_files" encType="multipart/form-data" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <label htmlFor="upload">Select a file to upload:</label>
+                  <Button icon={<UploadOutlined />}><input type="file" name="upload" id="upload" onChange={handleFileUpload}/></Button>
+                  
+                  {fileName && <span>{fileName}</span>}
+                  <button type="submit">Upload</button>
+    </form>
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>

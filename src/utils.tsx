@@ -2,7 +2,7 @@ import Cookies from "universal-cookie"
 
 export function getUnit(): string {
     if (process.env.NODE_ENV === "development") {
-        return "master"
+        return "hcmut"
     }
 
     const arr = window.location.hostname.split(".")
