@@ -21,6 +21,13 @@ interface IProps {
 }
 
 const CreateTable = (props: IProps) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const error = (message: any) => {
+    messageApi.open({
+      type: 'error',
+      content: message,
+    });
+  };
   const formRef: RefObject<HTMLFormElement> = useRef(null);
   const [Tablename, setTableName] = useState<string>("");
   const [fields, setFields] = useState<cols[]>([{ colsname: "", type: "", descript: ""}]);
@@ -30,7 +37,7 @@ const CreateTable = (props: IProps) => {
     newFields[index].colsname = event.target.value;
     setFields(newFields);
   };
-
+  
   const handleFieldTypeChange = (index: number, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newFields = [...fields];
     newFields[index].type = event.target.value;
@@ -58,6 +65,12 @@ const CreateTable = (props: IProps) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    for (var x of props.tablesInfo){
+      if (x.name == Tablename){
+          error("Tên table đã tồn tại")
+          return
+      }
+    }
     var cols: string[] = []
     let k : Table = {name: "", cols: [], des: []}
     let sub: string[] = []
@@ -79,10 +92,11 @@ const CreateTable = (props: IProps) => {
 
   return (
     <div>
+      {contextHolder} 
    <form onSubmit={handleSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
   <label style={{paddingLeft: "0px", fontSize: "1.2rem", paddingTop: '10px'}}> 
     Table name:
-    <Input style={{width: "50%", paddingLeft: "0px", marginLeft: "10px"}} type="text" value={Tablename} onChange={handleTableNameChange} />
+    <Input style={{width: "50%",  marginLeft: "10px"}} type="text" value={Tablename} onChange={handleTableNameChange} />
   </label>
   <table style={{borderCollapse: "collapse", marginTop: "20px"}}>
     <thead>

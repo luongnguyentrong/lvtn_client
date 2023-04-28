@@ -19,7 +19,19 @@ interface Table {
   des: string[];
 }
 
-const CreateBlock: React.FC = () => {
+interface VirtualFolder {
+  name: string;
+}
+
+interface IProps {
+  folders: VirtualFolder[]
+  Modal: boolean
+  setModal: React.Dispatch<React.SetStateAction<boolean>>
+  key: number
+  // reset: boolean
+}
+
+const CreateBlock: React.FC<IProps> = (props: IProps) => {
     const [TypeFile, setTypeFile] = useState<string>("");
     const { TextArea } = Input;
     const [tablesInfo, setTablesInfo] = useState<Table[]>([])
@@ -27,9 +39,15 @@ const CreateBlock: React.FC = () => {
     const [InputDes,setInputDes] = useState<string>("");
     const [Users,setUsers] = useState<User[]>([])
     const [addUser,setAddUser] = useState<string>("")
+    const [current, setCurrent] = useState(0);
+  
     const handleNameBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameblock(event.target.value);
+    console.log(Nameblock);
   };
+    const handleLoad = () =>{
+      setCurrent(0)
+    }
     const handleUserChange = (value: string) => {
       setAddUser(value) 
     }
@@ -50,6 +68,7 @@ const CreateBlock: React.FC = () => {
       console.error('Error creating database:', error);
       }
       try {
+        console.log(nameBlock)
         let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(nameBlock);
         let request : any=[]
         for (var i in tablesInfo){
@@ -88,7 +107,12 @@ const CreateBlock: React.FC = () => {
       } catch (error) {
       console.error('Error', error);
       }
-      
+    props.setModal(false)
+    setNameblock("")
+    setTablesInfo([])
+    setCurrent(0)
+    setInputDes("")
+    setUsers([])
   }
 
   async function getUsers(){
@@ -109,11 +133,11 @@ const CreateBlock: React.FC = () => {
   }, []);
   const steps = [ 
     {
-      title: 'First',
+      title: 'Bước 1',
       content: <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} onChange={handleNameBlockChange} />
     },
     {
-      title: 'Second',
+      title: 'Bước 2',
       content: <>
           Chọn cách nhập dữ liệu
       <Select
@@ -129,7 +153,7 @@ const CreateBlock: React.FC = () => {
     </> ,
     },
     {
-      title: 'Last',
+      title: 'Bước cuối',
       content: 
     <div>
       Nhập tiêu chí đầu ra dữ liệu
@@ -145,10 +169,31 @@ const CreateBlock: React.FC = () => {
   ];
     
   const { token } = theme.useToken();
-  const [current, setCurrent] = useState(0);
-
+ 
+  const [messageApi, contextHolder] = message.useMessage();
+  const error = (message: any) => {
+    messageApi.open({
+      type: 'error',
+      content: message,
+    });
+  };
+  
   const next = () => {
-    setCurrent(current + 1);
+    if (current == 0){
+      let flag :any = 0;
+      for (var x of props.folders){
+          if (x.name == Nameblock){
+              error("Tên tập dữ liệu đã tồn tại")
+              flag = 1
+          }
+      }
+      if(Nameblock ==""){
+        error("Tên tập dữ liệu không được để trống")
+        flag = 1
+      }
+      if (flag == 0) {setCurrent(current + 1);}
+    }
+    else {setCurrent(current + 1);}
   };
 
   
@@ -168,23 +213,23 @@ const CreateBlock: React.FC = () => {
     marginTop:30,
   };
   return (
-    <> <div style={{width: "700px"}}>
+    <>{contextHolder}<div key ={props.key} style={{width: "700px"}}>
       <Steps current={current} items={items} />
       <div style={contentStyle}>{ steps[current].content}</div>
       <div style={{ marginTop: 10 }}>
         {current < steps.length - 1 && (
           <Button type="primary" onClick={() => next()}>
-            Next
+            Tiếp tục
           </Button>
         )}
         {current === steps.length - 1 && (
           <Button type="primary" onClick={handleDone}>
-            Done
+            Xong
           </Button>
         )}
         {current > 0 && (
           <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-            Previous
+            Quay lại
           </Button>
         )}
       </div>

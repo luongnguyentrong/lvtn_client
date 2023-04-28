@@ -1,9 +1,9 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography } from 'antd';
-const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table } from 'antd';
+import React, { useRef, useState } from 'react';
+import { Layout, Row, Col, InputNumber, Form } from 'antd';
+const { Header, Content, Sider } = Layout;
+import { Input, Button, Avatar, Menu, theme, Table,Divider } from 'antd';
 import type { MenuProps } from 'antd';
-import { BellFilled, UserOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import { BellOutlined, UserOutlined,ExclamationCircleFilled,PlusCircleOutlined,ExportOutlined ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -11,9 +11,17 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
 import CreateBlock from './CreateBlock';
 import EditBlock from './EditBlock';
-import { FaFileExcel } from 'react-icons/fa';
 import { useLocation } from "react-router-dom";
 import './block.css'
+import { Excel } from "antd-table-saveas-excel";
+import CreateTable from '../../Create-table/CreateTable';
+import { create } from 'domain';
+
+interface IExcelColumn{
+  title: string;
+  dataIndex:string;
+}
+
 interface TableRow {
   [key: string]: any;
 }
@@ -62,29 +70,34 @@ const EditableCell: React.FC<EditableCellProps> = ({
   );
 };
 
-const Main = () => {
+const Main: React.FC = () => {
   const location = useLocation();
   const value = location.state;
  
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState(''); 
+  interface Table {
+    name: string;
+    cols: string[];
+    des: string[];
+  }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {setIsModalOpen(true);};
+  // const showModal = () => {setIsModalOpen(true);};
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
 
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const showModal2 = () => {setIsModalOpen2(true);};
-  const handleOk2 = () => {setIsModalOpen2(false);};
+  const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
+  
+  const [ShowAddModal,setShowAddModal] = useState(false);
+
   const handleCancel2 = () => {setIsModalOpen2(false);};
 
-  const cancel = () => {setEditingKey('');};
-
-  const edit = (record: Partial<TableRow> & { key: React.Key }) => {
-    form.setFieldsValue({ id: '', col1: '', col2: '', ...record });
-  };
+  // const cancel = () => {setEditingKey('');};
+  
   const [data, setData] = useState<ItemType[]>([])
+  // const ref3 = useRef<ItemType[]>([])
+  // ref3.current = data
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -98,31 +111,38 @@ const Main = () => {
   const [colName, setColName] = useState([]);
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
+  const [formData2, setFormData2] = useState({});
   const [colName1, setColName1] = useState([]);
-  const isEditing = (record: TableRow) => record.key === editingKey;
-  const save = async (key: React.Key) => {
-    try {
-      const row = (await form.validateFields()) as TableRow;
+  const [criteria, setCriteria] = useState("");
+  const [isEditing1, setIsEditing1] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
-      const newRows = [...rows];
-      const index = newRows.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newRows[index];
-        newRows.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setRows(newRows);
-        setEditingKey('');
-      } else {
-        newRows.push(row);
-        setRows(newRows);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+  const [EditRecord, setEditRecord] = useState(false);
+
+  const [currentRecord, setCurrentRecord] = useState<any>({});
+  const [createtable, setcreatetable] = useState<Table[]>([]);
+  const [function_table,setfunction_table] = useState(false);
+  const handleOk2 = async () => {
+    setIsModalOpen2(false);
+    try {
+      await axios.post('http://localhost:5000/edit_criteria?block=hcmut_' + value+'&new=' +encodeURIComponent(inputValue));
+    } catch (error) {
+      console.error('Failed', error);
     }
+    setIsEditing1(false)
   };
+
+  const handleCriteria = async ()=>{
+    try {
+      const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
+      console.log(response)
+      let crit: any = decodeURIComponent(response.data["body"])
+      setCriteria(crit)
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
+  }
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -134,6 +154,7 @@ const Main = () => {
       items2 = item.map((key) => ({
         key,
         label: `${key}`,
+        icon: <TableOutlined/>
       }));
       setData(items2)
     } catch (error) {
@@ -145,38 +166,12 @@ const Main = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
-  const handleDelete = async (key: React.Key) => {
-    let k: number = Number(key) - 1
-    if (ref.current && ref.current.length > 0) {
-      const newRows: any = [];
-      const entries = Object.entries(ref.current[k]);
-      for (const ele of ref.current) {
-        if (ele["key"] != key) {
-          newRows.push(ele)
-        }
-      }
-      let i: number = 1;
-      for (const ele of newRows) {
-        ele["key"] = i
-        i++
-      }
-      setRows(newRows);
-      setCount(count - 1);
-      let request: any = {}
-      console.log(ref1.current)
-      request["name"] = ref1.current
-      request["col"] = [entries[1][0], entries[1][1]]
-      console.log(request)
-      try {
-        await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/delete', request);
-        console.log('Delete successfully!');
-      } catch (error) {
-        console.error('Error creating table:', error);
-      }
-    }
-  };
 
+  const handleChange2 = (e: any) => {
+    const { name, value } = e.target;
+    setFormData2({ ...formData2, [name]: value });
+  };
+  
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key) 
@@ -184,14 +179,15 @@ const Main = () => {
     try {
       let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
       const response = await axios.get(url);
-      const data = response.data; // extract the data from the response
-      const arr = data["body"];
+      const data1 = response.data; // extract the data from the response
+      const arr = data1["body"];
       column = arr[0]
       row = arr[1]
       const transformedList = row.map(({ key, row }) => ({
         key,
         ...row
       }));
+      column[0].width = 50;
       setCount(row.length)
       setRows(transformedList)
       setColumns(column)
@@ -201,50 +197,138 @@ const Main = () => {
     } catch (error) {
       console.error('Failed', error);
     }
+    setfunction_table(true)
   };
-  const mergedColumns = ref2.current.map((col) => {
-    if (!col.editable) {
-      return col;
+
+  const handleButtonClick = () => {
+    if (isEditing1 == true){
+        setCriteria(inputValue)
     }
-    return {
-      ...col,
-      onCell: (record: TableRow) => ({
-        record,
-        inputType: col.dataIndex === 'col1' ? 'col2' : 'text',
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
-  // const FileName = ({ name:string }) => <span>{name}.xlsx</span>;
-  return (<Layout onLoad={getMenuItems}>
-    <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+    else{
+      setInputValue(criteria)
+    }
+    
+    setIsEditing1(!isEditing1);
+    // setInputValue(criteria);
+  };
+  const handleInputChange = (event: any) => {
+    setInputValue(event.target.value);
+  };
+  
+  const handleAddTable = async () => {
+    let sql: any = "http://localhost:5000/create_tables?name=hcmut_" + value;
+    let request: any = []
+    for (var i in createtable) {
+      let k: Table = {
+        name: '',
+        cols: [],
+        des: []
+      }
+      k.name = createtable[i].name
+      k.cols = createtable[i].cols
+      k.des = createtable[i].des
+      request.push(k)
+    }
+    try {
+      await axios.post(sql, request);
+    }
+    catch (error) {
+      console.error('Failed', error);
+    }
+
+    const newTable: ItemType = {
+      "key": createtable[0].name,
+      "label": createtable[0].name,
+      "icon": <TableOutlined />
+    }
+    const sup: ItemType[] = [...data];
+    sup.push(newTable)
+    setData(sup)
+    setcreatetable([])
+  }
+  const DeleteTable = () => {
+    Modal.confirm({
+      title: 'Xóa bảng dữ liệu',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn có chắc chắn muốn xóa bảng dữ liệu này?',
+      okText: 'Có',
+      okType: 'danger',
+      cancelText: 'Không',
+      async onOk() {
+        try {
+          await axios.delete("http://localhost:5000/delete_table?block=hcmut_" + value + "&table=" + name)
+        }
+        catch (error) {
+          console.error('Failed', error);
+        }
+        const filteredArr = data.filter((obj) => obj.label !== name);
+        setData(filteredArr)
+        setRows([])
+        setColumns([])
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+  const [NewRow, setNewRow] = useState(false);
+  const addrow = () =>{
+    setNewRow(true);
+  }
+   const arr1 = Object.keys(currentRecord);
+   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
+   
+   const excelColumns: IExcelColumn[] = columns.map(column => ({
+    title: column.title,
+    dataIndex: column.dataIndex
+  }));
+   const ExportExcel = () => {
+    const excel = new Excel();
+    excel
+      .addSheet("test")
+      .addColumns(excelColumns)
+      .addDataSource(rows, {
+        str2Percent: true
+      })
+      .saveAs(`${name}.xlsx`);
+  };
+return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+   <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-    <Content style={{ width: '100%', height: '1000px', margin: '20px 0px 0px 0px' }}>
+    <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
+          <Button style={{marginLeft:'35px', backgroundColor:'#4BAE16', color:'white'}} onClick={()=> setShowAddModal(true)}><PlusCircleOutlined />
+          Thêm bảng</Button>
+          <Modal
+            title="Thêm bảng"
+            open={ShowAddModal}
+            onOk={()=>{setShowAddModal(false),handleAddTable()}}
+            onCancel={()=> setShowAddModal(false)}
+          > 
+          <CreateTable tablesInfo={createtable} setTablesInfo={setcreatetable} /></Modal>
           <Menu
             onClick={onClick}
             mode="inline"
@@ -254,6 +338,7 @@ const Main = () => {
             items={data}
           />
           <div>
+          <Divider />
             <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
             <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
             <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
@@ -261,42 +346,65 @@ const Main = () => {
                     <Button key="OK" type="primary" onClick={handleOk2}>
                       OK
                     </Button>,
-  ]}>
-              <div>Làm t báo cáo</div> 
+                  ]}>
+                    <Button onClick={handleButtonClick}><EditOutlined/>Chỉnh sửa</Button> 
+                  {isEditing1 ? (
+                    <Input
+                      placeholder={criteria}
+                      value={inputValue}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    <div>{criteria}</div>
+                  )}
                 </Modal>
           </div>
         </Sider>
-        <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+        <Content style={{ width: '100%', height: '720px',backgroundColor:'#E8E8E8' }}>
           <Layout>
-            <Layout style={{ padding: '0 0px 0px' }}>
+            <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content
                 style={{
                   width: '100%',
-                  maxWidth: '1280px',
+                  maxWidth: '1230px',
                   padding: '24px',
                   margin: '0 0px 0px 25px',
-                  minHeight: '280px',
+                  minHeight: '700px',
                   background: colorBgContainer,
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-  <Button style={{ marginRight: '10px', color: 'red' }}><DeleteOutlined />Xóa</Button>                    {/*Xoa block */}
-  <Button onClick={showModal}><EditOutlined />Chỉnh sửa</Button>         {/* Chỉnh sửa block (table hoặc người được phân quyền) */}
-</div>
+          {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'25px' }}>
+            <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+            <Button style={{ color: 'red'}} onClick={DeleteTable}><DeleteOutlined />Xóa</Button>                    {/*Xoa Table */}
+          </div>) : null}  
 <Modal width={750} title="Chỉnh sửa tập dữ liệu" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
   <EditBlock />
 </Modal>
 
-                <br />
-                <br />
+              <Form form={form} component={false} style={{ width: '100%', overflowX: 'auto' }} >
+                 <Table 
+                    components={{
+                      body: {
+                        cell: EditableCell,
+                      },
+                    }}
+                    columns={columns} 
+                    dataSource={rows} 
+                    key={count}
+                    pagination={false}
+                    bordered 
+                    size="small"
+                    scroll={{ y: 500}} // enable horizontal scrolling
+                  />
+              </Form>
+                {NewRow ? (
                 <div style={{ display: "flex", alignItems: "center" }}>
                   {colName1.map((field) => (
                     <div key={field} className="form-field">
                       <label htmlFor={field}><h4>{field}</h4></label>
-                      <input
+                      <Input
                         type="text"
                         id={field}
                         name={field}
@@ -305,19 +413,51 @@ const Main = () => {
                       />
                     </div>
                   ))}
+                  <div style={{marginTop: '23px'}}>
+                  <button type='submit'
+                  style={{backgroundColor: "#4CAF50", 
+                  color: "#fff", 
+                  margin:'0 7px', 
+                  border: "none", 
+                  borderRadius: "5px",
+                  height: '32px',
+                  width: '60px',
+                  cursor: 'pointer'
+                  }} >
+                    Add
+                  </button>
+                  <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
+                  </div>
                 </div>
-              {rows.length === 0 ? null : (
-                <Table dataSource={rows} columns={columns}/>
-                )}
+                ) : null
+                } 
+                {/* {NewRow ? null : (
+                <button onClick={addrow} className='addrow'>
+                     <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
+                </button>)} */}
+                
+          <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), console.log(formData2)}} onCancel={()=>setEditRecord(false)}>
+            <div>
+                {
+                arr1 && arr1.map((field:any) => (
+                    <div key={field} className="form-field">
+                        <label htmlFor={field}><h4>{field}</h4></label>
+                        <Input
+                            type="text"
+                            id={field}
+                            name={field}
+                            onChange={handleChange2}
+                        />
+                    </div>
+                ))}
+            </div>
+          </Modal>
               </Content>
             </Layout>
           </Layout>
         </Content>
       </Layout>
     </Content>
-
-
-    <Footer >Footer</Footer>
 
   </Layout>
   );

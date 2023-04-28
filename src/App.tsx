@@ -27,6 +27,7 @@ function getAuthParams() {
 function App() {
     const [mainRole, setMainRole] = useState<string>("")
     const navigate = useNavigate()
+    const [username, setUserName] = useState<string>("")
 
     useEffect(() => {
         const cookies = new Cookies()
@@ -47,6 +48,7 @@ function App() {
 
             axios.post(userinfo_endpoint, {}, config).then((res) => {
                 if (res.status === 200) {
+                    console.log(res.data)
                     if (res.data.roles && Array.isArray(res.data.roles)) {
                         const roles: string[] = res.data.roles
 
@@ -56,6 +58,7 @@ function App() {
                             setMainRole("unit_admin")
                         } else if (roles.includes("unit_normal")) {
                             setMainRole("unit_normal")
+                            setUserName(res.data["preferred_username"])
                         }
                     }
                 }
@@ -78,7 +81,7 @@ function App() {
             return <UnitAdmin />
 
         case "unit_normal":
-            return <Normal />
+            return <Normal name={username}/>
 
         default:
             return <Loading />

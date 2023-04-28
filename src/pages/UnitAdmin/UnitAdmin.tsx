@@ -1,20 +1,45 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography} from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space } from 'antd';
+import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space, Card  } from 'antd';
 import { message, Steps, Select } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { BellOutlined, BellFilled, DatabaseTwoTone, UserOutlined} from '@ant-design/icons';
+import { BellOutlined, DatabaseTwoTone, UserOutlined,EllipsisOutlined, ExclamationCircleFilled,DeleteOutlined,EditOutlined } from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { Modal } from 'antd';
-import CreateTable from '../../Create-table/CreateTable';
+import './Unitadmin.css';
 import CreateBlock from './CreateBlock';
-import Block from './Block';
-import './Unitadmin.css'
-import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
+import { getUnit } from '../../utils';
+import CreateTable from '../../Create-table/CreateTable';
+
+interface Table {
+  name: string;
+  cols: string[];
+}
+
+interface User{
+  value: string;
+  label: string;
+}
+
+interface Table {
+  name: string;
+  cols: string[];
+  des: string[];
+}
+
+interface VirtualFolder {
+  name: string;
+}
+
+interface IProps {
+  folders: VirtualFolder[]
+}
+//////////////////////////////////////////////////////////////////////////
+const { confirm } = Modal;
 
 
 interface TableRow {
@@ -27,30 +52,27 @@ interface VirtualFolder {
 const UnitAdmin = () => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
   const showModal = () => {setIsModalOpen(true);};
-  const handleCancel = () => {setIsModalOpen(false);};
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-  const cancel = () => {setEditingKey('');};
-  const [data, setData] = useState<ItemType[]>([])
-  const {token: { colorBgContainer },} = theme.useToken();
-  const [name, setTableName] = useState<string>("");
-  const [rows, setRows] = useState<TableRow[]>([]);
-  const ref = useRef<TableRow[]>()
-  ref.current = rows
-  const ref1 = useRef<string>()
-  ref1.current = name
-  const [columns, setColumns] = useState<TableRow[]>([]);
-  const ref2 = useRef<TableRow[]>()
-  ref2.current = columns
-  const [colName, setColName] = useState([]);
-  const [count, setCount] = useState(0);
-  const [formData, setFormData] = useState({});
-  const [colName1, setColName1] = useState([]);
-  
+  const [resetKey, setResetKey] = useState(0);
+  const handleCancel = () => {setIsModalOpen(false); setResetKey(resetKey +1)};
+  const {token: { colorBgContainer },} = theme.useToken();  
+  const [deleteBlock,setDeleteBlock] = useState("")
+  const [EditBlockName,setEditBlockName] = useState("");
+
+  const [open, setOpen] = useState(false);
+
+  const showEditBlock = () =>{
+    setOpen(true);
+  }
+
+  // function BlockName(name: any){
+  //   setEditBlockName(name);
+  // }
+
+  function handleDeleteBlock(name: any){
+    setDeleteBlock(name)
+  }
+
   const handleShowBlock = async () => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders');
@@ -70,68 +92,119 @@ const UnitAdmin = () => {
        return [];
      }
   }
-  const handleAddFolder = (folder: VirtualFolder) => {
-    setVirtualFolders([...virtualFolders, folder]);
+  let k = 1;
+  const ChangeBlockName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEditBlockName(event.target.value);
+    // setDeleteBlock(event.target.value);
   };
 
-  interface AddFolderFormProps {
-    onSubmit: (folder: VirtualFolder) => void;
-  }
-   const AddFolderForm: React.FC<AddFolderFormProps> = ({ onSubmit }) => {
-    const [folderName, setFolderName] = useState("");
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      onSubmit({ name: folderName});
-      onSubmit({ name: folderName});
-      setFolderName("");
-    };
-  
-    return (
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Folder name"
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
-        />
-        <button type="submit">Add Folder</button>
-      </form>
-    );
+  const DeleteBLock = () => {
+    confirm({
+      title: 'Xóa tập dữ liệu',
+      icon: <ExclamationCircleFilled />,
+      content: 'Bạn có chắc chắn muốn xóa tập dữ liệu này?',
+      okText: 'Có',
+      okType: 'danger',
+      cancelText: 'Không',
+      async onOk() {
+        try {
+          await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+        }
+        catch (error) {
+          console.error('Failed', error);
+        }
+        handleShowBlock();
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   };
-
- 
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <div>
+        <div onClick={showEditBlock}>  <EditOutlined /> chỉnh sửa</div>
+        <Modal    
+          title='Sửa tên tập dữ liệu'
+          open={open}
+          onOk={async () => {setOpen(false);
+            try {
+              console.log(EditBlockName);
+              await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+            }
+            catch (error) {
+              console.error('Failed', error);
+            }
+          }
+        }
+          onCancel={() => {setOpen(false);}}
+          maskClosable={false}
+          mask={false}
+          wrapClassName="custom-modal"
+          footer={[
+              <Button key="Hủy" onClick={() => {setOpen(false)}}>Hủy</Button>,
+              <Button key="Submit" type='primary' 
+              onClick={async () => {setOpen(false);
+                try {
+                  console.log(EditBlockName);
+                  await axios.delete('http://localhost:5000/delete?block=hcmut_' + EditBlockName);
+                }
+                catch (error) {
+                  console.error('Failed', error);
+                }
+              }}>
+              Lưu</Button>
+          ]}
+        >
+          Tên
+          <Input type="text" placeholder={deleteBlock} onChange={ChangeBlockName} />
+        </Modal>
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div style={{ cursor: 'pointer' }} onClick={DeleteBLock}><DeleteOutlined />  Xóa</div>
+      ),
+    },
+  ];
   const navigate = useNavigate();
 
   function handleClick(value: any){
     navigate("/Unitadmin/block", {state: value})
   }
+  
 
-  return (<Layout onLoad={handleShowBlock}>
-  <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+  return (
+  <Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
+  <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '10px', color: 'black', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-<Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
+<Content style={{ width: '100%', height: '1000px', margin: '20px 0px'}}>
   <Layout>
-    <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+    <Content style={{ width: '100%', height: '1000px',backgroundColor:'#E8E8E8' }}>
       <Layout>
-        <Layout style={{ padding: '0 24px 24px' }}>
+        <Layout style={{ padding: '0 24px 24px', backgroundColor:'#E8E8E8' }}>
           <Content
             style={{
               width: '100%',
@@ -145,46 +218,37 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}>+ Thêm tập lưu trữ</Button>
-                <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onOk={handleOk}  onCancel={handleCancel}
+                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}> Thêm tập lưu trữ</Button>
+                <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
                   footer={[
-                    <Button key="OK" type="primary" onClick={handleOk}>
-                      OK
-                    </Button>,
-  ]}>
-                  <CreateBlock />
+                    ]}>
+                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey }/>
                 </Modal>
               </div>
             </div>
             <Divider />
             <div>
-              <Space size="large">
-                
-               {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
-                 <Button 
-                 className='btn' 
-                 key={folder.name} 
-                 onClick={() => handleClick(folder.name)}
-                 style={{ 
-                   width: 'auto', 
-                   height: '110px', 
-                   display: 'flex', 
-                   flexDirection: 'column', 
-                   alignItems: 'center', 
-                   justifyContent: 'center',
-                   boxShadow:'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
-                   borderWidth: '2px'
-                 }}> 
-                 <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
-
-                   <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}</span> 
-
-                 </div>
-
-               </Button>
-               ))): null}
-              </Space>
+                <Card>
+                  {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
+                 <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
+                 key={folder.name}
+              >
+                 <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
+                  <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} 
+                    onClick={() => handleDeleteBlock(folder.name)}>
+                    <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
+                   </button>
+                  </Dropdown>
+                  <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
+                   <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
+                   <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
+                </div> 
+                </Card.Grid>
+               
+               ))): (
+                <div>Loading folders...</div>
+              )}
+              </Card>
             </div>
           </Content>
         </Layout>
@@ -193,10 +257,7 @@ const UnitAdmin = () => {
   </Layout>
 </Content>
 
-    <Footer >Footer</Footer>
-
   </Layout>
   );
 };
-
 export default UnitAdmin;

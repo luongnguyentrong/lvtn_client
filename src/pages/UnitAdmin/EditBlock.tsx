@@ -104,7 +104,10 @@ const CreateBlock: React.FC = () => {
     fetchOptions();
   }, []);
   const steps = [ 
-   
+    {
+      title: 'First',
+      content: <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} onChange={handleNameBlockChange} />
+    },
     {
       title: 'First',
       content: <>

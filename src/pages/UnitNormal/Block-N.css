@@ -43,3 +43,58 @@
 .DataRequire:disabled:hover {
     box-shadow: none;
 }
+
+.ButtonEdit {
+    margin-right: 15px;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: rgb(99, 99, 99);
+}
+
+.ButtonEdit:hover {
+    background-color: rgb(214, 214, 214);
+    border-radius: 50%;
+    cursor: pointer;
+    color: rgb(15, 127, 188);
+}
+
+.ButtonDelete {
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: rgb(99, 99, 99);
+    font-size: 20px;
+}
+
+.ButtonDelete:hover {
+    background-color: rgb(214, 214, 214);
+    border-radius: 50%;
+    cursor: pointer;
+    color: #e40000;
+}
+
+.addrow {
+    width: fit-content;
+    margin-left: auto;
+    margin-top: 5px;
+    background-color: rgb(18, 165, 149);
+    border: none;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+    border-radius: 5px;
+}
+
+.addrow:hover {
+    box-shadow: rgba(133, 133, 133, 0.2) 1px 4px 2px -1px, rgba(58, 58, 58, 0.14) 1px 3px 3px 1px, rgba(44, 44, 44, 0.12) 1px 2px 6px 1px;
+    background-color: rgb(0, 124, 110);
+}

@@ -1,11 +1,11 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Layout, Row, Col, Popconfirm, InputNumber, Form, Typography} from 'antd';
 const { Header, Footer, Content, Sider } = Layout;
-import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space } from 'antd';
+import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space,Card } from 'antd';
 import { message, Steps, Select } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { BellFilled, UserOutlined, DatabaseTwoTone} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, DatabaseTwoTone} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -21,7 +21,11 @@ interface VirtualFolder {
   name: string;
 }
 
-const UnitAdmin = () => {
+interface IProps {
+  name : string;
+}
+
+const Normal = (props: IProps) => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -47,7 +51,7 @@ const UnitAdmin = () => {
   const [colName1, setColName1] = useState([]);
   const handleShowBlock = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/show_folders');
+      const response = await axios.get('http://localhost:5000/show_folders_normal?user='+props.name);
       const response1 = response.data["body"].map((str: string) => {
       return str.replace('hcmut_', '');
       });
@@ -63,135 +67,39 @@ const UnitAdmin = () => {
        return [];
      }
   }
-  const handleAddFolder = (folder: VirtualFolder) => {
-    setVirtualFolders([...virtualFolders, folder]);
-  };
-
-  interface AddFolderFormProps {
-    onSubmit: (folder: VirtualFolder) => void;
-  }
-   const AddFolderForm: React.FC<AddFolderFormProps> = ({ onSubmit }) => {
-    const [folderName, setFolderName] = useState("");
-  
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      onSubmit({ name: folderName});
-      setFolderName("");
-    };
-  
-    return (
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Folder name"
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
-        />
-        <button type="submit">Add Folder</button>
-      </form>
-    );
-  };
-
-  // const getMenuItems = async (e: any) => {
-  //   e.preventDefault();
-  //   let item: Array<string> = [];
-  //   let items2: MenuProps['items'] = [];
-  //   try {
-  //     const response = await axios.get('http://localhost:5000/show');
-  //     const data1 = response.data;
-  //     item = data1["body"]
-  //     items2 = item.map((key) => ({
-  //       key,
-  //       label: `${key}`,
-  //     }));
-  //     setData(items2)
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //     return [];
-  //   }
-  // }
-
-  // const onClick: MenuProps['onClick'] = async (e) => {
-  //   let column: TableRow[] = [];
-  //   setTableName(e.key) 
-  //   let row: TableRow[] = [];
-  //   try {
-  //     var request: any = {}
-  //     request["name"] = e.key
-  //     console.log(request)
-  //     const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
-  //     const data = response.data; // extract the data from the response
-  //     const arr = data["body"];
-  //     column = arr[0]
-  //     row = arr[1]
-  
-  //     setCount(row.length)
-  //     setRows(row)
-  //     setColumns(column)
-  //     setColName(arr[2])
-  //     arr[2].shift()
-  //     setColName1(arr[2])
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //   }
-  // };
+ 
   const navigate = useNavigate();
 
   function handleClick(value: any){
     navigate("/UnitUser/BlockNormal", {state: value})
   }
 
-  // const onClick: MenuProps['onClick'] = async (e) => {
-  //   let column: TableRow[] = [];
-  //   setTableName(e.key) 
-  //   let row: TableRow[] = [];
-  //   try {
-  //     var request: any = {}
-  //     request["name"] = e.key
-  //     console.log(request)
-  //     const response = await axios.post('https://ze784hzaxd.execute-api.ap-southeast-2.amazonaws.com/khoa/show_tables', request);
-  //     const data = response.data; // extract the data from the response
-  //     const arr = data["body"];
-  //     column = arr[0]
-  //     row = arr[1]
-  
-  //     setCount(row.length)
-  //     setRows(row)
-  //     setColumns(column)
-  //     setColName(arr[2])
-  //     arr[2].shift()
-  //     setColName1(arr[2])
-  //   } catch (error) {
-  //     console.error('Failed', error);
-  //   }
-  // };
-
-
-  return (<Layout onLoad={handleShowBlock}>
-  <Header style={{backgroundColor: '#6495ED', height: '80px'}}>
+  return (<Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
+  <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
-    <Col className="Logo" xs={{ span: 4 }} sm={{ span: 4 }} md={{ span: 2 }} lg={{ span: 6 }} style={{color: 'white'}}>
-      <img src="/logo.png" alt="logo" style={{ width: 50, marginTop: '5px' }}/>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
     </Col>
     
-    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '20px'}}>
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
       <Search className="Search" placeholder="input search text" onSearch={onSearch} />
     </Col>
     <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-        <BellFilled className="bell"style={{ marginRight: '20px', marginTop: '15px', color: 'black', fontSize: '28px'}} />
-        <Avatar className="Avartar" size={50} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-5px 5px 0px 20px', color:'white'}}>Unit-User</h1>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-<Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
+<Content style={{ width: '100%', height: '1000px', margin: '20px 0px',backgroundColor: '#E8E8E8' }}>
   <Layout>
-    <Content style={{ width: '100%', height: '1000px', margin: '0 0' }}>
+    <Content style={{ width: '100%', height: '1000px', margin: '0 0',backgroundColor: '#E8E8E8' }}>
       <Layout>
-        <Layout style={{ padding: '0 24px 24px' }}>
+        <Layout style={{ padding: '0 24px 24px',backgroundColor: '#E8E8E8' }}>
           <Content
             style={{
               width: '100%',
@@ -209,33 +117,22 @@ const UnitAdmin = () => {
             </div>
             <Divider />
             <div>
-              <Space size="large">
-                
-               {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
-                 <Button 
-                 className='btn' 
-                 key={folder.name} 
-                 onClick={() => handleClick(folder.name)}
-                 style={{ 
-                   width: 'auto', 
-                   height: '110px', 
-                   display: 'flex', 
-                   flexDirection: 'column', 
-                   alignItems: 'center', 
-                   justifyContent: 'center',
-                   boxShadow:'rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px',
-                   borderWidth: '2px'
-                 }}> 
-                 <div style={{ display: 'flex', flexDirection: 'column',alignItems: 'center' }}>
+                <Card>
+                  {virtualFolders.length > 0? ( virtualFolders.map((folder) => (
+                 <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
+                 key={folder.name}
+              >
 
-                   <DatabaseTwoTone style={{ fontSize: '60px', margin: '8px 8px' }} twoToneColor="#5b7a78"/> 
-                   <span style={{ fontSize: '16px', textAlign: 'center', marginBottom:'5px' }}>{folder.name}</span> 
-
-                 </div>
-
-               </Button>
-               ))): null}
-              </Space>
+                  <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
+                   <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
+                   <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
+                </div> 
+                </Card.Grid>
+               
+               ))): (
+                <div>Loading folders...</div>
+              )}
+              </Card>
             </div>
           </Content>
         </Layout>
@@ -244,10 +141,8 @@ const UnitAdmin = () => {
   </Layout>
 </Content>
 
-    <Footer >Footer</Footer>
-
   </Layout>
   );
 };
 
-export default UnitAdmin;
+export default Normal;
