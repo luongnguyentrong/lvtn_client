@@ -108,7 +108,8 @@ const UnitAdmin = () => {
       cancelText: 'Không',
       async onOk() {
         try {
-          await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+          console.log(deleteBlock)
+          //await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
         }
         catch (error) {
           console.error('Failed', error);
@@ -139,7 +140,18 @@ const UnitAdmin = () => {
               onClick={async () => {setOpen(false);
                 try {
                   console.log(EditBlockName);
-                  await axios.delete('http://localhost:5000/delete?block=hcmut_' + EditBlockName);
+                  let request: any={}
+                  request["new"] = "hcmut_" + EditBlockName
+                  request["old"] = "hcmut_"+ deleteBlock
+                  await axios.post('http://localhost:5000/edit_blockname',request);
+                  const filteredList: VirtualFolder[] = virtualFolders.map((element: VirtualFolder) => {
+                      if (element.name == deleteBlock) {
+                        element.name = EditBlockName
+                        return element;
+                      }
+                      return element;
+                  });
+                  setVirtualFolders(filteredList)
                 }
                 catch (error) {
                   console.error('Failed', error);
