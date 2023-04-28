@@ -1,7 +1,7 @@
 import React, {useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
-import { Input, Button, Avatar, Tooltip , Menu, theme, Table,Divider } from 'antd';
+import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider} from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
@@ -96,7 +96,7 @@ const Main = () => {
   const handleOk2 = () => {setIsModalOpen2(false);};
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
-
+  const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -115,7 +115,7 @@ const Main = () => {
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
 
   const [currentRecord, setCurrentRecord] = useState<any>({});
@@ -125,6 +125,10 @@ const Main = () => {
   const addrow = () =>{
     setNewRow(true);
   }
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
   const getMenuItems = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
@@ -253,6 +257,37 @@ const Main = () => {
     setCurrentRecord(record);
     setEditRecord(true);
 };
+  const success = (message1: any) => {
+    messageApi.open({
+      type: 'success',
+      content: message1,
+    });
+  };
+  const uploadFile = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch('http://localhost:5000/upload_files', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        //console.log('File uploaded successfully');
+        success("Upload file thành công");
+        form.reset();
+      } else {
+        console.error('File upload failed');
+        // Handle the failed response
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      // Handle the error
+    }
+  };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key)
@@ -346,7 +381,8 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+return (
+<>{contextHolder}<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -404,9 +440,12 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                   )}
                 </Modal>
   
-            <form method="POST" action="http://localhost:5000/upload_files" encType="multipart/form-data">
-              <input type="file" name="upload" />
-              <input type="submit" />
+            <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
+              <label htmlFor="upload" className="file-label">
+                 {selectedFile ? selectedFile.name : 'Choose a file'}
+                <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
+              </label>
+              <button type="submit" className="submit-button">Submit</button>
             </form>
           
           {/* <Upload {...props}>
@@ -511,6 +550,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
     </Content>
 
   </Layout>
+  </>
   );
 };
 
