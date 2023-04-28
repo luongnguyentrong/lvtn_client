@@ -2,7 +2,8 @@ import { Form, Input, Modal } from "antd";
 import axios from "axios";
 import { useState } from "react";
 import Cookies from "universal-cookie";
-import { getAPIHost } from '../../utils'
+import { getAPIHost, getUnit } from '../../utils'
+import TextArea from "antd/es/input/TextArea";
 
 interface IProps {
     open: boolean;
@@ -26,8 +27,9 @@ export default function (props: IProps) {
                 form
                     .validateFields()
                     .then((values) => {
-                        form.resetFields()
-                        // setIsLoading(true)
+                        setIsLoading(true)
+
+                        values["parent_unit"] = getUnit()
                         props.onCreate(values)
                     })
                     .catch((info) => {
@@ -43,10 +45,26 @@ export default function (props: IProps) {
             >
                 <Form.Item
                     name="unit_name"
-                    label="Tên đơn vị"
-                    rules={[{ required: true, message: 'Please input the title of collection!' }]}
+                    label="Mã đơn vị"
+                    rules={[{ required: true, message: 'Please input the unit name!' }]}
                 >
                     <Input disabled={isLoading ? true : false} />
+                </Form.Item>
+
+                <Form.Item
+                    name="display_name"
+                    label="Tên đơn vị"
+                    rules={[{ required: true, message: 'Please input the display name of the unit!' }]}
+                >
+                    <Input disabled={isLoading ? true : false} />
+                </Form.Item>
+
+                <Form.Item
+                    name="description"
+                    label="Mô tả"
+                    rules={[{ required: true, message: 'Please input the description!' }]}
+                >
+                    <TextArea rows={4} disabled={isLoading ? true : false} />
                 </Form.Item>
 
                 <Form.Item

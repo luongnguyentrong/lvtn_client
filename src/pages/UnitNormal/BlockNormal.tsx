@@ -122,6 +122,7 @@ const Main = () => {
 
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
+  const [ListFile, setListFile] = useState([]);
   const addrow = () =>{
     setNewRow(true);
   }

@@ -1,8 +1,31 @@
 import { Card, Layout, Typography } from "antd"
-import { OrganizationGraph } from '@ant-design/graphs';
+import { OrganizationGraph, OrgItem, NodeData } from '@ant-design/graphs';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import API from "../../api";
+import { getBearerHeader } from "../../utils";
 
-const DemoOrganizationGraph = () => {
-    const data = {
+function convertToNode(data: any) {
+    const children = data.children ? data.children.map((data: any) => convertToNode(data)) : undefined;
+
+    const node: NodeData<OrgItem> = {
+        id: data.realm_id,
+        children: children,
+        value: {
+            title: data.display_name,
+            name: data.name
+        }
+    }
+
+    return node
+}
+
+
+
+const UnitOrgChart = () => {
+    const [org, setOrg] = useState<NodeData<OrgItem>>()
+
+    const fakeData = {
         id: 'root',
         value: {
             name: 'master',
@@ -19,34 +42,6 @@ const DemoOrganizationGraph = () => {
                         value: {
                             name: 'c1',
                         },
-                        children: [
-                            {
-                                id: 'c1-1',
-                                value: {
-                                    name: 'c1-1',
-                                },
-                            },
-                            {
-                                id: 'c1-2',
-                                value: {
-                                    name: 'c1-2',
-                                },
-                                children: [
-                                    {
-                                        id: 'c1-2-1',
-                                        value: {
-                                            name: 'c1-2-1',
-                                        },
-                                    },
-                                    {
-                                        id: 'c1-2-2',
-                                        value: {
-                                            name: 'c1-2-2',
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
                     },
                     {
                         id: 'c2',
@@ -59,67 +54,42 @@ const DemoOrganizationGraph = () => {
                         value: {
                             name: 'c3',
                         },
-                        children: [
-                            {
-                                id: 'c3-1',
-                                value: {
-                                    name: 'c3-1',
-                                },
-                            },
-                            {
-                                id: 'c3-2',
-                                value: {
-                                    name: 'c3-2',
-                                },
-                                children: [
-                                    {
-                                        id: 'c3-2-1',
-                                        value: {
-                                            name: 'c3-2-1',
-                                        },
-                                    },
-                                    {
-                                        id: 'c3-2-2',
-                                        value: {
-                                            name: 'c3-2-2',
-                                        },
-                                    },
-                                    {
-                                        id: 'c3-2-3',
-                                        value: {
-                                            name: 'c3-2-3',
-                                        },
-                                    },
-                                ],
-                            },
-                            {
-                                id: 'c3-3',
-                                value: {
-                                    name: 'c3-3',
-                                },
-                            },
-                        ],
                     },
                 ],
             },
         ],
     };
 
-    return <OrganizationGraph nodeCfg={{
-        style: () => ({
-            fill: '#91d5ff',
-            stroke: '#91d5ff',
-        }),
-    }} data={data} behaviors={['drag-canvas', 'drag-node']} />;
+    useEffect(() => {
+        setOrg(fakeData)
+        const config = getBearerHeader()
+        if (config) {
+            // axios.get(API.baseURL + API.ListOrg.API, config).then(res => {
+            //     setOrg(convertToNode(res.data))
+            // })
+        }
+    }, [])
+
+    if (org === undefined) {
+        return <p>Loading...</p>
+    }
+
+    return <OrganizationGraph data={org} onReady={(graph) => {
+        graph.on('node:click', (evt) => {
+            const item = evt.item;
+            
+            console.log(item)
+        });
+    }} />;
 };
 
 
 export default function () {
     return <Layout.Content>
         <Card bordered={false}>
-            <Typography.Title level={3}>Danh sách đơn vị</Typography.Title>
+            <Typography.Title level={3}>Sơ đồ tổ chức</Typography.Title>
 
-            <DemoOrganizationGraph />
+            <UnitOrgChart />
         </Card>
     </Layout.Content>
 }

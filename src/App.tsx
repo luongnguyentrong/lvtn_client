@@ -3,13 +3,13 @@ import Cookies from 'universal-cookie';
 import 'antd/dist/reset.css'
 import './index.css';
 import axios from 'axios';
-import MainPage from './MainPage';
 import UnitAdmin from './pages/UnitAdmin/UnitAdmin';
 import Loading from './pages/Loading';
 import Admin from './pages/Admin';
 import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { Layout } from 'antd';
 
 function getAuthParams() {
     const data = {
@@ -71,10 +71,12 @@ function App() {
             })
         }
     }, [])
-        
+
     switch (mainRole) {
         case "admin":
-            return <Admin/>
+            return <Admin>
+                <Outlet />
+            </Admin>
 
         case "unit_admin":
             return <UnitAdmin />
@@ -83,7 +85,7 @@ function App() {
             return <Normal name={username}/>
 
         default:
-            return <Loading/>
+            return <Loading />
     }
 }
 

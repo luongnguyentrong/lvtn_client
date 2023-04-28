@@ -1,39 +1,41 @@
 import React from 'react';
-import { SettingOutlined, BellOutlined, UserOutlined, LineChartOutlined, ApartmentOutlined, TeamOutlined } from '@ant-design/icons';
+import { SettingOutlined, HomeOutlined, BellOutlined, UserOutlined, LineChartOutlined, ApartmentOutlined, TeamOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Badge, Avatar, Layout, Menu, Row, Col, Input } from 'antd';
-import Content from './Content';
-import { useNavigate } from 'react-router-dom';
+import { Layout, Menu, Row, Col, Input } from 'antd';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 const { Header, Footer } = Layout;
-const { Search } = Input
-
-
-const menu_items: MenuProps['items'] = [UserOutlined, SettingOutlined, BellOutlined].map(
-    (icon, index) => {
-        const key = String(index + 1);
-
-        return {
-            key: `sub_${key}`,
-            icon: <Badge count={5}><Avatar shape='square' icon={React.createElement(icon)} /></Badge>,
-        };
-    },
-);
 
 const navs = [
     {
-        label: "Dashboard",
-        icon: LineChartOutlined,
+        label: "Trang chủ",
+        icon: HomeOutlined,
         path: "/dashboard",
     },
     {
-        label: "Đơn vị",
+        label: "Đơn vị con",
         icon: ApartmentOutlined,
         path: "/units",
+        children: [
+            {
+                key: "child_1",
+                icon: React.createElement(ApartmentOutlined),
+                label: "Sơ đồ tổ chức"
+            },
+            {
+                key: "child_2",
+                icon: React.createElement(ApartmentOutlined),
+                label: "Sơ đồ tổ chức"
+            }
+        ]
     },
     {
         label: "Quản lý người dùng",
         icon: TeamOutlined,
+    },
+    {
+        label: "Cài đặt",
+        icon: SettingOutlined,
     }
 ]
 
@@ -43,6 +45,7 @@ const sider_items: MenuProps['items'] = navs.map(
             key: `slider_items_${index}`,
             icon: React.createElement(obj.icon),
             label: obj.label,
+            children: obj.children
         };
     },
 );
@@ -55,33 +58,40 @@ const headerStyles: React.CSSProperties = {
     width: "100%",
     zIndex: "100",
     right: "0px",
+    backgroundColor: "white",
+    borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
 }
 
-const emptyHeaderStyle: React.CSSProperties = {
-    height: "48px",
-    lineHeight: "48px",
-    background: "transparent",
+interface IProps {
+    children: React.ReactElement;
 }
 
-const siderStyles: React.CSSProperties = {
-    overflow: "hidden",
-    paddingTop: "48px",
-    flex: "0 0 208px",
-    maxWidth: "208px",
-    minWidth: "208px",
-    width: "208px",
-}
+const AdminLayout: React.FC<IProps> = (props: IProps) => {
+    const emptyHeaderStyle: React.CSSProperties = {
+        height: "48px",
+        lineHeight: "48px",
+        background: "transparent",
+    }
 
-const App: React.FC = () => {
+    const siderStyles: React.CSSProperties = {
+        overflow: "hidden",
+        paddingTop: "48px",
+        flex: "0 0 208px",
+        maxWidth: "208px",
+        minWidth: "208px",
+        width: "208px",
+    }
     const navigate = useNavigate()
 
     const handleSiderClick: MenuProps["onClick"] = (e) => {
-        if (e.key === "slider_items_1")
+        if (e.key === "slider_items_0")
+            navigate("/")
+        else if (e.key === "slider_items_1")
             navigate("/units")
     }
 
     return (
-        <Layout>
+        <Layout style={{ minHeight: '100%' }}>
             <Layout.Sider style={siderStyles} >
                 <Menu
                     mode="inline"
@@ -96,18 +106,30 @@ const App: React.FC = () => {
                 <Header style={headerStyles}>
                     <Row align="middle">
                         <Col span={6}>
-                            <div className="logo">
-                                <img src="/logo.png" alt="logo" style={{ width: 32 }} />
-                            </div>
+                            <Link to={"/"}>
+                                <div className="logo">
+                                    <img src="/logo.png" alt="logo" style={{ width: 32 }} />
+                                </div>
+                            </Link>
                         </Col>
-                        <Col span={12} style={{ display: "inherit" }}><Search size='middle' placeholder='Enter resource name...' /></Col>
-                        <Col span={6} flex="auto">
-                            <Menu mode='horizontal' theme='dark' items={menu_items} style={{ justifyContent: 'flex-end' }} />
+                        <Col span={12} style={{ display: "inherit" }}><Input.Search size='middle' placeholder='Nhập tên tập dữ liệu...' /></Col>
+                        <Col flex="auto">
+                            <Menu
+                                mode="horizontal"
+                                defaultSelectedKeys={['2']}
+                                items={new Array(2).fill(null).map((_, index) => {
+                                    const key = index + 1;
+                                    return {
+                                        key,
+                                        label: `nav ${key}`,
+                                    };
+                                })}
+                            />
                         </Col>
                     </Row>
                 </Header>
 
-                <Content />
+                <Outlet />
 
                 <Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Footer>
             </Layout>
@@ -115,4 +137,4 @@ const App: React.FC = () => {
     );
 };
 
-export default App;
+export default AdminLayout;
