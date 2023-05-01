@@ -82,7 +82,6 @@ const Main: React.FC = () => {
   }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const showModal = () => {setIsModalOpen(true);};
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
 
@@ -93,11 +92,8 @@ const Main: React.FC = () => {
 
   const handleCancel2 = () => {setIsModalOpen2(false);};
 
-  // const cancel = () => {setEditingKey('');};
-  
   const [data, setData] = useState<ItemType[]>([])
-  // const ref3 = useRef<ItemType[]>([])
-  // ref3.current = data
+  
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
