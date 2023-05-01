@@ -34,14 +34,12 @@ interface Table {
 interface VirtualFolder {
   name: string;
 }
-
-interface IProps {
-  folders: VirtualFolder[]
-}
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
 
-
+interface IProps {
+  name: string;
+}
 interface TableRow {
   [key: string]: any;
 }
@@ -49,7 +47,7 @@ interface VirtualFolder {
   name: string;
 }
 
-const UnitAdmin = () => {
+const UnitAdmin = (props: IProps) => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {setIsModalOpen(true);};
@@ -58,39 +56,33 @@ const UnitAdmin = () => {
   const {token: { colorBgContainer },} = theme.useToken();  
   const [deleteBlock,setDeleteBlock] = useState("")
   const [EditBlockName,setEditBlockName] = useState("");
-
+  const [isSuperUnit, setIsSuperUnit] = useState(false)
   const [open, setOpen] = useState(false);
 
   const showEditBlock = () =>{
     setOpen(true);
   }
 
-  // function BlockName(name: any){
-  //   setEditBlockName(name);
-  // }
-
   function handleDeleteBlock(name: any){
     setDeleteBlock(name)
   }
 
   const handleShowBlock = async () => {
+   
     try {
-      const response = await axios.get('http://localhost:5000/show_folders');
-      console.log(response);
-      const response1 = response.data["body"].map((str: string) => {
-      return str.replace('hcmut_', '');
-      });
+      const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
+      const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
       let folderList: VirtualFolder[] = []
-      for (var ele of response1){
-        var c: VirtualFolder={name:""};
+      for (var ele of response1) {
+        var c: VirtualFolder = { name: "" };
         c.name = ele
         folderList.push(c)
       }
       setVirtualFolders(folderList)
-     } catch (error) {
-       console.error('Failed', error);
-       return [];
-     }
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
   }
   let k = 1;
   const ChangeBlockName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,7 +212,11 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}> Thêm tập lưu trữ</Button>
+                      {isSuperUnit && ( // Only render the button if `a` is true
+                        <Button onClick={showModal} style={{ backgroundColor: '#32CD32', color: 'white', height: '40px' }}>
+                          Thêm tập lưu trữ
+                        </Button>
+                      )}
                 <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
                   footer={[
                     ]}>
@@ -235,12 +231,12 @@ const UnitAdmin = () => {
                  <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
                  key={folder.name}
               >
-                 <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
+                  {isSuperUnit &&(<Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
                   <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} 
                     onClick={() => handleDeleteBlock(folder.name)}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
                    </button>
-                  </Dropdown>
+                  </Dropdown>)}
                   <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
                    <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
                    <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>

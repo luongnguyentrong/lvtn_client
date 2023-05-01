@@ -52,9 +52,7 @@ const Normal = (props: IProps) => {
   const handleShowBlock = async () => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders_normal?user='+props.name);
-      const response1 = response.data["body"].map((str: string) => {
-      return str.replace('hcmut_', '');
-      });
+      const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
       let folderList: VirtualFolder[] = []
       for (var ele of response1){
         var c: VirtualFolder={name:""};

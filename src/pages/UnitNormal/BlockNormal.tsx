@@ -14,7 +14,8 @@ import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";
 import './Block-N.css'
-
+import DownloadLink from "react-download-link";
+import { test } from 'node:test';
 interface IExcelColumn{
   title: string;
   dataIndex:string;
@@ -23,26 +24,6 @@ interface TableRow {
   [key: string]: any;
 }
 
-const props: UploadProps = {
-  name: 'upload',
-  method: "POST",
-  headers:{
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST"
-  },
-  action: 'http://localhost:5000/upload_files',
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -117,9 +98,33 @@ const Main = () => {
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
   const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
-
+  const [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
+      const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
+        method: 'POST',
+        body: formData,
+      });
 
+      if (response.ok) {
+        console.log('File uploaded successfully');
+        // Handle success case
+      } else {
+        console.error('File upload failed');
+        // Handle error case
+      }
+    } catch (error) {
+      console.error('An error occurred during file upload:', error);
+    }
+  };
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
   const [ListFile, setListFile] = useState([]);
@@ -135,7 +140,7 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=cs_'+value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -271,7 +276,7 @@ const Main = () => {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch('http://localhost:5000/upload_files', {
+      const response = await fetch('http://localhost:5000/upload_files?block='+value, {
         method: 'POST',
         body: formData,
       });
@@ -294,7 +299,7 @@ const Main = () => {
     setTableName(e.key)
     let row: TableRow[] = [];
     try {
-      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      let url: any = "http://localhost:5000/show_inside?block_name=cs_" + value + "&table_name="+e.key
       const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
@@ -366,7 +371,15 @@ const Main = () => {
   if (index > -1){
     arr3.splice(index2,1)
   }
-  
+  const handleDownload = async () => {
+    const response = await fetch(testUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "fileName.txt";
+    link.click();
+  };
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
     title: column.title,
@@ -382,8 +395,13 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-return (
-<>{contextHolder}<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+  const testUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T093239Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=64a8b6fc24bf3df9eb549b76ff146a7b774a30019a14f9a903d2d7c344c829e0"
+  const fileName = "fileName.txt";
+  return (
+    <> <div>
+      <button onClick={handleDownload}>Download</button>
+    </div>
+{contextHolder}<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -455,6 +473,13 @@ return (
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
+            <div>
+              <h2>Upload Form</h2>
+              <form onSubmit={handleSubmit}>
+                <input type="file" name="file" onChange={handleFileChange} />
+                <button type="submit">Upload</button>
+              </form>
+            </div>
           <Layout>
             <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content
