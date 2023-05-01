@@ -6,7 +6,8 @@ import Units from "./pages/Admin/Units";
 import BlockLayout from './layout/Block';
 import NewBlock from "./pages/Admin/NewBlock";
 import Home from "./pages/Admin/Menu/Home";
-// import BlockNormal from "./pages/UnitNormal/BlockNormal";
+import Block from "./pages/UnitAdmin/Block"
+import BlockNormal from "./pages/UnitNormal/BlockNormal";
 
 export const router = createBrowserRouter([
     {
@@ -20,11 +21,12 @@ export const router = createBrowserRouter([
             {
                 path: "/units",
                 element: <Units />,
-            }, 
+            },
             {
                 path: "/new",
                 element: <NewBlock />
-            }
+            },
+
         ]
     },
     {
@@ -35,4 +37,12 @@ export const router = createBrowserRouter([
         path: "/oauth2/token",
         element: <SSOCallback />
     },
+    {
+        path: "/UnitAdmin/block",
+        element: <Block />
+    },
+    {
+        path: "/UnitUser/BlockNormal",
+        element: <BlockNormal />
+    }
 ])

@@ -1,9 +1,9 @@
 import React, {useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
-import { Input, Button, Avatar, Tooltip , Menu, theme, Table,Divider } from 'antd';
+import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider} from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,FileOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -14,6 +14,7 @@ import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";
 import './Block-N.css'
+import { url } from 'inspector';
 
 interface IExcelColumn{
   title: string;
@@ -23,26 +24,6 @@ interface TableRow {
   [key: string]: any;
 }
 
-const props: UploadProps = {
-  name: 'upload',
-  method: "POST",
-  headers:{
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST"
-  },
-  action: 'http://localhost:5000/upload_files',
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -96,7 +77,7 @@ const Main = () => {
   const handleOk2 = () => {setIsModalOpen2(false);};
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
-
+  const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -115,18 +96,44 @@ const Main = () => {
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
-
+  const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
 
   const [currentRecord, setCurrentRecord] = useState<any>({});
 
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
+  const [ListFile, setListFile] = useState<ItemType[]>([]);
+  const [addfile, setaddfile] = useState('');
   const addrow = () =>{
     setNewRow(true);
   }
-  const getMenuItems = async (e: any) => {
-    e.preventDefault();
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const getFile = async () => {
+   // e.preventDefault();
+    try {
+      const response = await axios.get('http://localhost:5000/list-items');
+      const data1 = response.data;
+      const data2 = data1["items"]
+      data2.shift();
+      const items = data2.map((key: string) => ({
+        key,
+        label: `${key}`,
+        icon: <FileOutlined />,
+      }));
+      setListFile(items);
+    } catch (error) {
+      console.error('Failed', error);
+      setListFile([]);
+    }
+  };
+
+  const getMenuItems = async () => {
+   // e.preventDefault();
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
@@ -253,6 +260,43 @@ const Main = () => {
     setCurrentRecord(record);
     setEditRecord(true);
 };
+  const success = (message1: any) => {
+    messageApi.open({
+      type: 'success',
+      content: message1,
+    });
+  };
+  const uploadFile = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    try {
+      const response = await fetch('http://localhost:5000/upload_files', {
+        method: 'POST',
+        body: formData,
+      });
+      if (response.ok) {
+        success("Upload file thành công");
+        form.reset();
+      } 
+      else {
+        console.error('File upload failed');
+      }
+    } 
+    catch (error) {
+        console.error('An error occurred:', error);
+    }
+    const newfile: ItemType = {
+      "key": selectedFile.name,
+      "label": selectedFile.name,
+      "icon": <FileOutlined />
+    }
+    const sup: ItemType[] = [...ListFile];
+    sup.push(newfile)
+    setListFile(sup)
+  //  setaddfile([])
+  };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key)
@@ -346,7 +390,42 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
+  // const downloadObject = (url: string) => {
+  //   const link = document.createElement("a");
+  // link.href = url;
+  // link.download = "code.txt";
+  // link.click();
+  //   // window.open(url, "_blank");
+  //   // fetch(url)
+  //   //   .then((response) => response.blob())
+  //   //   .then((blob) => {
+  //   //     // Create a temporary anchor element
+  //   //     const link = document.createElement("a");
+  //   //     link.href = URL.createObjectURL(blob);
+  //   //     link.download = "code.txt";
+  //   //     link.click();
+  // };const downloadObject = (url: string) => {
+    const downloadObject = (url: string) => {
+      fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          // Create a temporary anchor element
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "code.txt";
+          link.click();
+        })
+        .catch((error) => {
+          console.error("Error downloading object:", error);
+        });
+    };
+  
+  const objectUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T082908Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=3522d23a58f8cfa6f933e7a46d8281a3013f137a76386c580afbe60e39842335";
+const fileName = "code.txt";
+return (
+<>{contextHolder}
+
+<Layout onLoad={() => { getMenuItems(); getFile(); }} style={{ backgroundColor: '#E8E8E8' }}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
     <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
@@ -361,7 +440,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>User</h1>
       </div>
     </Col>
   </Row>
@@ -370,7 +449,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
     <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'750px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
@@ -403,15 +482,20 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                     <div>{criteria}</div>
                   )}
                 </Modal>
-  
-            <form method="POST" action="http://localhost:5000/upload_files" encType="multipart/form-data">
-              <input type="file" name="upload" />
-              <input type="submit" />
+            <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
+              <label htmlFor="upload" className="file-label">
+                 {selectedFile ? selectedFile.name : 'Choose a file'}
+                <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
+              </label>
+              <button type="submit" className="submit-button">Submit</button>
             </form>
-          
-          {/* <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Upload</Button>
-          </Upload> */}
+            <Menu
+            mode="inline"
+            defaultSelectedKeys={['1']}
+            defaultOpenKeys={['sub1']}
+            style={{ height: '250px', borderRight: 0, maxHeight: '450px', overflowY: 'scroll' }}
+            items={ListFile}
+          />
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
@@ -432,7 +516,11 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'15px' }}>
           {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'5px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+            <Button onClick={handleButtonClick}><EditOutlined/>Phân tích</Button> 
           </div>) : null} 
+          <div>
+      {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
+    </div>
           </div>
                 <Form form={form} component={false}>
                   <Table 
@@ -487,7 +575,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
                 <button onClick={addrow} className='addrow'>
                      <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
                 </button>)}
-                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
+                <Modal title="Sửa dòng" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
                 arr3 && arr3.map((field:any) => (
@@ -511,6 +599,7 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
     </Content>
 
   </Layout>
+  </>
   );
 };
 
