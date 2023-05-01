@@ -1,5 +1,5 @@
 import { Button, Card, Empty, Form, Space, Table, TableProps } from "antd";
-import { TableOutlined, FolderAddOutlined } from '@ant-design/icons';
+import { TableOutlined, FolderAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import uniqid from 'uniqid';
 
@@ -7,6 +7,7 @@ import uniqid from 'uniqid';
 import { ITable, IFolder } from '../NewBlock'
 import DefineSheet from "../Modals/DefineSheet";
 import { TableColumnsType } from 'antd'
+import DefineFolder from "../Modals/DefineFolder";
 
 
 interface IProps {
@@ -14,134 +15,82 @@ interface IProps {
     items: Array<IFolder | ITable>
 }
 
-interface DataType {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-}
-
-const columns: TableColumnsType<DataType> = [
+const columns: TableColumnsType<IFolder | ITable> = [
     {
-        title: 'Name',
+        title: 'Tên dữ liệu',
         dataIndex: 'name',
-        filters: [
-            {
-                text: 'Joe',
-                value: 'Joe',
-            },
-            {
-                text: 'Category 1',
-                value: 'Category 1',
-                children: [
-                    {
-                        text: 'Yellow',
-                        value: 'Yellow',
-                    },
-                    {
-                        text: 'Pink',
-                        value: 'Pink',
-                    },
-                ],
-            },
-            {
-                text: 'Category 2',
-                value: 'Category 2',
-                children: [
-                    {
-                        text: 'Green',
-                        value: 'Green',
-                    },
-                    {
-                        text: 'Black',
-                        value: 'Black',
-                    },
-                ],
-            },
-        ],
-        filterMode: 'tree',
-        filterSearch: true,
-        onFilter: (value: string, record) => record.name.includes(value),
-        width: '30%',
+        key: "id",
+        render: (_, record) => {
+            if (record.type === "table")
+                return <div><TableOutlined /> {record.display_name}</div>
+            else
+                return <div><FolderAddOutlined /> {record.display_name}</div>
+        }
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
-        sorter: (a, b) => a.age - b.age,
-    },
-    {
-        title: 'Address',
-        dataIndex: 'address',
-        filters: [
-            {
-                text: 'London',
-                value: 'London',
-            },
-            {
-                text: 'New York',
-                value: 'New York',
-            },
-        ],
-        onFilter: (value: string, record: DataType) => record.address.startsWith(value),
-        filterSearch: true,
-        width: '40%',
+        title: 'Hành động',
+        dataIndex: 'action',
+        key: "action",
+        render: (_, record) => (
+            <Space size="middle">
+                <Button icon={<EditOutlined />} />
+                <Button icon={<DeleteOutlined />} />
+            </Space>
+        ),
     },
 ];
 
-const data: DataType[] = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sydney No. 1 Lake Park',
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        age: 32,
-        address: 'London No. 2 Lake Park',
-    },
-];
 
 function DisplayItems(props: { items: Array<IFolder | ITable> }) {
-    const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
-        console.log('params', pagination, filters, sorter, extra);
-    };
-
-    return <Table columns={columns} dataSource={data} onChange={onChange} />;
+    return <Table columns={columns} rowKey={(record) => record.id} dataSource={props.items} />;
 }
 
 export default function (props: IProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalFolderOpen, setIsModalFolderOpen] = useState(false);
     const [form] = Form.useForm();
+    const [folderForm] = Form.useForm();
 
     const showModal = () => {
         setIsModalOpen(true);
     };
 
+    const showFolderModal = () => {
+        setIsModalFolderOpen(true);
+    };
+
     const handleOk = () => {
-        form.validateFields().then((res: ITable | IFolder | undefined) => {
-            if (res && res.type === "table") {
-                if (res.id === undefined) {
-                    res.id = uniqid()
+        form.validateFields().then((res: any) => {
+            if (res && res.hasOwnProperty("table")) {
+                const table: ITable = res.table
+
+                if (table.id === undefined) {
+                    table.id = uniqid()
                 }
+
+                table.type = "table"
+
+                props.onDefineSuccess(table)
             }
 
-            props.onDefineSuccess(res)
             setIsModalOpen(false);
+        }).catch(err => {
+
         })
+    };
+
+    const handleFolderOk = () => {
+        folderForm.validateFields().then((res: IFolder) => {
+            res.type = "folder"
+            res.id = uniqid()
+
+            props.onDefineSuccess(res)
+            setIsModalFolderOpen(false);
+        })
+    };
+
+    const handleFolderCancel = () => {
+        setIsModalFolderOpen(false);
     };
 
     const handleCancel = () => {
@@ -155,7 +104,7 @@ export default function (props: IProps) {
                 <Button type="primary" icon={<TableOutlined />} onClick={showModal}>
                     Tạo bảng dữ liệu
                 </Button>
-                <Button icon={<FolderAddOutlined />}>
+                <Button icon={<FolderAddOutlined />} onClick={showFolderModal}>
                     Tạo Folder chứa file
                 </Button>
             </Space>}>
@@ -165,5 +114,6 @@ export default function (props: IProps) {
         </Card>
 
         <DefineSheet form={form} isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} />
+        <DefineFolder form={folderForm} isOpen={isModalFolderOpen} handleOk={handleFolderOk} handleCancel={handleFolderCancel} />
     </div >
 }

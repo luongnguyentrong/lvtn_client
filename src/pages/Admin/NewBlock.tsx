@@ -2,11 +2,13 @@ import { Button, Divider, Empty, Layout, Steps, Typography, message, theme } fro
 import { useEffect, useState } from "react";
 import DefineData from "./Steps/DefineData";
 import { useLocation } from "react-router-dom";
+import ProvisionBlock from "./Steps/ProvisionBlock";
 
 export interface ITable {
     id: string
     type: "table"
     name: string
+    display_name: string
     description: string
     columns: Array<{
         id: string
@@ -17,11 +19,13 @@ export interface ITable {
 }
 
 export interface IFolder {
+    id: string
     type: "folder",
-    name: "string"
+    name: string
+    display_name: string
 }
 
-interface IBlock {
+export interface IBlock {
     name: string
     description: string
     items: Array<ITable | IFolder>
@@ -35,7 +39,11 @@ export default function () {
 
     useEffect(() => {
         if (location.state.block) {
-            setBlockData(location.state.block)
+            const new_block: IBlock = location.state.block.block
+
+            new_block.items = []
+
+            setBlockData(new_block)
         }
     }, [])
 
@@ -75,7 +83,7 @@ export default function () {
         },
         {
             title: 'Khởi tạo dữ liệu',
-            content: 'Last-content',
+            content: <ProvisionBlock block={blockData} />,
         },
     ];
 
