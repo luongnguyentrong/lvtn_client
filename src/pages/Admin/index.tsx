@@ -3,6 +3,7 @@ import { SettingOutlined, HomeOutlined, BellOutlined, UserOutlined, LineChartOut
 import type { MenuProps } from 'antd';
 import { Layout, Menu, Row, Col, Input } from 'antd';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
+import RightNav from './Header/RightNav';
 
 const { Header, Footer } = Layout;
 
@@ -13,21 +14,9 @@ const navs = [
         path: "/dashboard",
     },
     {
-        label: "Đơn vị con",
+        label: "Tổ chức",
         icon: ApartmentOutlined,
         path: "/units",
-        children: [
-            {
-                key: "child_1",
-                icon: React.createElement(ApartmentOutlined),
-                label: "Sơ đồ tổ chức"
-            },
-            {
-                key: "child_2",
-                icon: React.createElement(ApartmentOutlined),
-                label: "Sơ đồ tổ chức"
-            }
-        ]
     },
     {
         label: "Quản lý người dùng",
@@ -45,7 +34,6 @@ const sider_items: MenuProps['items'] = navs.map(
             key: `slider_items_${index}`,
             icon: React.createElement(obj.icon),
             label: obj.label,
-            children: obj.children
         };
     },
 );
@@ -114,17 +102,7 @@ const AdminLayout: React.FC<IProps> = (props: IProps) => {
                         </Col>
                         <Col span={12} style={{ display: "inherit" }}><Input.Search size='middle' placeholder='Nhập tên tập dữ liệu...' /></Col>
                         <Col flex="auto">
-                            <Menu
-                                mode="horizontal"
-                                defaultSelectedKeys={['2']}
-                                items={new Array(2).fill(null).map((_, index) => {
-                                    const key = index + 1;
-                                    return {
-                                        key,
-                                        label: `nav ${key}`,
-                                    };
-                                })}
-                            />
+                            <RightNav />
                         </Col>
                     </Row>
                 </Header>
