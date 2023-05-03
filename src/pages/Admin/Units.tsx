@@ -1,88 +1,12 @@
-import { Avatar, Button, Card, Layout, Space, Spin, Table, Tabs, Tag, Tooltip, Typography } from "antd"
-import { OrganizationGraph, OrgItem, NodeData } from '@ant-design/graphs';
+import { Avatar, Button, Card, Layout, Space, Spin, Table, Tabs, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react";
 import type { TabsProps, TableColumnsType } from 'antd'
 import { getBearerHeader } from "../../utils";
 import { ApartmentOutlined, TableOutlined, PlusOutlined, EditOutlined, DeleteFilled } from '@ant-design/icons';
 import axios from "axios";
+import AddUnit from "./Modals/AddUnit";
+import OrgChart from "./OrgChart";
 
-function convertToNode(data: any) {
-    const children = data.children ? data.children.map((data: any) => convertToNode(data)) : undefined;
-
-    const node: NodeData<OrgItem> = {
-        id: data.realm_id,
-        children: children,
-        value: {
-            title: data.display_name,
-            name: data.name
-        }
-    }
-
-    return node
-}
-
-
-
-const UnitOrgChart = () => {
-    const [org, setOrg] = useState<NodeData<OrgItem>>()
-
-    const fakeData = {
-        id: 'root',
-        value: {
-            name: 'master',
-        },
-        children: [
-            {
-                id: 'joel',
-                value: {
-                    name: 'Joel Alan',
-                },
-                children: [
-                    {
-                        id: 'c1',
-                        value: {
-                            name: 'c1',
-                        },
-                    },
-                    {
-                        id: 'c2',
-                        value: {
-                            name: 'c2',
-                        },
-                    },
-                    {
-                        id: 'c3',
-                        value: {
-                            name: 'c3',
-                        },
-                    },
-                ],
-            },
-        ],
-    };
-
-    useEffect(() => {
-        setOrg(fakeData)
-        const config = getBearerHeader()
-        if (config) {
-            // axios.get(API.baseURL + API.ListOrg.API, config).then(res => {
-            //     setOrg(convertToNode(res.data))
-            // })
-        }
-    }, [])
-
-    if (org === undefined) {
-        return <p>Loading...</p>
-    }
-
-    return <OrganizationGraph behaviors={[]} height={400} data={org} onReady={(graph) => {
-        graph.on('node:click', (evt) => {
-            const item = evt.item;
-
-            console.log(item)
-        });
-    }} />;
-};
 
 interface IUnit {
     realm_id: string
@@ -158,7 +82,17 @@ function UnitTable(props: { units: Array<IUnit> }) {
 }
 
 export default function () {
+    const [openAddUser, setOpenAddUser] = useState(false)
     const [units, setUnits] = useState<Array<IUnit> | undefined>()
+
+    const handleClose = () => {
+        setOpenAddUser(false)
+    }
+
+    const handleOpen = () => {
+        setOpenAddUser(true)
+    }
+
     useEffect(() => {
         axios.get("http://localhost:5000/units", getBearerHeader()).then(res => {
             setUnits(res.data)
@@ -172,7 +106,7 @@ export default function () {
                 <ApartmentOutlined />
                 Sơ đồ tổ chức
             </span>,
-            children: <UnitOrgChart />,
+            children: <OrgChart />,
         },
         {
             key: '2',
@@ -196,10 +130,13 @@ export default function () {
     return <Layout.Content>
         <div style={{ margin: 24, minHeight: 380 }}>
             <Card title="Đại học Bách Khoa" extra={<Button type="primary"
+                onClick={handleOpen}
                 icon={<PlusOutlined />}
             >Tạo đơn vị</Button>}>
                 <Tabs defaultActiveKey="1" items={items} />
             </Card>
         </div>
+
+        <AddUnit open={openAddUser} close={handleClose} />
     </Layout.Content >
 }

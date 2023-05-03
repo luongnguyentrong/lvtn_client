@@ -12,7 +12,6 @@ interface IProps {
 }
 export default function (props: IProps) {
     const [form] = Form.useForm();
-    const cookies = new Cookies()
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     return (

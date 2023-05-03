@@ -32,7 +32,7 @@ export async function getCurrentUser(): Promise<any> {
             },
         };
 
-        const result = await axios.post(userinfo_endpoint, {}, config)    
+        const result = await axios.post(userinfo_endpoint, {}, config)
 
         if (result.status === 200) {
             return result.data
@@ -56,17 +56,18 @@ export function toSlug(str: string) {
     // Xóa ký tự đặc biệt
     str = str.replace(/([^0-9a-z-\s])/g, '');
 
-    // Xóa khoảng trắng thay bằng ký tự -
-    str = str.replace(/(\s+)/g, '_');
-
     // Xóa ký tự - liên tiếp
     str = str.replace(/-+/g, '-');
 
     // xóa phần dư - ở đầu & cuối
     str = str.replace(/^-+|-+$/g, '');
 
-    // return
-    return str;
+    let matches = str.match(/\b(\w)/g);
+    if (matches) {
+        return matches.join(''); // JSON
+    }
+
+    return "";
 }
 
 export function getBearerHeader() {
