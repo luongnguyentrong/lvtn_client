@@ -13,7 +13,6 @@ import { Modal } from 'antd';
 import './Unitadmin.css';
 import CreateBlock from './CreateBlock';
 import { getBearerHeader, getUnit } from '../../utils';
-import CreateTable from '../../Create-table/CreateTable';
 import Cookies from 'universal-cookie';
 
 interface Table {
@@ -35,14 +34,12 @@ interface Table {
 interface VirtualFolder {
   name: string;
 }
-
-interface IProps {
-  folders: VirtualFolder[]
-}
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
 
-
+interface IProps {
+  name: string;
+}
 interface TableRow {
   [key: string]: any;
 }
@@ -50,7 +47,7 @@ interface VirtualFolder {
   name: string;
 }
 
-const UnitAdmin = () => {
+const UnitAdmin = (props: IProps) => {
   const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {setIsModalOpen(true);};
@@ -59,39 +56,33 @@ const UnitAdmin = () => {
   const {token: { colorBgContainer },} = theme.useToken();  
   const [deleteBlock,setDeleteBlock] = useState("")
   const [EditBlockName,setEditBlockName] = useState("");
-
+  const [isSuperUnit, setIsSuperUnit] = useState(false)
   const [open, setOpen] = useState(false);
 
   const showEditBlock = () =>{
     setOpen(true);
   }
 
-  // function BlockName(name: any){
-  //   setEditBlockName(name);
-  // }
-
   function handleDeleteBlock(name: any){
     setDeleteBlock(name)
   }
 
   const handleShowBlock = async () => {
+   
     try {
-      const response = await axios.get('http://localhost:5000/show_folders');
-      console.log(response);
-      const response1 = response.data["body"].map((str: string) => {
-      return str.replace('hcmut_', '');
-      });
+      const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
+      const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
       let folderList: VirtualFolder[] = []
-      for (var ele of response1){
-        var c: VirtualFolder={name:""};
+      for (var ele of response1) {
+        var c: VirtualFolder = { name: "" };
         c.name = ele
         folderList.push(c)
       }
       setVirtualFolders(folderList)
-     } catch (error) {
-       console.error('Failed', error);
-       return [];
-     }
+    } catch (error) {
+      console.error('Failed', error);
+      return [];
+    }
   }
   let k = 1;
   const ChangeBlockName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,8 +170,33 @@ const UnitAdmin = () => {
   function handleClick(value: any){
     navigate("/Unitadmin/block", {state: value})
   }
-  
+ 
+  const menuItems2 = [
+    <Menu.Item key="0" onClick={() => {
+      const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
 
+      const config =  getBearerHeader()
+
+      if (config !== undefined) {
+        const cookies = new Cookies()
+        const params = new URLSearchParams()
+        params.append("client_id", "console")
+        params.append("refresh_token", cookies.get("refresh_token"))
+
+        axios.post(logoutEndpoint, params, config).then(res => {
+          if (res.status === 204) {
+            cookies.remove("access_token")
+            cookies.remove("refresh_token")
+
+            location.reload()
+          }
+        })
+      }
+    }} 
+      style={{color:'red'}}>
+            Log out
+    </Menu.Item>,
+  ];
   return (
   <Layout onLoad={handleShowBlock} style={{backgroundColor: '#E8E8E8'}}>
   <Header style={{backgroundColor: '#020547', height: '50px'}}>
@@ -197,27 +213,13 @@ const UnitAdmin = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}} onClick={() => {
-          const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
-
-          const config =  getBearerHeader()
-
-          if (config !== undefined) {
-            const cookies = new Cookies()
-            const params = new URLSearchParams()
-            params.append("client_id", "console")
-            params.append("refresh_token", cookies.get("refresh_token"))
-
-            axios.post(logoutEndpoint, params, config).then(res => {
-              if (res.status === 204) {
-                cookies.remove("access_token")
-                cookies.remove("refresh_token")
-
-                location.reload()
-              }
-            })
-          }
-        }}>Unit-Manager</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-Manager
+          </a>
+        </Dropdown>
+        </h1>
       </div>
     </Col>
   </Row>
@@ -241,7 +243,11 @@ const UnitAdmin = () => {
             <div className='header'>
               <h1 style={{fontSize: '20px'}}>TẬP DỮ LIỆU</h1>
               <div className='btn-wrapper'>
-                <Button onClick={showModal} style={{backgroundColor: '#32CD32', color:'white', height:'40px'}}> Thêm tập lưu trữ</Button>
+                      {isSuperUnit && ( // Only render the button if `a` is true
+                        <Button onClick={showModal} style={{ backgroundColor: '#32CD32', color: 'white', height: '40px' }}>
+                          Thêm tập lưu trữ
+                        </Button>
+                      )}
                 <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
                   footer={[
                     ]}>
@@ -256,12 +262,12 @@ const UnitAdmin = () => {
                  <Card.Grid style={{width:'25%', textAlign:'center', position:'relative'}}
                  key={folder.name}
               >
-                 <Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
+                  {isSuperUnit &&(<Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
                   <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }} 
                     onClick={() => handleDeleteBlock(folder.name)}>
                     <h1 className='Edit' style={{ margin:'-1px -6px 0px 0px', color: '#71717a', fontSize:'22px',padding: '0px 2px'}}><EllipsisOutlined/></h1> 
                    </button>
-                  </Dropdown>
+                  </Dropdown>)}
                   <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
                    <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
                    <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>

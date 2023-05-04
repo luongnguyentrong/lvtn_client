@@ -162,9 +162,8 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
       <Select
       style={{ width: "200px", marginTop: "10px" }}
       onChange={handleUserChange}
-      options={Users}
-    />
-      </div> 
+      options={Users}/>
+    </div> 
     },
   ];
     

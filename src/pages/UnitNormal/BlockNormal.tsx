@@ -1,9 +1,9 @@
 import React, {useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
-import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider} from 'antd';
+import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider,Dropdown} from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,FileOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined, FileOutlined, ExportOutlined, DeleteOutlined, TableOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -15,10 +15,12 @@ import { useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";
 import './Block-N.css'
 import { url } from 'inspector';
+import { getBearerHeader, getUnit } from '../../utils';
+import Cookies from 'universal-cookie';
 
 interface IExcelColumn{
   title: string;
-  dataIndex:string;
+  dataIndex: string;
 }
 interface TableRow {
   [key: string]: any;
@@ -74,14 +76,14 @@ const Main = () => {
   const [criteria, setCriteria] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const handleOk2 = () => {setIsModalOpen2(false);};
-  const handleCancel2 = () => {setIsModalOpen2(false);};
+  const handleOk2 = () => { setIsModalOpen2(false); };
+  const handleCancel2 = () => { setIsModalOpen2(false); };
   const [NewRow, setNewRow] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
-  const {token: { colorBgContainer },} = theme.useToken();
+  const { token: { colorBgContainer }, } = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
   const ref = useRef<TableRow[]>()
@@ -95,17 +97,42 @@ const Main = () => {
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
   const [colName1, setColName1] = useState([]);
-  const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
+  const showModal2 = () => { setIsModalOpen2(true); handleCriteria(); };
   const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
-
+  const [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
+      const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log('File uploaded successfully');
+        // Handle success case
+      } else {
+        console.error('File upload failed');
+        // Handle error case
+      }
+    } catch (error) {
+      console.error('An error occurred during file upload:', error);
+    }
+  };
   const [formData2, setFormData2] = useState({});
-  const [function_table,setfunction_table] = useState(false);
+  const [function_table, setfunction_table] = useState(false);
   const [ListFile, setListFile] = useState<ItemType[]>([]);
   const [addfile, setaddfile] = useState('');
-  const addrow = () =>{
+  const addrow = () => {
     setNewRow(true);
   }
   const handleFileChange = (event: any) => {
@@ -114,7 +141,7 @@ const Main = () => {
   };
 
   const getFile = async () => {
-   // e.preventDefault();
+    // e.preventDefault();
     try {
       const response = await axios.get('http://localhost:5000/list-items');
       const data1 = response.data;
@@ -133,17 +160,17 @@ const Main = () => {
   };
 
   const getMenuItems = async () => {
-   // e.preventDefault();
+    // e.preventDefault();
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
         key,
         label: `${key}`,
-        icon: <TableOutlined/>
+        icon: <TableOutlined />
       }));
       setData(items2)
     } catch (error) {
@@ -163,7 +190,7 @@ const Main = () => {
     k["value"] = [...kh, ...formValues]
     k["col"] = colName
     try {
-      axios.post('http://localhost:5000/add_data?block=hcmut_' + value, k);
+      axios.post('http://localhost:5000/add_data?block=' + curUnit + '_' + value, k);
     } catch (error) {
       console.error('Failed', error);
       return [];
@@ -192,14 +219,14 @@ const Main = () => {
     setFormData({})
     setNewRow(false)
   };
-  const handleEditData = async () =>{
+  const handleEditData = async () => {
     // const formValues = Object.values(formData2);
     let k: any = {}
     k["table"] = name
     k["cond"] = currentRecord["id"]
     k["change"] = formData2
     try {
-      axios.post('http://localhost:5000/edit_row?block=hcmut_' + value,k);
+      axios.post('http://localhost:5000/edit_row?block=' + curUnit + '_' + value, k);
     } catch (error) {
       console.error('Failed', error);
       return [];
@@ -211,7 +238,7 @@ const Main = () => {
       }
     }
   }
-  
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -231,7 +258,7 @@ const Main = () => {
       cancelText: 'Không',
       async onOk() {
         try {
-          let url: any = 'http://localhost:5000/delete_row?block=hcmut_' + value +'&table=' + ref1.current + '&id=' + record.id;
+          let url: any = 'http://localhost:5000/delete_row?block=' + curUnit + '_' + value + '&table=' + ref1.current + '&id=' + record.id;
           await axios.delete(url);
         }
         catch (error) {
@@ -259,7 +286,7 @@ const Main = () => {
   const showEditRecord = (record: TableRow) => {
     setCurrentRecord(record);
     setEditRecord(true);
-};
+  };
   const success = (message1: any) => {
     messageApi.open({
       type: 'success',
@@ -272,20 +299,20 @@ const Main = () => {
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
     try {
-      const response = await fetch('http://localhost:5000/upload_files', {
+      const response = await fetch('http://localhost:5000/upload_files?block=' + value, {
         method: 'POST',
         body: formData,
       });
       if (response.ok) {
         success("Upload file thành công");
         form.reset();
-      } 
+      }
       else {
         console.error('File upload failed');
       }
-    } 
+    }
     catch (error) {
-        console.error('An error occurred:', error);
+      console.error('An error occurred:', error);
     }
     const newfile: ItemType = {
       "key": selectedFile.name,
@@ -295,20 +322,20 @@ const Main = () => {
     const sup: ItemType[] = [...ListFile];
     sup.push(newfile)
     setListFile(sup)
-  //  setaddfile([])
+    //  setaddfile([])
   };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key)
     let row: TableRow[] = [];
     try {
-      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + e.key
       const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
       column = arr[0]
       row = arr[1]
-      const   transformedList = row.map(({ key, row }) => ({
+      const transformedList = row.map(({ key, row }) => ({
         key,
         ...row
       }));
@@ -318,22 +345,22 @@ const Main = () => {
         width: 110,
         render: (_: any, record: TableRow) => (
           <>
-        <Tooltip title='Edit' placement="left" color='#646464'>
-          <button
-            onClick={() => {showEditRecord(record), console.log(record)}}
-            className='ButtonEdit'
-          >
-              <EditOutlined />
-          </button>
-        </Tooltip>
-        <Tooltip title='Delete' placement="right" color='#646464'>
-          <button 
-            onClick={()=> DeleteRerord(record)}
-            className='ButtonDelete'
-          >
-            <DeleteOutlined/>
-          </button>
-        </Tooltip>
+            <Tooltip title='Edit' placement="left" color='#646464'>
+              <button
+                onClick={() => { showEditRecord(record), console.log(record) }}
+                className='ButtonEdit'
+              >
+                <EditOutlined />
+              </button>
+            </Tooltip>
+            <Tooltip title='Delete' placement="right" color='#646464'>
+              <button
+                onClick={() => DeleteRerord(record)}
+                className='ButtonDelete'
+              >
+                <DeleteOutlined />
+              </button>
+            </Tooltip>
           </>
         )
       };
@@ -353,9 +380,9 @@ const Main = () => {
   const handleButtonClick = () => {
     window.open('http://167.172.70.223:8080/superset/dashboard/1/?native_filters_key=A-BM7FEk1wsmidor1E5yaSxBDY5gW25OPQTuE7VKfwQyPULmEfZ4oLq1lU9yOchh', '_blank');
   };
-  const handleCriteria = async ()=>{
+  const handleCriteria = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
+      const response = await axios.get('http://localhost:5000/show_criteria?block='+curUnit+'_' + value);
       let crit: any = decodeURIComponent(response.data["body"])
       setCriteria(crit)
     } catch (error) {
@@ -367,20 +394,28 @@ const Main = () => {
   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
   const arr3 = arr1
   const index = arr3.indexOf('key')
-  if (index > -1){
-    arr3.splice(index,1)
+  if (index > -1) {
+    arr3.splice(index, 1)
   }
   const index2 = arr3.indexOf('id')
-  if (index > -1){
-    arr3.splice(index2,1)
+  if (index > -1) {
+    arr3.splice(index2, 1)
   }
-  
+  const handleDownload = async () => {
+    const response = await fetch(testUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "fileName.txt";
+    link.click();
+  };
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
     title: column.title,
     dataIndex: column.dataIndex
   }));
-   const ExportExcel = () => {
+  const ExportExcel = () => {
     const excel = new Excel();
     excel
       .addSheet("test")
@@ -390,38 +425,55 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-  // const downloadObject = (url: string) => {
-  //   const link = document.createElement("a");
-  // link.href = url;
-  // link.download = "code.txt";
-  // link.click();
-  //   // window.open(url, "_blank");
-  //   // fetch(url)
-  //   //   .then((response) => response.blob())
-  //   //   .then((blob) => {
-  //   //     // Create a temporary anchor element
-  //   //     const link = document.createElement("a");
-  //   //     link.href = URL.createObjectURL(blob);
-  //   //     link.download = "code.txt";
-  //   //     link.click();
-  // };const downloadObject = (url: string) => {
-    const downloadObject = (url: string) => {
-      fetch(url)
-        .then((response) => response.blob())
-        .then((blob) => {
-          // Create a temporary anchor element
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "code.txt";
-          link.click();
-        })
-        .catch((error) => {
-          console.error("Error downloading object:", error);
-        });
-    };
+    // const downloadObject = (url: string) => {
+    //   fetch(url)
+    //     .then((response) => response.blob())
+    //     .then((blob) => {
+    //       // Create a temporary anchor element
+    //       const link = document.createElement("a");
+    //       link.href = URL.createObjectURL(blob);
+    //       link.download = "code.txt";
+    //       link.click();
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error downloading object:", error);
+    //     });
+    // };
   
-  const objectUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T082908Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=3522d23a58f8cfa6f933e7a46d8281a3013f137a76386c580afbe60e39842335";
-const fileName = "code.txt";
+//   const objectUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T082908Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=3522d23a58f8cfa6f933e7a46d8281a3013f137a76386c580afbe60e39842335";
+// const fileName = "code.txt";
+const menuItems2 = [
+  <Menu.Item key="0" onClick={() => {
+    const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+
+    const config =  getBearerHeader()
+
+    if (config !== undefined) {
+      const cookies = new Cookies()
+      const params = new URLSearchParams()
+      params.append("client_id", "console")
+      params.append("refresh_token", cookies.get("refresh_token"))
+
+      axios.post(logoutEndpoint, params, config).then(res => {
+        if (res.status === 204) {
+          cookies.remove("access_token")
+          cookies.remove("refresh_token")
+
+          location.reload()
+        } <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-Manager
+          </a>
+        </Dropdown>
+        </h1>
+      })
+    }
+  }} 
+    style={{color:'red'}}>
+          Log out
+  </Menu.Item>,
+];
 return (
 <>{contextHolder}
 
@@ -440,38 +492,44 @@ return (
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>User</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-User
+          </a>
+        </Dropdown>
+        </h1>
       </div>
     </Col>
   </Row>
 </Header>
 
-    <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
+        <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px', backgroundColor: '#E8E8E8' }}>
 
-      <Layout>
-        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'750px' }}>
-          <div>
-            <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
-          </div>
-          <Menu
-            onClick={onClick}
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            style={{ height: '200px', borderRight: 0 }}
-            items={data}
-          />
-          <div>
-          <Divider />
-            <h1 style={{textAlign: 'center', fontSize:'20px'}}>Dữ liệu đính kèm</h1>
-            <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
-            <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2}  onCancel={handleCancel2}
+          <Layout>
+            <Sider width={200} style={{ background: colorBgContainer, maxHeight: '750px' }}>
+              <div>
+                <h1 style={{ textAlign: 'center', fontSize: '20px', paddingTop: '10px' }}>Các dữ liệu quản lý</h1>
+              </div>
+              <Menu
+                onClick={onClick}
+                mode="inline"
+                defaultSelectedKeys={['1']}
+                defaultOpenKeys={['sub1']}
+                style={{ height: '200px', borderRight: 0 }}
+                items={data}
+              />
+              <div>
+                <Divider />
+                <h1 style={{ textAlign: 'center', fontSize: '20px' }}>Dữ liệu đính kèm</h1>
+                <button onClick={showModal2} className='button-25'>Tiêu chí dữ liệu đầu ra</button>
+                <Modal width={750} title="Tiều chí dữ liệu đầu ra" open={isModalOpen2} onOk={handleOk2} onCancel={handleCancel2}
                   footer={[
                     <Button key="OK" type="primary" onClick={handleOk2}>
                       OK
                     </Button>,
                   ]}>
-                    <Button onClick={handleButtonClick}><EditOutlined/>Chỉnh sửa</Button> 
+                  <Button onClick={handleButtonClick}><EditOutlined />Chỉnh sửa</Button>
                   {isEditing1 ? (
                     <Input
                       placeholder={criteria}
@@ -482,124 +540,132 @@ return (
                     <div>{criteria}</div>
                   )}
                 </Modal>
-            <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
-              <label htmlFor="upload" className="file-label">
-                 {selectedFile ? selectedFile.name : 'Choose a file'}
-                <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
-              </label>
-              <button type="submit" className="submit-button">Submit</button>
-            </form>
-            <Menu
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            style={{ height: '250px', borderRight: 0, maxHeight: '450px', overflowY: 'scroll' }}
-            items={ListFile}
-          />
-          </div>
-        </Sider>
-        <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
-          <Layout>
-            <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
-              <Content
-                style={{
-                  width: '100%',
-                  maxWidth: '1230px',
-                  padding: '24px',
-                  margin: '0 0px 0px 25px',
-                  minHeight: '700px',
-                  background: colorBgContainer,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'15px' }}>
-          {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'5px' }}>
-            <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
-            <Button onClick={handleButtonClick}><EditOutlined/>Phân tích</Button> 
-          </div>) : null} 
-          <div>
-      {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
-    </div>
-          </div>
-                <Form form={form} component={false}>
-                  <Table 
-                  components={{
-                    body: {
-                      cell: EditableCell,
-                    },
-                  }}
-                  columns={columns} 
-                  dataSource={rows} 
-                  key={count}
-                  pagination={false}
-                  scroll={{ y: 500 }}
-                  bordered
-                  size="small"
-                  />
-                </Form>
-                {NewRow ? (
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {colName1.map((field) => (
-                    <div key={field} className="form-field">
-                      <label htmlFor={field}><h4>{field}</h4></label>
-                      <Input
-                        type="text"
-                        id={field}
-                        name={field}
-                        value={formData[field] || ""}
-                        onChange={handleChange}
+                <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
+                  <label htmlFor="upload" className="file-label">
+                    {selectedFile ? selectedFile.name : 'Choose a file'}
+                    <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
+                  </label>
+                  <button type="submit" className="submit-button">Submit</button>
+                </form>
+                <Menu
+                  mode="inline"
+                  defaultSelectedKeys={['1']}
+                  defaultOpenKeys={['sub1']}
+                  style={{ height: '250px', borderRight: 0, maxHeight: '450px', overflowY: 'scroll' }}
+                  items={ListFile}
+                />
+              </div>
+            </Sider>
+            <Content style={{ width: '100%', height: '720px', margin: '0 0', backgroundColor: '#E8E8E8' }}>
+              <div>
+                <h2>Upload Form</h2>
+                <form onSubmit={handleSubmit}>
+                  <input type="file" name="file" onChange={handleFileChange} />
+                  <button type="submit">Upload</button>
+                </form>
+              </div>
+              <Layout>
+                <Layout style={{ padding: '0 0px 0px', backgroundColor: '#E8E8E8' }}>
+                  <Content
+                    style={{
+                      width: '100%',
+                      maxWidth: '1230px',
+                      padding: '24px',
+                      margin: '0 0px 0px 25px',
+                      minHeight: '700px',
+                      background: colorBgContainer,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
+                      {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                        <Button onClick={ExportExcel} style={{ marginRight: '10px' }}><ExportOutlined />Export</Button>
+                        <Button onClick={handleButtonClick}><EditOutlined />Phân tích</Button>
+                      </div>) : null}
+                      <div>
+                        {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
+                      </div>
+                    </div>
+                    <Form form={form} component={false}>
+                      <Table
+                        components={{
+                          body: {
+                            cell: EditableCell,
+                          },
+                        }}
+                        columns={columns}
+                        dataSource={rows}
+                        key={count}
+                        pagination={false}
+                        scroll={{ y: 500 }}
+                        bordered
+                        size="small"
                       />
-                    </div>
-                  ))}
-                  <div style={{marginTop: '23px'}}>
-                  <button
-                  style={{backgroundColor: "#4CAF50", 
-                  color: "#fff", 
-                  margin:'0 7px', 
-                  border: "none", 
-                  borderRadius: "5px",
-                  height: '32px',
-                  width: '60px',
-                  cursor: 'pointer'
-                  }} 
-                  onClick={handleAddData}>
-                    Add
-                  </button>
-                  <Button onClick={ ()=> setNewRow(false) }>Cancel</Button>
-                  </div>
-                </div>
-                ) : null
-                }
-                {NewRow ? null : (
-                <button onClick={addrow} className='addrow'>
-                     <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
-                </button>)}
-                <Modal title="Sửa dòng" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
-            <div>
-                {
-                arr3 && arr3.map((field:any) => (
-                    <div key={field} className="form-field">
-                        <label htmlFor={field}><h4>{field}</h4></label>
-                        <Input
-                            type="text"
-                            id={field}
-                            name={field}
-                            onChange={handleChange2}
-                        />
-                    </div>
-                ))}
-            </div>
-          </Modal>
-              </Content>
-            </Layout>
+                    </Form>
+                    {NewRow ? (
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        {colName1.map((field) => (
+                          <div key={field} className="form-field">
+                            <label htmlFor={field}><h4>{field}</h4></label>
+                            <Input
+                              type="text"
+                              id={field}
+                              name={field}
+                              value={formData[field] || ""}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        ))}
+                        <div style={{ marginTop: '23px' }}>
+                          <button
+                            style={{
+                              backgroundColor: "#4CAF50",
+                              color: "#fff",
+                              margin: '0 7px',
+                              border: "none",
+                              borderRadius: "5px",
+                              height: '32px',
+                              width: '60px',
+                              cursor: 'pointer'
+                            }}
+                            onClick={handleAddData}>
+                            Add
+                          </button>
+                          <Button onClick={() => setNewRow(false)}>Cancel</Button>
+                        </div>
+                      </div>
+                    ) : null
+                    }
+                    {NewRow ? null : (
+                      <button onClick={addrow} className='addrow'>
+                        <h1 style={{ fontSize: '17px', color: 'white', padding: '6px 10px 2px 10px' }}>ADD NEW ROW</h1>
+                      </button>)}
+                    <Modal title="Sửa dòng" open={EditRecord} onOk={() => { setEditRecord(false), handleEditData() }} onCancel={() => setEditRecord(false)}>
+                      <div>
+                        {
+                          arr3 && arr3.map((field: any) => (
+                            <div key={field} className="form-field">
+                              <label htmlFor={field}><h4>{field}</h4></label>
+                              <Input
+                                type="text"
+                                id={field}
+                                name={field}
+                                onChange={handleChange2}
+                              />
+                            </div>
+                          ))}
+                      </div>
+                    </Modal>
+                  </Content>
+                </Layout>
+              </Layout>
+            </Content>
           </Layout>
         </Content>
-      </Layout>
-    </Content>
 
-  </Layout>
-  </>
+      </Layout>
+    </>
   );
 };
 
