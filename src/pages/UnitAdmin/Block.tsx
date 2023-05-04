@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Layout, Row, Col, InputNumber, Form, Select } from 'antd';
 const { Header, Content, Sider } = Layout;
-import { Input, Button, Avatar, Menu, theme, Table,Divider } from 'antd';
+import { Input, Button, Avatar, Menu, theme, Table,Divider, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined,ExclamationCircleFilled,PlusCircleOutlined,ExportOutlined ,EditOutlined, DeleteOutlined,TableOutlined} from '@ant-design/icons';
 const { Search } = Input;
@@ -16,8 +16,8 @@ import './block.css'
 import { Excel } from "antd-table-saveas-excel";
 import CreateTable from '../../Create-table/CreateTable';
 import { create } from 'domain';
-import TextArea from 'antd/es/input/TextArea';
-import { getUnit } from '../../utils';
+import Cookies from 'universal-cookie';
+import { getBearerHeader, getUnit } from '../../utils';
 
 interface IExcelColumn{
   title: string;
@@ -349,6 +349,32 @@ const Main: React.FC = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
+  const menuItems2 = [
+    <Menu.Item key="0" onClick={() => {
+      const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+
+      const config =  getBearerHeader()
+
+      if (config !== undefined) {
+        const cookies = new Cookies()
+        const params = new URLSearchParams()
+        params.append("client_id", "console")
+        params.append("refresh_token", cookies.get("refresh_token"))
+
+        axios.post(logoutEndpoint, params, config).then(res => {
+          if (res.status === 204) {
+            cookies.remove("access_token")
+            cookies.remove("refresh_token")
+
+            location.reload()
+          }
+        })
+      }
+    }} 
+      style={{color:'red'}}>
+            Log out
+    </Menu.Item>,
+  ];
 return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
    <Header style={{backgroundColor: '#020547', height: '50px'}}>
   <Row gutter={[16, 16]}>
@@ -364,7 +390,13 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-Manager
+          </a>
+        </Dropdown>
+        </h1>
       </div>
     </Col>
   </Row>

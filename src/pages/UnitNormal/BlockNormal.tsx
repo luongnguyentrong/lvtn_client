@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
-import { Layout, Row, Col, InputNumber, Form, } from 'antd';
-const { Header, Content, Sider } = Layout;
-import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider } from 'antd';
+import React, {useRef, useState } from 'react';
+import { Layout, Row, Col, InputNumber, Form,} from 'antd';
+const { Header,Content, Sider } = Layout;
+import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider,Dropdown} from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined, EditOutlined, FileOutlined, ExportOutlined, DeleteOutlined, TableOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 const { Search } = Input;
@@ -14,9 +14,11 @@ import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";
 import './Block-N.css'
-import DownloadLink from "react-download-link";
-import { test } from 'node:test';
-interface IExcelColumn {
+import { url } from 'inspector';
+import { getBearerHeader, getUnit } from '../../utils';
+import Cookies from 'universal-cookie';
+
+interface IExcelColumn{
   title: string;
   dataIndex: string;
 }
@@ -423,32 +425,84 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-  const testUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T093239Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=64a8b6fc24bf3df9eb549b76ff146a7b774a30019a14f9a903d2d7c344c829e0"
-  const fileName = "fileName.txt";
-  return (
-    <> <div>
-      <button onClick={handleDownload}>Download</button>
-    </div>
-      {contextHolder}<Layout onLoad={getMenuItems} style={{ backgroundColor: '#E8E8E8' }}>
-        <Header style={{ backgroundColor: '#020547', height: '50px' }}>
-          <Row gutter={[16, 16]}>
-            <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{ display: 'flex' }}>
-              <img src="/logo.png" alt="logo" style={{ width: '35px', height: '35px', marginTop: '8px', marginLeft: '-25px' }} />
-              <h1 style={{ color: 'white', marginLeft: '10px', marginTop: '-5px' }}>Quality Assurance</h1>
-            </Col>
+    // const downloadObject = (url: string) => {
+    //   fetch(url)
+    //     .then((response) => response.blob())
+    //     .then((blob) => {
+    //       // Create a temporary anchor element
+    //       const link = document.createElement("a");
+    //       link.href = URL.createObjectURL(blob);
+    //       link.download = "code.txt";
+    //       link.click();
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error downloading object:", error);
+    //     });
+    // };
+  
+//   const objectUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T082908Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=3522d23a58f8cfa6f933e7a46d8281a3013f137a76386c580afbe60e39842335";
+// const fileName = "code.txt";
+const menuItems2 = [
+  <Menu.Item key="0" onClick={() => {
+    const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
 
-            <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{ marginTop: '10px' }}>
-              <Search className="Search" placeholder="input search text" onSearch={onSearch} />
-            </Col>
-            <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px' }} />
-                <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{ backgroundColor: '#FF00FF' }} />
-                <h1 style={{ margin: '-17px 5px 0px 20px', color: 'white' }}>User</h1>
-              </div>
-            </Col>
-          </Row>
-        </Header>
+    const config =  getBearerHeader()
+
+    if (config !== undefined) {
+      const cookies = new Cookies()
+      const params = new URLSearchParams()
+      params.append("client_id", "console")
+      params.append("refresh_token", cookies.get("refresh_token"))
+
+      axios.post(logoutEndpoint, params, config).then(res => {
+        if (res.status === 204) {
+          cookies.remove("access_token")
+          cookies.remove("refresh_token")
+
+          location.reload()
+        } <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-Manager
+          </a>
+        </Dropdown>
+        </h1>
+      })
+    }
+  }} 
+    style={{color:'red'}}>
+          Log out
+  </Menu.Item>,
+];
+return (
+<>{contextHolder}
+
+<Layout onLoad={() => { getMenuItems(); getFile(); }} style={{ backgroundColor: '#E8E8E8' }}>
+   <Header style={{backgroundColor: '#020547', height: '50px'}}>
+  <Row gutter={[16, 16]}>
+    <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{display: 'flex'}}>
+      <img src="/logo.png" alt="logo" style={{ width: '35px', height:'35px',marginTop:'8px', marginLeft: '-25px'}}/>
+      <h1 style={{color:'white', marginLeft:'10px', marginTop:'-5px'}}>Quality Assurance</h1>
+    </Col>
+    
+    <Col className="Search-bar" xs={{ span: 16 }} sm={{ span: 14 }} md={{ span: 14 }} lg={{ span: 8 }} style={{marginTop: '10px'}}>
+      <Search className="Search" placeholder="input search text" onSearch={onSearch} />
+    </Col>
+    <Col className="Bellout" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 4 }} lg={{ span: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+        <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
+        <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>
+        <Dropdown overlay={<Menu>{menuItems2}</Menu>} trigger={['click']}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            Unit-User
+          </a>
+        </Dropdown>
+        </h1>
+      </div>
+    </Col>
+  </Row>
+</Header>
 
         <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px', backgroundColor: '#E8E8E8' }}>
 
