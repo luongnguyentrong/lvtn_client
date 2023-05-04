@@ -56,7 +56,8 @@ const UnitAdmin = (props: IProps) => {
   const {token: { colorBgContainer },} = theme.useToken();  
   const [deleteBlock,setDeleteBlock] = useState("")
   const [EditBlockName,setEditBlockName] = useState("");
-  const [isSuperUnit, setIsSuperUnit] = useState(false)
+  const [curUnit, setUnit] = useState("cs");
+  const [isSuperUnit, setIsSuperUnit] = useState(true)
   const [open, setOpen] = useState(false);
 
   const showEditBlock = () =>{
@@ -251,7 +252,7 @@ const UnitAdmin = (props: IProps) => {
                 <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
                   footer={[
                     ]}>
-                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey }/>
+                  <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey } name = {props.name} curUnit={curUnit}/>
                 </Modal>
               </div>
             </div>

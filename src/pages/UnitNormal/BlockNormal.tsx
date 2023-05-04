@@ -3,7 +3,7 @@ import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
 import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider,Dropdown} from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined, FileOutlined, ExportOutlined, DeleteOutlined, TableOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined, FileOutlined, ExportOutlined, DeleteOutlined, TableOutlined, ExclamationCircleFilled, ImportOutlined } from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -70,7 +70,20 @@ const EditableCell: React.FC<EditableCellProps> = ({
   );
 };
 
+
 const Main = () => {
+  const props = {
+    name: 'upload',
+    action: '/your-upload-endpoint',
+    showUploadList: false, // Hide the file list
+    beforeUpload: (file:any) => {
+      // Perform any necessary checks or validations here
+      // If everything is valid, trigger the form submission
+      // setSelectedFile(file)
+      handleSubmit(file);
+      return false; // Prevent default file upload behavior
+    },
+  };
   const [form] = Form.useForm();
   const [isEditing1, setIsEditing1] = useState(false);
   const [criteria, setCriteria] = useState("");
@@ -103,15 +116,15 @@ const Main = () => {
   const [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (selectedFile: any) => {
+    //event.preventDefault();
+    console.log(selectedFile)
     if (!selectedFile) {
       return;
     }
     const formData = new FormData();
     formData.append('file', selectedFile);
     try {
-      //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
       const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
         method: 'POST',
         body: formData,
@@ -247,7 +260,7 @@ const Main = () => {
     const { name, value } = e.target;
     setFormData2({ ...formData2, [name]: value });
   };
-
+  
   const DeleteRerord = async (record: TableRow) => {
     Modal.confirm({
       title: 'Xóa dòng',
@@ -294,12 +307,12 @@ const Main = () => {
     });
   };
   const uploadFile = async (event: React.FormEvent) => {
-    event.preventDefault();
-
+    //event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
+    console.log(formData)
     try {
-      const response = await fetch('http://localhost:5000/upload_files?block=' + value, {
+      const response = await fetch('http://localhost:5000/upload_files?block=' +curUnit+'_'+ value, {
         method: 'POST',
         body: formData,
       });
@@ -314,14 +327,14 @@ const Main = () => {
     catch (error) {
       console.error('An error occurred:', error);
     }
-    const newfile: ItemType = {
-      "key": selectedFile.name,
-      "label": selectedFile.name,
-      "icon": <FileOutlined />
-    }
-    const sup: ItemType[] = [...ListFile];
-    sup.push(newfile)
-    setListFile(sup)
+    // const newfile: ItemType = {
+    //   "key": selectedFile.name,
+    //   "label": selectedFile.name,
+    //   "icon": <FileOutlined />
+    // }
+    // const sup: ItemType[] = [...ListFile];
+    // sup.push(newfile)
+    // setListFile(sup)
     //  setaddfile([])
   };
   const onClick: MenuProps['onClick'] = async (e) => {
@@ -540,13 +553,15 @@ return (
                     <div>{criteria}</div>
                   )}
                 </Modal>
-                <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
-                  <label htmlFor="upload" className="file-label">
-                    {selectedFile ? selectedFile.name : 'Choose a file'}
-                    <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
-                  </label>
-                  <button type="submit" className="submit-button">Submit</button>
-                </form>
+              <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
+                <label htmlFor="upload" className="file-label">
+                  {selectedFile ? selectedFile.name : 'Choose a file'}
+                  <input type="file" name="upload" id="upload" className="file-input" onChange={handleFileChange} />
+                </label>
+                <button type="submit" className="submit-button">
+                  Submit
+                </button>
+              </form>
                 <Menu
                   mode="inline"
                   defaultSelectedKeys={['1']}
@@ -557,13 +572,9 @@ return (
               </div>
             </Sider>
             <Content style={{ width: '100%', height: '720px', margin: '0 0', backgroundColor: '#E8E8E8' }}>
-              <div>
+              {/* <div>
                 <h2>Upload Form</h2>
-                <form onSubmit={handleSubmit}>
-                  <input type="file" name="file" onChange={handleFileChange} />
-                  <button type="submit">Upload</button>
-                </form>
-              </div>
+              </div> */}
               <Layout>
                 <Layout style={{ padding: '0 0px 0px', backgroundColor: '#E8E8E8' }}>
                   <Content
@@ -582,6 +593,16 @@ return (
                       {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
                         <Button onClick={ExportExcel} style={{ marginRight: '10px' }}><ExportOutlined />Export</Button>
                         <Button onClick={handleButtonClick}><EditOutlined />Phân tích</Button>
+                      <form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <Upload {...props}>
+                          <Button><ImportOutlined/>
+                            {selectedFile ? selectedFile.name : 'Import'}
+                          </Button>
+                        </Upload>
+                        {/* <Button type="primary" htmlType="submit" className="submit-button">
+                          Submit
+                        </Button> */}
+                      </form> 
                       </div>) : null}
                       <div>
                         {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
