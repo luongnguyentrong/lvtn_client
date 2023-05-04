@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { OrganizationGraph, OrgItem, NodeData } from '@ant-design/graphs';
+import { OrganizationGraph, OrgItem, NodeData, Edge } from '@ant-design/graphs';
 import axios from "axios";
 import { getBearerHeader } from "../../utils";
 import API from "../../api";
+import { Spin } from "antd";
 
 function convertToNode(data: any) {
     const children = data.children ? data.children.map((data: any) => convertToNode(data)) : undefined;
@@ -22,41 +23,6 @@ function convertToNode(data: any) {
 export default function () {
     const [org, setOrg] = useState<NodeData<OrgItem>>()
 
-    const fakeData = {
-        id: 'root',
-        value: {
-            name: 'Đại học Bách Khoa',
-        },
-        children: [
-            {
-                id: 'joel',
-                value: {
-                    name: 'Joel Alan',
-                },
-                children: [
-                    {
-                        id: 'c1',
-                        value: {
-                            name: 'c1',
-                        },
-                    },
-                    {
-                        id: 'c2',
-                        value: {
-                            name: 'c2',
-                        },
-                    },
-                    {
-                        id: 'c3',
-                        value: {
-                            name: 'c3',
-                        },
-                    },
-                ],
-            },
-        ],
-    };
-
     useEffect(() => {
         const config = getBearerHeader()
         if (config) {
@@ -67,14 +33,24 @@ export default function () {
     }, [])
 
     if (org === undefined) {
-        return <p>Loading...</p>
+        return <div style={{
+            paddingTop: "20px",
+            minHeight: '200px',
+            textAlign: 'center'
+        }}>
+            <Spin />
+        </div>
     }
 
     return <OrganizationGraph nodeCfg={{
         size: [120, 40],
         style: {
+            radius: 3,
             stroke: '#91d5ff',
+            fill: "white",
         },
+        label: {
+        }
     }} behaviors={[]} height={400} autoFit={false} data={org} onReady={(graph) => {
         graph.on('node:click', (evt) => {
             const item = evt.item;

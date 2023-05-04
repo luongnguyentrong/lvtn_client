@@ -8,7 +8,7 @@ export function getUnit(): string {
 
     const arr = window.location.hostname.split(".")
 
-    if (arr.length === 2) {
+    if (arr.length <= 2) {
         return "master"
     }
 
