@@ -13,6 +13,8 @@ import { Modal } from 'antd';
 import CreateTable from '../../Create-table/CreateTable';
 // import CreateBlock from './UnitAdmin/CreateBlock';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
+import Cookies from 'universal-cookie';
+import { getBearerHeader, getUnit } from '../../utils';
 
 interface TableRow {
   [key: string]: any;
@@ -87,7 +89,27 @@ const Normal = (props: IProps) => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}} onClick={() => {
+          const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+
+          const config =  getBearerHeader()
+
+          if (config !== undefined) {
+            const cookies = new Cookies()
+            const params = new URLSearchParams()
+            params.append("client_id", "console")
+            params.append("refresh_token", cookies.get("refresh_token"))
+
+            axios.post(logoutEndpoint, params, config).then(res => {
+              if (res.status === 204) {
+                cookies.remove("access_token")
+                cookies.remove("refresh_token")
+
+                location.reload()
+              }
+            })
+          }
+        }}>User</h1>
       </div>
     </Col>
   </Row>

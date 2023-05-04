@@ -1,13 +1,15 @@
+
+const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster"
+
 const API = {
-    baseURL: import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster",
     CreateUnits: {
-        URL: "/units"
+        URL: BaseURL + "/units"
     },
     ListUnits: {
         API: "/units"
     },
     ListOrg: {
-        API: "/units/org"
+        URL: BaseURL + "/units/org"
     }
 }
 

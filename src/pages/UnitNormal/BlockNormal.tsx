@@ -3,7 +3,7 @@ import { Layout, Row, Col, InputNumber, Form,} from 'antd';
 const { Header,Content, Sider } = Layout;
 import { Input, Button, Avatar, Tooltip, Menu, theme, Table, Divider} from 'antd';
 import type { MenuProps } from 'antd';
-import { BellOutlined, UserOutlined, EditOutlined,UploadOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
+import { BellOutlined, UserOutlined, EditOutlined,FileOutlined,ExportOutlined, DeleteOutlined,TableOutlined,ExclamationCircleFilled} from '@ant-design/icons';
 const { Search } = Input;
 const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
@@ -127,7 +127,8 @@ const Main = () => {
   };
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
-  const [ListFile, setListFile] = useState([]);
+  const [ListFile, setListFile] = useState<ItemType[]>([]);
+  const [addfile, setaddfile] = useState('');
   const addrow = () =>{
     setNewRow(true);
   }
@@ -135,8 +136,28 @@ const Main = () => {
     const file = event.target.files[0];
     setSelectedFile(file);
   };
-  const getMenuItems = async (e: any) => {
-    e.preventDefault();
+
+  const getFile = async () => {
+   // e.preventDefault();
+    try {
+      const response = await axios.get('http://localhost:5000/list-items');
+      const data1 = response.data;
+      const data2 = data1["items"]
+      data2.shift();
+      const items = data2.map((key: string) => ({
+        key,
+        label: `${key}`,
+        icon: <FileOutlined />,
+      }));
+      setListFile(items);
+    } catch (error) {
+      console.error('Failed', error);
+      setListFile([]);
+    }
+  };
+
+  const getMenuItems = async () => {
+   // e.preventDefault();
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
@@ -274,25 +295,31 @@ const Main = () => {
 
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
-
     try {
       const response = await fetch('http://localhost:5000/upload_files?block='+value, {
         method: 'POST',
         body: formData,
       });
-
       if (response.ok) {
-        //console.log('File uploaded successfully');
         success("Upload file thành công");
         form.reset();
-      } else {
+      } 
+      else {
         console.error('File upload failed');
-        // Handle the failed response
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      // Handle the error
+    } 
+    catch (error) {
+        console.error('An error occurred:', error);
     }
+    const newfile: ItemType = {
+      "key": selectedFile.name,
+      "label": selectedFile.name,
+      "icon": <FileOutlined />
+    }
+    const sup: ItemType[] = [...ListFile];
+    sup.push(newfile)
+    setListFile(sup)
+  //  setaddfile([])
   };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
@@ -416,7 +443,7 @@ const Main = () => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
         <BellOutlined className="bell" style={{ marginRight: '20px', color: 'white', fontSize: '28px'}} />
         <Avatar className="Avartar" size={30} icon={<UserOutlined />} style={{backgroundColor: '#FF00FF'}} />
-        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>SuperUser</h1>
+        <h1 style={{margin:'-17px 5px 0px 20px', color:'white'}}>User</h1>
       </div>
     </Col>
   </Row>
@@ -425,7 +452,7 @@ const Main = () => {
     <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'750px' }}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
@@ -458,7 +485,6 @@ const Main = () => {
                     <div>{criteria}</div>
                   )}
                 </Modal>
-  
             <form onSubmit={uploadFile} encType="multipart/form-data" className="upload-form">
               <label htmlFor="upload" className="file-label">
                  {selectedFile ? selectedFile.name : 'Choose a file'}
@@ -466,10 +492,13 @@ const Main = () => {
               </label>
               <button type="submit" className="submit-button">Submit</button>
             </form>
-          
-          {/* <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Upload</Button>
-          </Upload> */}
+            <Menu
+            mode="inline"
+            defaultSelectedKeys={['1']}
+            defaultOpenKeys={['sub1']}
+            style={{ height: '250px', borderRight: 0, maxHeight: '450px', overflowY: 'scroll' }}
+            items={ListFile}
+          />
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
@@ -497,7 +526,11 @@ const Main = () => {
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'15px' }}>
           {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom:'5px' }}>
             <Button onClick={ExportExcel} style={{ marginRight: '10px'}}><ExportOutlined />Export</Button>
+            <Button onClick={handleButtonClick}><EditOutlined/>Phân tích</Button> 
           </div>) : null} 
+          <div>
+      {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
+    </div>
           </div>
                 <Form form={form} component={false}>
                   <Table 
@@ -552,7 +585,7 @@ const Main = () => {
                 <button onClick={addrow} className='addrow'>
                      <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
                 </button>)}
-                <Modal title="Basic Modal" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
+                <Modal title="Sửa dòng" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
                 arr3 && arr3.map((field:any) => (
