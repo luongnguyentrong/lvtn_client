@@ -80,6 +80,7 @@ const Main = () => {
   const handleCancel2 = () => {setIsModalOpen2(false);};
   const [NewRow, setNewRow] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile2, setSelectedFile2] = useState(null);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -102,13 +103,14 @@ const Main = () => {
   const [EditRecord, setEditRecord] = useState(false);
   const [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!selectedFile) {
+    if (!selectedFile2) {
       return;
     }
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append('file', selectedFile2);
     try {
       //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
       const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
@@ -137,6 +139,11 @@ const Main = () => {
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     setSelectedFile(file);
+  };
+
+  const handleFileImport = (event: any) => {
+    const file = event.target.files[0];
+    setSelectedFile2(file);
   };
 
   const getFile = async () => {
@@ -556,13 +563,6 @@ return (
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
-            <div>
-              <h2>Upload Form</h2>
-              <form onSubmit={handleSubmit}>
-                <input type="file" name="file" onChange={handleFileChange} />
-                <button type="submit">Upload</button>
-              </form>
-            </div>
           <Layout>
             <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content
@@ -636,9 +636,18 @@ return (
                 ) : null
                 }
                 {NewRow ? null : (
-                <button onClick={addrow} className='addrow'>
-                     <h1 style={{fontSize:'17px', color:'white', padding:'6px 10px 2px 10px'}}>ADD NEW ROW</h1> 
-                </button>)}
+                   <>
+                   <div style={{display:'flex',justifyContent: 'flex-end'}}>
+                      <form onSubmit={handleSubmit}>
+                        <input type="file" name="file" onChange={handleFileImport} />
+                        <button type="submit">Upload</button>
+                      </form>
+                    </div>
+                    <button onClick={addrow} className='addrow'>
+                        <h1 style={{ fontSize: '17px', color: 'white', padding: '6px 10px 2px 10px' }}>ADD NEW ROW</h1>
+                      </button>
+                      </>
+                      )}
                 <Modal title="Sửa dòng" open={EditRecord} onOk={()=> {setEditRecord(false), handleEditData()}} onCancel={()=>setEditRecord(false)}>
             <div>
                 {
