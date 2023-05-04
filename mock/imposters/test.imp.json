@@ -1,0 +1,15 @@
+[
+    {
+        "request": {
+            "method": "GET",
+            "endpoint": "/gophers/01D8EMQ185CA8PRGE20DKZTGSR"
+        },
+        "response": {
+            "status": 200,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": "{\"data\":{\"type\":\"gophers\",\"id\":\"01D8EMQ185CA8PRGE20DKZTGSR\",\"attributes\":{\"name\":\"Zebediah\",\"color\":\"Purples\",\"age\":55}}}"
+        }
+    }
+]
