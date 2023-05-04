@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Layout, Row, Col, InputNumber, Form } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Layout, Row, Col, InputNumber, Form, Select } from 'antd';
 const { Header, Content, Sider } = Layout;
 import { Input, Button, Avatar, Menu, theme, Table,Divider, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
@@ -37,7 +37,10 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   index: number;
   children: React.ReactNode;
 }
-
+interface User {
+  value: string;
+  label: string;
+}
 const EditableCell: React.FC<EditableCellProps> = ({
   editing,
   dataIndex,
@@ -73,29 +76,60 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const Main: React.FC = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    //console.log('http://localhost:5000/upload?block=' + curUnit + '_' + value + '&table=' + name)
+    try {
+      const response = await fetch('http://localhost:5000/import?block='+curUnit+'_'+ value+'&table='+name, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log('File uploaded successfully');
+        // Handle success case
+      } else {
+        console.error('File upload failed');
+        // Handle error case
+      }
+    } catch (error) {
+      console.error('An error occurred during file upload:', error);
+    }
+  };
   const location = useLocation();
   const value = location.state;
- 
   const [form] = Form.useForm();
   interface Table {
     name: string;
     cols: string[];
     des: string[];
   }
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleOk = () => {setIsModalOpen(false);};
   const handleCancel = () => {setIsModalOpen(false);};
-
+  const handleUserChange = (value: string) => {
+    setAddUser(value)
+  }
+  const [curUnit, setCurUnit] = useState<string>("cs")
+  const [addUser, setAddUser] = useState<string>("")
+  const [Users, setUsers] = useState<User[]>([])
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
-  
   const [ShowAddModal,setShowAddModal] = useState(false);
-
+  const [ShowAddModal1, setShowAddModal1] = useState(false);
   const handleCancel2 = () => {setIsModalOpen2(false);};
-
   const [data, setData] = useState<ItemType[]>([])
-  
   const {token: { colorBgContainer },} = theme.useToken();
   const [name, setTableName] = useState<string>("");
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -123,7 +157,7 @@ const Main: React.FC = () => {
   const handleOk2 = async () => {
     setIsModalOpen2(false);
     try {
-      await axios.post('http://localhost:5000/edit_criteria?block=hcmut_' + value+'&new=' +encodeURIComponent(inputValue));
+      await axios.post('http://localhost:5000/edit_criteria?block=cs_' + value+'&new=' +encodeURIComponent(inputValue));
     } catch (error) {
       console.error('Failed', error);
     }
@@ -132,8 +166,7 @@ const Main: React.FC = () => {
 
   const handleCriteria = async ()=>{
     try {
-      const response = await axios.get('http://localhost:5000/show_criteria?block=hcmut_' + value);
-      console.log(response)
+      const response = await axios.get('http://localhost:5000/show_criteria?block=cs_' + value);
       let crit: any = decodeURIComponent(response.data["body"])
       setCriteria(crit)
     } catch (error) {
@@ -146,7 +179,7 @@ const Main: React.FC = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
+      const response = await axios.get('http://localhost:5000/show_tables?block_name='+curUnit+'_'+value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -175,7 +208,7 @@ const Main: React.FC = () => {
     setTableName(e.key) 
     let row: TableRow[] = [];
     try {
-      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      let url: any = "http://localhost:5000/show_inside?block_name="+curUnit+"_" + value + "&table_name="+e.key
       const response = await axios.get(url);
       const data1 = response.data; // extract the data from the response
       const arr = data1["body"];
@@ -212,9 +245,24 @@ const Main: React.FC = () => {
   const handleInputChange = (event: any) => {
     setInputValue(event.target.value);
   };
-  
+  async function getUsers() {
+    try {
+      let sql: any = "http://localhost:5000/show_user?name=hcmut";
+      const response = await axios.post(sql);
+      return response.data["body"]
+    } catch (error) {
+      console.error('Error creating database:', error);
+    }
+  }
+  useEffect(() => {
+    async function fetchOptions() {
+      const options = await getUsers();
+      setUsers(options);
+    }
+    fetchOptions();
+  }, []);
   const handleAddTable = async () => {
-    let sql: any = "http://localhost:5000/create_tables?name=hcmut_" + value;
+    let sql: any = "http://localhost:5000/create_tables?name="+curUnit+"_" + value;
     let request: any = []
     for (var i in createtable) {
       let k: Table = {
@@ -269,6 +317,17 @@ const Main: React.FC = () => {
       },
     });
   };
+  const handleAddUser = async () => {
+    try {
+      let url: any = "http://localhost:5000/add_users?block=" + curUnit + "_" + value
+      let body: string[] = []
+      body.push(addUser)
+      await axios.post(url, body);
+      setAddUser("")
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
   const [NewRow, setNewRow] = useState(false);
   const addrow = () =>{
     setNewRow(true);
@@ -346,19 +405,37 @@ return (<Layout onLoad={getMenuItems} style={{backgroundColor: '#E8E8E8'}}>
     <Content style={{ width: '100%', maxHeight: '1200px', margin: '20px 0px 0px 0px',backgroundColor:'#E8E8E8' }}>
 
       <Layout>
-        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px' }}>
+        <Sider width={200} style={{ background: colorBgContainer ,maxHeight:'720px'}}>
           <div>
             <h1 style={{textAlign: 'center', fontSize:'20px', paddingTop: '10px'}}>Các dữ liệu quản lý</h1>
           </div>
           <Button style={{marginLeft:'35px', backgroundColor:'#4BAE16', color:'white'}} onClick={()=> setShowAddModal(true)}><PlusCircleOutlined />
-          Thêm bảng</Button>
+          Thêm bảng
+          </Button>
+        <Button style={{ marginLeft: '0px', backgroundColor: '#4BAE16', color: 'white' }} onClick={() => setShowAddModal1(true)}><PlusCircleOutlined />
+          Thêm người nhập dữ liệu
+        </Button>
           <Modal
             title="Thêm bảng"
             open={ShowAddModal}
             onOk={()=>{setShowAddModal(false),handleAddTable()}}
-            onCancel={()=> setShowAddModal(false)}
-          > 
-          <CreateTable tablesInfo={createtable} setTablesInfo={setcreatetable} /></Modal>
+            onCancel={()=> setShowAddModal(false)}> 
+          <CreateTable tablesInfo={createtable} setTablesInfo={setcreatetable} />
+          </Modal>
+          <Modal
+            title="Thêm người chỉnh sửa"
+            open={ShowAddModal1}
+            onOk={() => { setShowAddModal1(false), handleAddUser()}}
+            onCancel={() => setShowAddModal1(false)}>
+          <div>
+            {/* <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu' value={InputDes} onChange={handleInputDes} /> */}
+            <p>Chọn người nhập dữ liệu</p>
+            <Select
+              style={{ width: "200px", marginTop: "10px" }}
+              onChange={handleUserChange}
+              options={Users} />
+          </div> 
+          </Modal>
           <Menu
             onClick={onClick}
             mode="inline"

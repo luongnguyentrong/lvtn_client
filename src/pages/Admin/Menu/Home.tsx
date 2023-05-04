@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, Layout, Modal, Space, Tag, Typography, theme } from "antd"
+import { Avatar, Breadcrumb, Button, Card, Layout, Modal, Space, Tag, Typography, theme } from "antd"
 import { HomeOutlined, CrownFilled, TeamOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -48,9 +48,24 @@ export default function () {
                     <Layout.Content style={{
                         backgroundColor: token.colorBgContainer,
                     }}>
+                        <Breadcrumb
+                            items={[
+                                {
+                                    title: 'Home',
+                                },
+                                {
+                                    title: 'Đại học Bách Khoa',
+                                },
+                            ]}
+                            style={{
+                                marginTop: "16px"
+                            }}
+                        />
+
                         <Typography.Title level={4} style={{
                             marginTop: "16px"
                         }}>Môi trường làm việc</Typography.Title>
+
 
                         <Space size={"middle"}>
                             <Avatar
@@ -71,7 +86,15 @@ export default function () {
 
             <Layout>
                 <Layout.Content style={{ margin: "16px" }}>
-                    <Card title="Tập dữ liệu" extra={<Button type="primary" onClick={showModal} icon={<PlusOutlined />}>Tạo dữ liệu mới</Button>}>
+                    <Card
+                        title="Tập dữ liệu"
+                        style={{
+                            minHeight: "380px"
+                        }}
+                        extra={<Button type="primary"
+                            onClick={showModal}
+                            icon={<PlusOutlined />}
+                        >Tạo dữ liệu mới</Button>}>
                         <Card.Grid style={gridStyle} onClick={() => {
                             navigate("/blocks/1")
                         }}>

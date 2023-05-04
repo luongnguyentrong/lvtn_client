@@ -100,9 +100,33 @@ const Main = () => {
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria();};
   const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
-
+  const [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedFile) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
+      const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
+        method: 'POST',
+        body: formData,
+      });
 
+      if (response.ok) {
+        console.log('File uploaded successfully');
+        // Handle success case
+      } else {
+        console.error('File upload failed');
+        // Handle error case
+      }
+    } catch (error) {
+      console.error('An error occurred during file upload:', error);
+    }
+  };
   const [formData2, setFormData2] = useState({});
   const [function_table,setfunction_table] = useState(false);
   const [ListFile, setListFile] = useState<ItemType[]>([]);
@@ -139,7 +163,7 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=hcmut_'+value);
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=cs_'+value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -274,7 +298,7 @@ const Main = () => {
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
     try {
-      const response = await fetch('http://localhost:5000/upload_files', {
+      const response = await fetch('http://localhost:5000/upload_files?block='+value, {
         method: 'POST',
         body: formData,
       });
@@ -304,7 +328,7 @@ const Main = () => {
     setTableName(e.key)
     let row: TableRow[] = [];
     try {
-      let url: any = "http://localhost:5000/show_inside?block_name=hcmut_" + value + "&table_name="+e.key
+      let url: any = "http://localhost:5000/show_inside?block_name=cs_" + value + "&table_name="+e.key
       const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
@@ -376,7 +400,15 @@ const Main = () => {
   if (index > -1){
     arr3.splice(index2,1)
   }
-  
+  const handleDownload = async () => {
+    const response = await fetch(testUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "fileName.txt";
+    link.click();
+  };
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
     title: column.title,
@@ -524,6 +556,13 @@ return (
           </div>
         </Sider>
         <Content style={{ width: '100%', height: '720px', margin: '0 0',backgroundColor:'#E8E8E8' }}>
+            <div>
+              <h2>Upload Form</h2>
+              <form onSubmit={handleSubmit}>
+                <input type="file" name="file" onChange={handleFileChange} />
+                <button type="submit">Upload</button>
+              </form>
+            </div>
           <Layout>
             <Layout style={{ padding: '0 0px 0px',backgroundColor:'#E8E8E8' }}>
               <Content

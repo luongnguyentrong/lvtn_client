@@ -25,7 +25,7 @@ function getAuthParams() {
 }
 
 function App() {
-    // return <UnitAdmin/>
+    //return <UnitAdmin name="manh"/>
     const [mainRole, setMainRole] = useState<string>("")
     const navigate = useNavigate()
     const [username, setUserName] = useState<string>("")
@@ -57,6 +57,7 @@ function App() {
                             setMainRole("admin")
                         } else if (roles.includes("unit_admin")) {
                             setMainRole("unit_admin")
+                            setUserName(res.data["preferred_username"])
                         } else if (roles.includes("unit_normal")) {
                             setMainRole("unit_normal")
                             setUserName(res.data["preferred_username"])
@@ -79,7 +80,7 @@ function App() {
             </Admin>
 
         case "unit_admin":
-            return <UnitAdmin />
+            return <UnitAdmin name={username}/>
 
         case "unit_normal":
             return <Normal name={username}/>
