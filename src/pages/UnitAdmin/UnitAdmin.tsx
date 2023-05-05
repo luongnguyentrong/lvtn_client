@@ -56,7 +56,7 @@ const UnitAdmin = (props: IProps) => {
   const {token: { colorBgContainer },} = theme.useToken();  
   const [deleteBlock,setDeleteBlock] = useState("")
   const [EditBlockName,setEditBlockName] = useState("");
-  const [isSuperUnit, setIsSuperUnit] = useState(false)
+  const [isSuperUnit, setIsSuperUnit] = useState(true)
   const [open, setOpen] = useState(false);
 
   const showEditBlock = () =>{
