@@ -28,6 +28,8 @@ interface IProps {
   Modal: boolean
   setModal: React.Dispatch<React.SetStateAction<boolean>>
   key: number
+  name: string
+  curUnit: string
   // reset: boolean
 }
 
@@ -59,8 +61,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     console.log(`selected ${value}`);
   };
   async function handleDone(){
-    let nameBlock = getUnit()
-    nameBlock = nameBlock + "_"+Nameblock
+    let nameBlock = props.curUnit + "_"+Nameblock
       try {
         let sql: any = "http://localhost:5000/create_block?name=" + encodeURIComponent(nameBlock);
         await axios.post(sql);
@@ -107,6 +108,14 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
       } catch (error) {
       console.error('Error', error);
       }
+    try {
+      let url: any = "http://localhost:5000/add_users?block=" + nameBlock
+      let body: string[] = []
+      body.push(props.name)
+      await axios.post(url, body);
+    } catch (error) {
+      console.error('Error', error);
+    }
     props.setModal(false)
     setNameblock("")
     setTablesInfo([])
