@@ -93,6 +93,7 @@ const Main = () => {
   const handleCancel2 = () => { setIsModalOpen2(false); };
   const [NewRow, setNewRow] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile2, setSelectedFile2] = useState(null);
   const location = useLocation();
   const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
@@ -123,7 +124,7 @@ const Main = () => {
       return;
     }
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append('file', selectedFile2);
     try {
       const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
         method: 'POST',
@@ -151,6 +152,11 @@ const Main = () => {
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     setSelectedFile(file);
+  };
+
+  const handleFileImport = (event: any) => {
+    const file = event.target.files[0];
+    setSelectedFile2(file);
   };
 
   const getFile = async () => {
@@ -438,23 +444,6 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
-    // const downloadObject = (url: string) => {
-    //   fetch(url)
-    //     .then((response) => response.blob())
-    //     .then((blob) => {
-    //       // Create a temporary anchor element
-    //       const link = document.createElement("a");
-    //       link.href = URL.createObjectURL(blob);
-    //       link.download = "code.txt";
-    //       link.click();
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error downloading object:", error);
-    //     });
-    // };
-  
-//   const objectUrl = "https://lvtnstorage.s3.ap-southeast-1.amazonaws.com/code.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVQKWVG6WAUWPSHWR%2F20230428%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230428T082908Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=3522d23a58f8cfa6f933e7a46d8281a3013f137a76386c580afbe60e39842335";
-// const fileName = "code.txt";
 const menuItems2 = [
   <Menu.Item key="0" onClick={() => {
     const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
@@ -659,9 +648,20 @@ return (
                     ) : null
                     }
                     {NewRow ? null : (
-                      <button onClick={addrow} className='addrow'>
-                        <h1 style={{ fontSize: '17px', color: 'white', padding: '6px 10px 2px 10px' }}>ADD NEW ROW</h1>
-                      </button>)}
+                      <>
+                    <div style={{display:'flex', justifyContent:'flex-end'}}>
+
+                      <div style={{marginTop:'10px'}}>
+                      <form onSubmit={handleSubmit}>
+                        <input type="file" name="file" onChange={handleFileImport} />
+                        <button type="submit">Upload</button>
+                      </form>
+                      </div>
+                    <button onClick={addrow} className='addrow'>
+                        <h1 style={{ fontSize: '17px', color: 'white', padding: '3px 8px 0px 10px' }}>ADD NEW ROW</h1>
+                      </button>
+                      </div>
+                      </>)}
                     <Modal title="Sửa dòng" open={EditRecord} onOk={() => { setEditRecord(false), handleEditData() }} onCancel={() => setEditRecord(false)}>
                       <div>
                         {

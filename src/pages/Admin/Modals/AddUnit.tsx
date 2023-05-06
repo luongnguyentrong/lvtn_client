@@ -67,6 +67,7 @@ export default function (props: IProps) {
             username: fields.username,
             password: fields.password,
             unit_name: unit_name,
+            role: "unit_admin"
         }
 
         const result = await axios.post(API.CreateUsers.URL, data, getBearerHeader())
