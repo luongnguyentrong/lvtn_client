@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, message, Steps, theme, Input, Select } from 'antd';
 import CreateTable from '../../Create-table/CreateTable';
 import axios from 'axios';
-import { getUnit } from '../../utils';
+
 interface Table {
   name: string;
   cols: string[];
@@ -47,9 +47,6 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     setNameblock(event.target.value);
     console.log(Nameblock);
   };
-    const handleLoad = () =>{
-      setCurrent(0)
-    }
     const handleUserChange = (value: string) => {
       setAddUser(value) 
     }
@@ -60,6 +57,24 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     setTypeFile(value);
     console.log(`selected ${value}`);
   };
+  
+  async function getUsers(){
+    try {
+        let sql: any = "http://localhost:5000/show_user?name=hcmut";
+        const response = await axios.post(sql);
+        return response.data["body"]
+    } catch (error) {
+      console.error('Error creating database:', error);
+    }
+  }
+  useEffect(() => {
+    async function fetchOptions() {
+      const options = await getUsers();
+      setUsers(options);
+    }
+    fetchOptions();
+  }, []);
+
   async function handleDone(){
     let nameBlock = props.curUnit + "_"+Nameblock
       try {
@@ -124,26 +139,13 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     setUsers([])
   }
 
-  async function getUsers(){
-    try {
-        let sql: any = "http://localhost:5000/show_user?name=hcmut";
-        const response = await axios.post(sql);
-        return response.data["body"]
-    } catch (error) {
-      console.error('Error creating database:', error);
-    }
-  }
-  useEffect(() => {
-    async function fetchOptions() {
-      const options = await getUsers();
-      setUsers(options);
-    }
-    fetchOptions();
-  }, []);
+  
+
   const steps = [ 
     {
       title: 'Bước 1',
-      content: <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} onChange={handleNameBlockChange} />
+      content: <Input style={{width: "50%"}} type='text' placeholder='Nhập tên vùng dữ liệu' value={Nameblock} 
+      onChange={handleNameBlockChange} />
     },
     {
       title: 'Bước 2',
@@ -220,6 +222,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     padding:20,
     marginTop:30,
   };
+  
   return (
     <>{contextHolder}<div key ={props.key} style={{width: "700px"}}>
       <Steps current={current} items={items} />

@@ -581,17 +581,15 @@ return (
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
                       {function_table ? (<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
                         <Button onClick={ExportExcel} style={{ marginRight: '10px' }}><ExportOutlined />Export</Button>
-                        <Button onClick={handleButtonClick}><EditOutlined />Phân tích</Button>
-                      <form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <form onSubmit={handleSubmit} encType="multipart/form-data" style={{ marginRight: '10px' }}>
                         <Upload {...props}>
                           <Button><ImportOutlined/>
                             {selectedFile ? selectedFile.name : 'Import'}
                           </Button>
                         </Upload>
-                        {/* <Button type="primary" htmlType="submit" className="submit-button">
-                          Submit
-                        </Button> */}
                       </form> 
+                        <Button onClick={handleButtonClick} ><EditOutlined />Phân tích</Button>
+                      
                       </div>) : null}
                       <div>
                         {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
@@ -648,20 +646,11 @@ return (
                     ) : null
                     }
                     {NewRow ? null : (
-                      <>
-                    <div style={{display:'flex', justifyContent:'flex-end'}}>
-
-                      <div style={{marginTop:'10px'}}>
-                      <form onSubmit={handleSubmit}>
-                        <input type="file" name="file" onChange={handleFileImport} />
-                        <button type="submit">Upload</button>
-                      </form>
-                      </div>
                     <button onClick={addrow} className='addrow'>
                         <h1 style={{ fontSize: '17px', color: 'white', padding: '3px 8px 0px 10px' }}>ADD NEW ROW</h1>
                       </button>
-                      </div>
-                      </>)}
+                  
+                     )}
                     <Modal title="Sửa dòng" open={EditRecord} onOk={() => { setEditRecord(false), handleEditData() }} onCancel={() => setEditRecord(false)}>
                       <div>
                         {
