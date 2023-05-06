@@ -154,7 +154,7 @@ const Main: React.FC = () => {
   const [Table1,setTable1] = useState<User[]>([])
   const [tableChange1, setTableChange1] = useState<string>("")
   const [tableChange2, setTableChange2] = useState<string>("")
-  const [colRelatation, set]
+  const [colRelation, setColRelation] = useState<string>("")
   const [listColTableChange1, setListTableChange1] = useState<User[]>([])
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria(); };
