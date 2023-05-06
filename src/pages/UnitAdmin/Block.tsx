@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Row, Col, InputNumber, Form, Select } from 'antd';
+import { Layout, Row, Col, InputNumber, Form, Select, Table } from 'antd';
 const { Header, Content, Sider } = Layout;
-import { Input, Button, Avatar, Menu, theme, Table, Divider, Dropdown } from 'antd';
+import { Input, Button, Avatar, Menu, theme, Divider, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { BellOutlined, UserOutlined, ExclamationCircleFilled, PlusCircleOutlined, ExportOutlined, EditOutlined, DeleteOutlined, TableOutlined } from '@ant-design/icons';
 const { Search } = Input;
@@ -40,6 +40,9 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
 interface User {
   value: string;
   label: string;
+}
+interface Table1 {
+  name1: string
 }
 const EditableCell: React.FC<EditableCellProps> = ({
   editing,
@@ -121,9 +124,38 @@ const Main: React.FC = () => {
   const handleUserChange = (value: string) => {
     setAddUser(value)
   }
+  const handleTable1Change = async (value1: string) =>{
+    setTableChange1(value1)
+    try {
+      let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + value1
+      const response = await axios.get(url);
+      const data1 = response.data; // extract the data from the response
+      const arr = data1["body"];
+      console.log(arr[2])
+      let k: User[] = []
+      for (var ele of arr[2]){
+        let new1: User = {
+          value: ele,
+          label: ele
+        }
+        k.push(new1)
+      }
+      setListTableChange1(k)
+    } catch (error) {
+      console.error('Failed', error);
+    }
+  }
+  const handleTable2Change = async (value1: string) => {
+    setTableChange2(value1)
+  }
   const [curUnit, setCurUnit] = useState<string>("cs")
   const [addUser, setAddUser] = useState<string>("")
   const [Users, setUsers] = useState<User[]>([])
+  const [Table1,setTable1] = useState<User[]>([])
+  const [tableChange1, setTableChange1] = useState<string>("")
+  const [tableChange2, setTableChange2] = useState<string>("")
+  const [colRelatation, set]
+  const [listColTableChange1, setListTableChange1] = useState<User[]>([])
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria(); };
   const [ShowAddModal, setShowAddModal] = useState(false);
@@ -188,6 +220,17 @@ const Main: React.FC = () => {
         icon: <TableOutlined />
       }));
       setData(items2)
+      let k: User[] = []
+      console.log(item)
+      for (var i of item){
+        console.log(i)
+        let newtable: User = {value: '', label: ''}
+        newtable.value = i
+        newtable.label = i
+        k.push(newtable)
+      }
+      console.log(k)
+      setTable1(k)
     } catch (error) {
       console.error('Failed', error);
       return [];
@@ -328,6 +371,9 @@ const Main: React.FC = () => {
       console.error('Error', error);
     }
   }
+  const handleAddRela = () =>{
+    console.log(tableChange1)
+  }
   const [NewRow, setNewRow] = useState(false);
   const arr1 = Object.keys(currentRecord);
   const arr2 = Object.keys(currentRecord).map(key => currentRecord[key]);
@@ -410,7 +456,7 @@ const Main: React.FC = () => {
             Thêm bảng
           </Button>
           <Button style={{ marginLeft: '0px', backgroundColor: '#4BAE16', color: 'white' }} onClick={() => setShowAddModal1(true)}><PlusCircleOutlined />
-            Thêm người nhập dữ liệu
+            Thêm relationship
           </Button>
           <Modal
             title="Thêm bảng"
@@ -422,19 +468,31 @@ const Main: React.FC = () => {
           <Modal
             title="Thêm relationship giữa các bảng"
             open={ShowAddModal1}
-            onOk={() => { setShowAddModal1(false), handleAddUser() }}
-            onCancel={() => setShowAddModal1(false)}>
+            onOk={() => { setShowAddModal1(false), handleAddRela()}}
+            onCancel={() => {setShowAddModal1(false), setTableChange1(''),setTableChange2('')}}>
             <div>
               {/* <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu' value={InputDes} onChange={handleInputDes} /> */}
               <p>Chọn bảng một</p>
               <Select
-                style={{ width: "200px", marginTop: "10px", marginBottom: "100px" }}
-                onChange={handleUserChange}
-                options={Users} />
+                style={{ width: "200px", marginTop: "0px", marginBottom: "100px" }}
+                onChange={handleTable1Change}
+                options={Table1}
+                value={tableChange1}/>
               <Select
-                style={{ width: "200px", marginTop: "10px", marginLeft: "50px" }}
+                style={{ width: "200px", marginTop: "0px", marginLeft: "50px" }}
                 onChange={handleUserChange}
-                options={Users} />
+                placeholder={"Chọn cột"}
+                options={listColTableChange1}
+                value={tableChange2}
+                />
+            </div>
+            <div>
+              {/* <TextArea rows={4} placeholder='Nhập tiêu chí đầu ra dữ liệu' value={InputDes} onChange={handleInputDes} /> */}
+              <p>Chọn bảng 2</p>
+              <Select
+                style={{ width: "200px", marginTop: "0px", marginBottom: "100px" }}
+                onChange={handleTable2Change}
+                options={Table1} />
             </div>
           </Modal>
           <Menu
