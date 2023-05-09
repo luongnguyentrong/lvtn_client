@@ -146,6 +146,11 @@ const Main = () => {
         setOpendashboard(false)
     }
 
+    const handleFileImport = (event: any) => {
+        const file = event.target.files[0];
+        setSelectedFile2(file);
+    };
+
     const handleSubmit = async (selectedFile: any) => {
         //event.preventDefault();
         if (!selectedFile) {
@@ -183,6 +188,25 @@ const Main = () => {
     const handleFileChange = (event: any) => {
         const file = event.target.files[0];
         setSelectedFile(file);
+    };
+
+    const getFile = async () => {
+        // e.preventDefault();
+        try {
+            const response = await axios.get('http://localhost:5000/list-items');
+            const data1 = response.data;
+            const data2 = data1["items"]
+            data2.shift();
+            const items = data2.map((key: string) => ({
+                key,
+                label: `${key}`,
+                icon: <FileOutlined />,
+            }));
+            setListFile(items);
+        } catch (error) {
+            console.error('Failed', error);
+            setListFile([]);
+        }
     };
 
     const getMenuItems = async () => {
@@ -358,7 +382,8 @@ const Main = () => {
         setTableName(e.key)
         let row: TableRow[] = [];
         try {
-            let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + e.key
+            // let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + e.key
+            let url: any = "http://localhost:5000/show_inside?block_name=pck" + "_" + "nckh" + "&table_name=" + e.key
             const response = await axios.get(url);
             const data = response.data; // extract the data from the response
             const arr = data["body"];
