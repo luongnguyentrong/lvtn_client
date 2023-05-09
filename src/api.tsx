@@ -13,7 +13,10 @@ const API = {
     },
     ListOrg: {
         URL: BaseURL + "/units/org"
-    }
+    },
+    Dashboards: {
+        List: BaseURL + "/superset/",
+    },
 }
 
 export default API

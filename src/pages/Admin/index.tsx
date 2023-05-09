@@ -21,6 +21,7 @@ const navs = [
     {
         label: "Quản lý người dùng",
         icon: TeamOutlined,
+        path: "/users"
     },
     {
         label: "Cài đặt",
@@ -76,6 +77,8 @@ const AdminLayout: React.FC<IProps> = (props: IProps) => {
             navigate("/")
         else if (e.key === "slider_items_1")
             navigate("/units")
+        else if (e.key === "slider_items_2")
+            navigate("/users")
     }
 
     return (

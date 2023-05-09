@@ -10,6 +10,7 @@ import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Layout } from 'antd';
+import UnitAdminLayout from './pages/UnitAdmin/UnitAdminLayout';
 
 function getAuthParams() {
     const data = {
@@ -80,10 +81,12 @@ function App() {
             </Admin>
 
         case "unit_admin":
-            return <UnitAdmin name={username}/>
+            return <UnitAdminLayout>
+                <UnitAdmin name={username} />
+            </UnitAdminLayout>
 
         case "unit_normal":
-            return <Normal name={username}/>
+            return <Normal name={username} />
 
         default:
             return <Loading />
@@ -91,4 +94,3 @@ function App() {
 }
 
 export default App;
- 

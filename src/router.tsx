@@ -8,6 +8,7 @@ import NewBlock from "./pages/Admin/NewBlock";
 import Home from "./pages/Admin/Menu/Home";
 import Block from "./pages/UnitAdmin/Block"
 import BlockNormal from "./pages/UnitNormal/BlockNormal";
+import UserManager from "./pages/Admin/UserManager";
 
 export const router = createBrowserRouter([
     {
@@ -26,7 +27,10 @@ export const router = createBrowserRouter([
                 path: "/new",
                 element: <NewBlock />
             },
-
+            {
+                path: "/users",
+                element: <UserManager />
+            }
         ]
     },
     {
