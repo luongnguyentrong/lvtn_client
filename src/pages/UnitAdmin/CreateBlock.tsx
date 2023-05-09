@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, message, Steps, theme, Input, Select } from 'antd';
 import CreateTable from '../../Create-table/CreateTable';
 import axios from 'axios';
-import { getUnit } from '../../utils';
+import { getUnit, toSlug } from '../../utils';
 interface Table {
   name: string;
   cols: string[];
@@ -61,15 +61,17 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     console.log(`selected ${value}`);
   };
   async function handleDone(){
-    let nameBlock = props.curUnit + "_"+Nameblock
+    let nameBlock = props.curUnit + "_"+toSlug(Nameblock)
       try {
-        let sql: any = "http://localhost:5000/create_block?name=" + encodeURIComponent(nameBlock);
-        await axios.post(sql);
+        let request: any = {}
+        request["disname"] = Nameblock
+        request["norname"] = nameBlock
+        let sql: any = "http://localhost:5000/create_block";
+        await axios.post(sql,request);
       } catch (error) {
       console.error('Error creating database:', error);
       }
       try {
-        console.log(nameBlock)
         let sql: any = "http://localhost:5000/create_tables?name=" + encodeURIComponent(nameBlock);
         let request : any=[]
         for (var i in tablesInfo){
@@ -92,7 +94,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
         let sql: any = "http://localhost:5000/add_des"
         let k: any = {
           "name": nameBlock,
-          "display":"",
+          "display": Nameblock,
           "descript": encodeURIComponent(InputDes)
         }
         await axios.post(sql,k);

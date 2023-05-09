@@ -11,7 +11,7 @@ import axios from 'axios';
 import { Modal } from 'antd';
 import './Unitadmin.css';
 import CreateBlock from './CreateBlock';
-import { getBearerHeader, getUnit } from '../../utils';
+import { getBearerHeader, getUnit, toSlug } from '../../utils';
 import Cookies from 'universal-cookie';
 
 interface Table {
@@ -32,6 +32,7 @@ interface Table {
 
 interface VirtualFolder {
     name: string;
+    norname: string;
 }
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
@@ -47,7 +48,7 @@ interface VirtualFolder {
 }
 
 const UnitAdmin = (props: IProps) => {
-    const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{ name: "" }]);
+    const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{ name: "", norname: "" }]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const showModal = () => { setIsModalOpen(true); };
     const [resetKey, setResetKey] = useState(0);
@@ -55,7 +56,7 @@ const UnitAdmin = (props: IProps) => {
     const { token: { colorBgContainer }, } = theme.useToken();
     const [deleteBlock, setDeleteBlock] = useState("")
     const [EditBlockName, setEditBlockName] = useState("");
-    const [curUnit, setUnit] = useState("cs");
+    const curUnit = getUnit()
     const [isSuperUnit, setIsSuperUnit] = useState(true)
     const [open, setOpen] = useState(false);
 
@@ -64,12 +65,7 @@ const UnitAdmin = (props: IProps) => {
         setOpen(true);
     }
 
-    function handleDeleteBlock(name: any) {
-        setDeleteBlock(name)
-    }
-
     const handleShowBlock = async () => {
-
         try {
             const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
             const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
@@ -101,8 +97,22 @@ const UnitAdmin = (props: IProps) => {
             cancelText: 'Không',
             async onOk() {
                 try {
-                    console.log(deleteBlock)
-                    //await axios.delete('http://localhost:5000/delete?block=hcmut_' + deleteBlock);
+                    console.log(EditBlockName);
+                    let newBlockName = toSlug(EditBlockName)
+                    let request: any = {}
+                    request["new"] = curUnit + "_" + toSlug(EditBlockName)
+                    request["old"] = curUnit + "_" + toSlug(deleteBlock)
+                    request["new_dis"] = EditBlockName
+                    await axios.post('http://localhost:5000/edit_blockname', request);
+                    const filteredList: VirtualFolder[] = virtualFolders.map((element: VirtualFolder) => {
+                        if (element.name == deleteBlock) {
+                            element.name = EditBlockName
+                            element.norname = toSlug(EditBlockName)
+                            return element;
+                        }
+                        return element;
+                    });
+                    setVirtualFolders(filteredList)
                 }
                 catch (error) {
                     console.error('Failed', error);
@@ -170,7 +180,7 @@ const UnitAdmin = (props: IProps) => {
     const navigate = useNavigate();
 
     function handleClick(value: any) {
-        navigate("/Unitadmin/block", { state: value })
+        navigate("/Unitadmin/block", { state: [toSlug(value), curUnit] })
     }
 
     const menuItems2 = [
@@ -204,55 +214,65 @@ const UnitAdmin = (props: IProps) => {
             <Layout>
                 <Content style={{ width: '100%', height: '1000px' }}>
                     <Layout style={{ padding: '0 24px 24px' }}>
-                        <Content
-                            style={{
-                                width: '100%',
-                                maxWidth: '1400px',
-                                padding: '24px',
-                                margin: '0 auto',
-                                minHeight: '280px',
-                                background: colorBgContainer,
-                            }}
-                        >
-                            <div className='header'>
-                                <h1 style={{ fontSize: '20px' }}>Tập dữ liệu</h1>
-                                <div className='btn-wrapper'>
-                                    {isSuperUnit && ( // Only render the button if `a` is true
-                                        <Button onClick={showModal} style={{ backgroundColor: '#32CD32', color: 'white', height: '40px' }}>
-                                            Thêm tập lưu trữ
-                                        </Button>
-                                    )}
-                                    <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
-                                        footer={[
-                                        ]}>
-                                        <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey} name={props.name} curUnit={curUnit} />
-                                    </Modal>
-                                </div>
-                            </div>
-                            <Divider />
-                            <div>
-                                <Card>
-                                    {virtualFolders.length > 0 ? (virtualFolders.map((folder) => (
-                                        <Card.Grid style={{ width: '25%', textAlign: 'center', position: 'relative' }}
-                                            key={folder.name}
-                                        >
-                                            {isSuperUnit && (<Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
-                                                <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
-                                                    onClick={() => handleDeleteBlock(folder.name)}>
-                                                    <h1 className='Edit' style={{ margin: '-1px -6px 0px 0px', color: '#71717a', fontSize: '22px', padding: '0px 2px' }}><EllipsisOutlined /></h1>
-                                                </button>
-                                            </Dropdown>)}
-                                            <div className='BlockName' style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <DatabaseTwoTone className='anticon' style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
-                                                <span style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer' }} onClick={() => handleClick(folder.name)}>{folder.name}</span>
-                                            </div>
-                                        </Card.Grid>
+                        <Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
+                            <Layout>
+                                <Content style={{ width: '100%', height: '1000px', backgroundColor: '#E8E8E8' }}>
+                                    <Layout>
+                                        <Layout style={{ padding: '0 24px 24px', backgroundColor: '#E8E8E8' }}>
+                                            <Content
+                                                style={{
+                                                    width: '100%',
+                                                    maxWidth: '1400px',
+                                                    padding: '24px',
+                                                    margin: '0 auto',
+                                                    minHeight: '280px',
+                                                    background: colorBgContainer,
+                                                }}
+                                            >
+                                                <div className='header'>
+                                                    <h1 style={{ fontSize: '20px' }}>TẬP DỮ LIỆU</h1>
+                                                    <div className='btn-wrapper'>
+                                                        {isSuperUnit && ( // Only render the button if `a` is true
+                                                            <Button onClick={showModal} style={{ backgroundColor: '#32CD32', color: 'white', height: '40px' }}>
+                                                                Thêm tập lưu trữ
+                                                            </Button>
+                                                        )}
+                                                        <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
+                                                            footer={[
+                                                            ]}>
+                                                            <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey} name={props.name} curUnit={curUnit} />
+                                                        </Modal>
+                                                    </div>
+                                                </div>
+                                                <Divider />
+                                                <div>
+                                                    <Card>
+                                                        {virtualFolders.length > 0 ? (virtualFolders.map((folder) => (
+                                                            <Card.Grid style={{ width: '25%', textAlign: 'center', position: 'relative' }}
+                                                                key={folder.name}
+                                                            >
+                                                                {isSuperUnit && (<Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
+                                                                    <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
+                                                                        onClick={() => handleDeleteBlock(folder.name)}>
+                                                                        <h1 className='Edit' style={{ margin: '-1px -6px 0px 0px', color: '#71717a', fontSize: '22px', padding: '0px 2px' }}><EllipsisOutlined /></h1>
+                                                                    </button>
+                                                                </Dropdown>)}
+                                                                <div className='BlockName' style={{ display: 'flex', flexDirection: 'column' }}>
+                                                                    <DatabaseTwoTone className='anticon' style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
+                                                                    <span style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer' }} onClick={() => handleClick(folder.name)}>{folder.name}</span>
+                                                                </div>
+                                                            </Card.Grid>
 
-                                    ))) : (
-                                        <div>Loading folders...</div>
-                                    )}
-                                </Card>
-                            </div>
+                                                        ))) : (
+                                                            <div>Loading folders...</div>
+                                                        )}
+                                                    </Card>
+                                                </div>
+                                            </Content>
+                                        </Layout>
+                                    </Layout>
+                                </Content>
+                            </Layout>
                         </Content>
 
                     </Layout>

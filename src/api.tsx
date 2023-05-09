@@ -4,7 +4,7 @@ const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.duc
 const API = {
     CreateUnits: {
         URL: BaseURL + "/units/"
-    },
+    }, 
     CreateUsers: {
         URL: BaseURL + "/users/"
     },

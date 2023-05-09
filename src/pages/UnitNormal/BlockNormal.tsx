@@ -151,10 +151,13 @@ const Main = () => {
         if (!selectedFile) {
             return;
         }
+
         const formData = new FormData();
-        formData.append('file', selectedFile2);
+        formData.append('file', selectedFile);
+        //console.log('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name)
         try {
-            const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
+            //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
+            const response = await fetch('http://localhost:5000/import_with_excel?block=pck_nckh' + '&table=' + name, {
                 method: 'POST',
                 body: formData,
             });
@@ -182,36 +185,13 @@ const Main = () => {
         setSelectedFile(file);
     };
 
-    const handleFileImport = (event: any) => {
-        const file = event.target.files[0];
-        setSelectedFile2(file);
-    };
-
-    const getFile = async () => {
-        // e.preventDefault();
-        try {
-            const response = await axios.get('http://localhost:5000/list-items');
-            const data1 = response.data;
-            const data2 = data1["items"]
-            data2.shift();
-            const items = data2.map((key: string) => ({
-                key,
-                label: `${key}`,
-                icon: <FileOutlined />,
-            }));
-            setListFile(items);
-        } catch (error) {
-            console.error('Failed', error);
-            setListFile([]);
-        }
-    };
-
     const getMenuItems = async () => {
         // e.preventDefault();
         let item: Array<string> = [];
         let items2: MenuProps['items'] = [];
         try {
-            const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
+            //const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
+            const response = await axios.get('http://localhost:5000/show_tables?block_name=pck_nckh');
             const data1 = response.data;
             item = data1["body"]
             items2 = item.map((key) => ({
@@ -219,17 +199,7 @@ const Main = () => {
                 label: `${key}`,
                 icon: <TableOutlined />
             }));
-
-            const total: MenuProps['items'] = [
-                {
-                    key: "tables",
-                    label: "Dữ liệu quản lý",
-                    icon: <DatabaseOutlined />,
-                    children: items2
-                }
-            ]
-
-            setData(total)
+            setData(items2)
         } catch (error) {
             console.error('Failed', error);
             return [];
@@ -276,6 +246,7 @@ const Main = () => {
         setFormData({})
         setNewRow(false)
     };
+
     const handleEditData = async () => {
         // const formValues = Object.values(formData2);
         let k: any = {}
@@ -459,15 +430,7 @@ const Main = () => {
     if (index > -1) {
         arr3.splice(index2, 1)
     }
-    const handleDownload = async () => {
-        const response = await fetch(testUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "fileName.txt";
-        link.click();
-    };
+
     const newColumns = columns.slice(0, -1);
     const excelColumns: IExcelColumn[] = newColumns.map(column => ({
         title: column.title,
