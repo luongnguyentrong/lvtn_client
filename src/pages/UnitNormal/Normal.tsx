@@ -14,6 +14,7 @@ import CreateTable from '../../Create-table/CreateTable';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import Cookies from 'universal-cookie';
 import { getBearerHeader, getUnit } from '../../utils';
+import API from '../../api';
 
 interface TableRow {
   [key: string]: any;
@@ -52,7 +53,7 @@ const Normal = (props: IProps) => {
   const [colName1, setColName1] = useState([]);
   const handleShowBlock = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
+      const response = await axios.get(API.Folders.Show + props.name);
       const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
       let folderList: VirtualFolder[] = []
       for (var ele of response1) {

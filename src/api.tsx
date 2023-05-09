@@ -15,9 +15,12 @@ const API = {
         URL: BaseURL + "/units/org"
     },
     Dashboards: {
-        List: BaseURL + "/superset/",
-        Create: BaseURL + "/superset/",
+        List: "http://localhost:5000" + "/superset/",
+        Create: "http://localhost:5000" + "/superset/",
     },
+    Folders: {
+        Show: BaseURL + "show_folders_normal?user="
+    }
 }
 
 export default API
