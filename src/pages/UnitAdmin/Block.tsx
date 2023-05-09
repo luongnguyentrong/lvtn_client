@@ -111,7 +111,8 @@ const Main: React.FC = () => {
     }
   };
   const location = useLocation();
-  const value = location.state;
+  const value = location.state[0]
+  const curUnit = location.state[1]
   const [form] = Form.useForm();
   interface Table {
     name: string;
@@ -148,7 +149,7 @@ const Main: React.FC = () => {
   const handleTable2Change = async (value1: string) => {
     setTableChange2(value1)
   }
-  const [curUnit, setCurUnit] = useState<string>("cs")
+  //const [curUnit, setCurUnit] = useState<string>("cs")
   const [addUser, setAddUser] = useState<string>("")
   const [Users, setUsers] = useState<User[]>([])
   const [Table1,setTable1] = useState<User[]>([])
@@ -189,7 +190,7 @@ const Main: React.FC = () => {
   const handleOk2 = async () => {
     setIsModalOpen2(false);
     try {
-      await axios.post('http://localhost:5000/edit_criteria?block=cs_' + value + '&new=' + encodeURIComponent(inputValue));
+      await axios.post('http://localhost:5000/edit_criteria?block='+curUnit+'_' + value + '&new=' + encodeURIComponent(inputValue));
     } catch (error) {
       console.error('Failed', error);
     }

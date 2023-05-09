@@ -12,7 +12,7 @@ import axios from 'axios';
 import { Modal } from 'antd';
 import './Unitadmin.css';
 import CreateBlock from './CreateBlock';
-import { getBearerHeader, getUnit } from '../../utils';
+import { getBearerHeader, getUnit, toSlug } from '../../utils';
 import Cookies from 'universal-cookie';
 
 interface Table {
@@ -33,6 +33,7 @@ interface Table {
 
 interface VirtualFolder {
   name: string;
+  norname: string;
 }
 //////////////////////////////////////////////////////////////////////////
 const { confirm } = Modal;
@@ -48,7 +49,7 @@ interface VirtualFolder {
 }
 
 const UnitAdmin = (props: IProps) => {
-  const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: ""}]);
+  const [virtualFolders, setVirtualFolders] = useState<VirtualFolder[]>([{name: "", norname: ""}]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {setIsModalOpen(true);};
   const [resetKey, setResetKey] = useState(0);
@@ -57,7 +58,6 @@ const UnitAdmin = (props: IProps) => {
   const [deleteBlock,setDeleteBlock] = useState("")
   const [EditBlockName,setEditBlockName] = useState("");
   const curUnit= getUnit()
-  console.log("Cfdfd",curUnit)
   const [isSuperUnit, setIsSuperUnit] = useState(true)
   const [open, setOpen] = useState(false);
 
@@ -74,10 +74,12 @@ const UnitAdmin = (props: IProps) => {
     try {
       const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
       const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
+      console.log(response1)
       let folderList: VirtualFolder[] = []
       for (var ele of response1) {
-        var c: VirtualFolder = { name: "" };
+        var c: VirtualFolder = { name: "", norname: ""};
         c.name = ele
+        c.norname = toSlug(ele)
         folderList.push(c)
       }
       setVirtualFolders(folderList)
@@ -134,13 +136,16 @@ const UnitAdmin = (props: IProps) => {
               onClick={async () => {setOpen(false);
                 try {
                   console.log(EditBlockName);
+                  let newBlockName = toSlug(EditBlockName)
                   let request: any={}
-                  request["new"] = "hcmut_" + EditBlockName
-                  request["old"] = "hcmut_"+ deleteBlock
+                  request["new"] = curUnit+ "_" + toSlug(EditBlockName)
+                  request["old"] = curUnit + "_"+ toSlug(deleteBlock)
+                  request["new_dis"] = EditBlockName
                   await axios.post('http://localhost:5000/edit_blockname',request);
                   const filteredList: VirtualFolder[] = virtualFolders.map((element: VirtualFolder) => {
                       if (element.name == deleteBlock) {
                         element.name = EditBlockName
+                        element.norname = toSlug(EditBlockName)
                         return element;
                       }
                       return element;
@@ -170,7 +175,7 @@ const UnitAdmin = (props: IProps) => {
   const navigate = useNavigate();
 
   function handleClick(value: any){
-    navigate("/Unitadmin/block", {state: value})
+    navigate("/Unitadmin/block", {state: [toSlug(value),curUnit]})
   }
  
   const menuItems2 = [
@@ -272,7 +277,7 @@ const UnitAdmin = (props: IProps) => {
                   </Dropdown>)}
                   <div className='BlockName' style={{display:'flex', flexDirection: 'column'}}>
                    <DatabaseTwoTone className='anticon'  style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
-                   <span  style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
+                   <span style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer'}} onClick={() => handleClick(folder.name)}>{folder.name}</span>
                 </div> 
                 </Card.Grid>
                

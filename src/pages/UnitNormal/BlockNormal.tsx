@@ -124,9 +124,11 @@ const Main = () => {
       return;
     }
     const formData = new FormData();
-    formData.append('file', selectedFile2);
+    formData.append('file', selectedFile);
+    //console.log('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name)
     try {
-      const response = await fetch('http://localhost:5000/import_with_excel?block=' + curUnit + '_' + value + '&table=' + name, {
+      //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
+      const response = await fetch('http://localhost:5000/import_with_excel?block=pck_nckh' + '&table=' + name, {
         method: 'POST',
         body: formData,
       });
@@ -183,7 +185,8 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
+      //const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=pck_nckh');
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -348,7 +351,8 @@ const Main = () => {
     setTableName(e.key)
     let row: TableRow[] = [];
     try {
-      let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + e.key
+      //let url: any = "http://localhost:5000/show_inside?block_name=" + curUnit + "_" + value + "&table_name=" + e.key
+      let url: any = "http://localhost:5000/show_inside?block_name=pck_nckh" + "&table_name=" + e.key
       const response = await axios.get(url);
       const data = response.data; // extract the data from the response
       const arr = data["body"];
