@@ -58,6 +58,7 @@ function App() {
                             setMainRole("admin")
                         } else if (roles.includes("unit_admin")) {
                             setMainRole("unit_admin")
+                            navigate("/unit_admin")
                             setUserName(res.data["preferred_username"])
                         } else if (roles.includes("unit_normal")) {
                             setMainRole("unit_normal")
@@ -79,11 +80,6 @@ function App() {
             return <Admin>
                 <Outlet />
             </Admin>
-
-        case "unit_admin":
-            return <UnitAdminLayout>
-                <UnitAdmin name={username} />
-            </UnitAdminLayout>
 
         case "unit_normal":
             return <Normal name={username} />

@@ -20,6 +20,17 @@ const API = {
     },
     Folders: {
         Show: BaseURL + "/show_folders_normal?user="
+    },
+    Blocks: {
+        List: BaseURL + "/blocks/",
+        Create: BaseURL + "/blocks/",
+        Tables: {
+            Create: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
+            List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/"
+        }
+    },
+    Users: {
+        List: BaseURL + "/users/"
     }
 }
 

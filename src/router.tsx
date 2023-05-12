@@ -4,11 +4,16 @@ import App from "./App";
 import SSOCallback from "./components/SSOCallback"
 import Units from "./pages/Admin/Units";
 import BlockLayout from './layout/Block';
-import NewBlock from "./pages/Admin/NewBlock";
+import NewBlock from "./pages/UnitAdmin/NewBlock";
 import Home from "./pages/Admin/Menu/Home";
 import Block from "./pages/UnitAdmin/Block"
 import BlockNormal from "./pages/UnitNormal/BlockNormal";
 import UserManager from "./pages/Admin/UserManager";
+import UnitAdminLayout from "./pages/UnitAdmin/UnitAdminLayout";
+import UnitAdmin from "./pages/UnitAdmin/UnitAdmin";
+import Details from "./pages/Blocks/Layout";
+import Default from "./pages/Blocks/Default";
+import Criteria from "./pages/Blocks/Criteria";
 
 export const router = createBrowserRouter([
     {
@@ -24,12 +29,36 @@ export const router = createBrowserRouter([
                 element: <Units />,
             },
             {
-                path: "/new",
+                path: "/users",
+                element: <UserManager />
+            }
+        ]
+    },
+    {
+        path: "/unit_admin",
+        element: <UnitAdminLayout />,
+        children: [
+            {
+                index: true,
+                element: <UnitAdmin name="something" />
+            },
+            {
+                path: "blocks/new",
                 element: <NewBlock />
             },
             {
-                path: "/users",
-                element: <UserManager />
+                path: "blocks/:block_name",
+                element: <Details />,
+                children: [
+                    {
+                        index: true,
+                        element: <Default />
+                    },
+                    {
+                        path: "criteria",
+                        element: <Criteria />
+                    }
+                ]
             }
         ]
     },

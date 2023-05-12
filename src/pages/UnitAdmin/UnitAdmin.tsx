@@ -13,6 +13,7 @@ import './Unitadmin.css';
 import CreateBlock from './CreateBlock';
 import { getBearerHeader, getUnit, toSlug } from '../../utils';
 import Cookies from 'universal-cookie';
+import BlockCard from './Cards/BlockCard';
 
 interface Table {
     name: string;
@@ -211,74 +212,10 @@ const UnitAdmin = (props: IProps) => {
     ];
     return (
         <Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
-            <Layout>
-                <Content style={{ width: '100%', height: '1000px' }}>
-                    <Layout style={{ padding: '0 24px 24px' }}>
-                        <Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
-                            <Layout>
-                                <Content style={{ width: '100%', height: '1000px', backgroundColor: '#E8E8E8' }}>
-                                    <Layout>
-                                        <Layout style={{ padding: '0 24px 24px', backgroundColor: '#E8E8E8' }}>
-                                            <Content
-                                                style={{
-                                                    width: '100%',
-                                                    maxWidth: '1400px',
-                                                    padding: '24px',
-                                                    margin: '0 auto',
-                                                    minHeight: '280px',
-                                                    background: colorBgContainer,
-                                                }}
-                                            >
-                                                <div className='header'>
-                                                    <h1 style={{ fontSize: '20px' }}>TẬP DỮ LIỆU</h1>
-                                                    <div className='btn-wrapper'>
-                                                        {isSuperUnit && ( // Only render the button if `a` is true
-                                                            <Button onClick={showModal} style={{ backgroundColor: '#32CD32', color: 'white', height: '40px' }}>
-                                                                Thêm tập lưu trữ
-                                                            </Button>
-                                                        )}
-                                                        <Modal width={750} title="Thêm mới tập dữ liệu" open={isModalOpen} onCancel={handleCancel}
-                                                            footer={[
-                                                            ]}>
-                                                            <CreateBlock folders={virtualFolders} Modal={isModalOpen} setModal={setIsModalOpen} key={resetKey} name={props.name} curUnit={curUnit} />
-                                                        </Modal>
-                                                    </div>
-                                                </div>
-                                                <Divider />
-                                                <div>
-                                                    <Card>
-                                                        {virtualFolders.length > 0 ? (virtualFolders.map((folder) => (
-                                                            <Card.Grid style={{ width: '25%', textAlign: 'center', position: 'relative' }}
-                                                                key={folder.name}
-                                                            >
-                                                                {isSuperUnit && (<Dropdown menu={{ items }} placement="bottomLeft" trigger={['click']}>
-                                                                    <button style={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
-                                                                        onClick={() => handleDeleteBlock(folder.name)}>
-                                                                        <h1 className='Edit' style={{ margin: '-1px -6px 0px 0px', color: '#71717a', fontSize: '22px', padding: '0px 2px' }}><EllipsisOutlined /></h1>
-                                                                    </button>
-                                                                </Dropdown>)}
-                                                                <div className='BlockName' style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                    <DatabaseTwoTone className='anticon' style={{ fontSize: '60px', padding: '0px 0px 8px 0', marginTop: '18px' }} twoToneColor="#5b7a78" onClick={() => handleClick(folder.name)} />
-                                                                    <span style={{ fontSize: '16px', textAlign: 'center', margin: '0px 5px', cursor: 'pointer' }} onClick={() => handleClick(folder.name)}>{folder.name}</span>
-                                                                </div>
-                                                            </Card.Grid>
-
-                                                        ))) : (
-                                                            <div>Loading folders...</div>
-                                                        )}
-                                                    </Card>
-                                                </div>
-                                            </Content>
-                                        </Layout>
-                                    </Layout>
-                                </Content>
-                            </Layout>
-                        </Content>
-
-                    </Layout>
-                </Content>
+            <Layout style={{ padding: '0 24px 24px' }}>
+                <BlockCard />
             </Layout>
-        </Content >
+        </Content>
     )
 };
 export default UnitAdmin;

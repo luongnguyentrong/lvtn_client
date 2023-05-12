@@ -23,13 +23,9 @@ const headerStyles: React.CSSProperties = {
     borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
 }
 
-interface IProps {
-    children: React.ReactElement;
-}
+export default function () {
 
-export default function (props: IProps) {
-
-    return <Layout>
+    return <Layout style={{ height: "100%" }}>
         <Header style={emptyHeaderStyle} />
         <Header style={headerStyles}>
             <Row align="middle">
@@ -47,9 +43,8 @@ export default function (props: IProps) {
             </Row>
         </Header>
 
+        <Outlet />
 
-        {props.children}
-
-        <Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Footer>
+        {/* <Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Footer> */}
     </Layout>
 }

@@ -19,7 +19,15 @@ export function getUnit(): string {
     return ""
 }
 
-export async function getCurrentUser(): Promise<any> {
+export interface IUser {
+    sub: string
+    roles: Array<string>
+    preferred_username: string
+    given_name: string
+    family_name: string
+}
+
+export async function getCurrentUser(): Promise<IUser | undefined> {
     const cookies = new Cookies()
     const userinfo_endpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/userinfo`
 
@@ -38,7 +46,6 @@ export async function getCurrentUser(): Promise<any> {
             return result.data
         }
     }
-
 }
 
 export function toSlug(str: string) {
