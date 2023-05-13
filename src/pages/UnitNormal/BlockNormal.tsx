@@ -9,7 +9,6 @@ const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
-import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import { useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";
@@ -17,6 +16,7 @@ import './Block-N.css'
 import { url } from 'inspector';
 import { getBearerHeader, getUnit } from '../../utils';
 import Cookies from 'universal-cookie';
+import { BaseURL} from '../../api';
 
 interface IExcelColumn{
   title: string;
@@ -77,11 +77,8 @@ const Main = () => {
     action: '/your-upload-endpoint',
     showUploadList: false, // Hide the file list
     beforeUpload: (file:any) => {
-      // Perform any necessary checks or validations here
-      // If everything is valid, trigger the form submission
-      // setSelectedFile(file)
       handleSubmit(file);
-      return false; // Prevent default file upload behavior
+      return false;
     },
   };
   const [form] = Form.useForm();
@@ -94,8 +91,6 @@ const Main = () => {
   const [NewRow, setNewRow] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFile2, setSelectedFile2] = useState(null);
-  const location = useLocation();
-  const value = location.state;
   const [data, setData] = useState<ItemType[]>([])
   const { token: { colorBgContainer }, } = theme.useToken();
   const [name, setTableName] = useState<string>("");
@@ -114,9 +109,11 @@ const Main = () => {
   const showModal2 = () => { setIsModalOpen2(true); handleCriteria(); };
   const [messageApi, contextHolder] = message.useMessage();
   const [EditRecord, setEditRecord] = useState(false);
-  const [curUnit, setCurUnit] = useState<string>("cs")
+  //onst [curUnit, setCurUnit] = useState<string>("cs")
   const [currentRecord, setCurrentRecord] = useState<any>({});
-
+  const location = useLocation();
+  const value = location.state[0]
+  const curUnit = location.state[1]
   const handleSubmit = async (selectedFile: any) => {
     //event.preventDefault();
     console.log(selectedFile)
@@ -128,7 +125,7 @@ const Main = () => {
     //console.log('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name)
     try {
       //const response = await fetch('http://localhost:5000/import?block=' + curUnit + '_' + value + '&table=' + name, {
-      const response = await fetch('http://localhost:5000/import_with_excel?block=pck_nckh' + '&table=' + name, {
+      const response = await fetch(BaseURL + '/import_with_excel?block=' + curUnit + '_'+'nckh' + '&table=' + name, {
         method: 'POST',
         body: formData,
       });
@@ -164,15 +161,15 @@ const Main = () => {
   const getFile = async () => {
     // e.preventDefault();
     try {
-      const response = await axios.get('http://localhost:5000/list-items');
+      const response = await axios.get('http://localhost:5000/list-items?block='+value + '&unit=' + curUnit);
       const data1 = response.data;
       const data2 = data1["items"]
-      data2.shift();
       const items = data2.map((key: string) => ({
         key,
         label: `${key}`,
         icon: <FileOutlined />,
       }));
+      console.log(items)
       setListFile(items);
     } catch (error) {
       console.error('Failed', error);
@@ -185,8 +182,7 @@ const Main = () => {
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
     try {
-      //const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
-      const response = await axios.get('http://localhost:5000/show_tables?block_name=pck_nckh');
+      const response = await axios.get('http://localhost:5000/show_tables?block_name=' + curUnit + '_' + value);
       const data1 = response.data;
       item = data1["body"]
       items2 = item.map((key) => ({
@@ -316,12 +312,12 @@ const Main = () => {
     });
   };
   const uploadFile = async (event: React.FormEvent) => {
-    //event.preventDefault();
+    event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
-    console.log(formData)
+    //console.log('http://localhost:5000/upload_files?block='+value+'&unit='+ curUnit)
     try {
-      const response = await fetch('http://localhost:5000/upload_files?block=' +curUnit+'_'+ value, {
+      const response = await fetch('http://localhost:5000/upload_files?block='+value+'&unit='+ curUnit, {
         method: 'POST',
         body: formData,
       });
@@ -336,15 +332,6 @@ const Main = () => {
     catch (error) {
       console.error('An error occurred:', error);
     }
-    // const newfile: ItemType = {
-    //   "key": selectedFile.name,
-    //   "label": selectedFile.name,
-    //   "icon": <FileOutlined />
-    // }
-    // const sup: ItemType[] = [...ListFile];
-    // sup.push(newfile)
-    // setListFile(sup)
-    //  setaddfile([])
   };
   const onClick: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
@@ -424,15 +411,15 @@ const Main = () => {
   if (index > -1) {
     arr3.splice(index2, 1)
   }
-  const handleDownload = async () => {
-    const response = await fetch(testUrl);
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "fileName.txt";
-    link.click();
-  };
+  // const handleDownload = async () => {
+  //   const response = await fetch(testUrl);
+  //   const blob = await response.blob();
+  //   const url = window.URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = "fileName.txt";
+  //   link.click();
+  // };
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
     title: column.title,
@@ -535,7 +522,6 @@ return (
                       OK
                     </Button>,
                   ]}>
-                  <Button onClick={handleButtonClick}><EditOutlined />Chỉnh sửa</Button>
                   {isEditing1 ? (
                     <Input
                       placeholder={criteria}
@@ -596,7 +582,7 @@ return (
                           Submit
                         </Button> */}
                       </form> 
-                      </div>) : null}
+                    </div>) : null}
                       <div>
                         {/* <button onClick={()=>downloadObject(objectUrl)}>dowkoad</button> */}
                       </div>
@@ -655,12 +641,12 @@ return (
                       <>
                     <div style={{display:'flex', justifyContent:'flex-end'}}>
 
-                      <div style={{marginTop:'10px'}}>
+                      {/* <div style={{marginTop:'10px'}}>
                       <form onSubmit={handleSubmit}>
                         <input type="file" name="file" onChange={handleFileImport} />
                         <button type="submit">Upload</button>
                       </form>
-                      </div>
+                      </div> */}
                     <button onClick={addrow} className='addrow'>
                         <h1 style={{ fontSize: '17px', color: 'white', padding: '3px 8px 0px 10px' }}>ADD NEW ROW</h1>
                       </button>

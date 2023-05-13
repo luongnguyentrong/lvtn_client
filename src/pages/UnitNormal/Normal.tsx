@@ -14,7 +14,7 @@ import CreateTable from '../../Create-table/CreateTable';
 // import CreateBlock from './UnitAdmin/CreateBlock';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import Cookies from 'universal-cookie';
-import { getBearerHeader, getUnit } from '../../utils';
+import { getBearerHeader, getUnit, toSlug } from '../../utils';
 
 interface TableRow {
   [key: string]: any;
@@ -47,6 +47,7 @@ const Normal = (props: IProps) => {
   const [columns, setColumns] = useState<TableRow[]>([]);
   const ref2 = useRef<TableRow[]>()
   ref2.current = columns
+  const curUnit = getUnit()
   const [colName, setColName] = useState([]);
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
@@ -71,7 +72,7 @@ const Normal = (props: IProps) => {
   const navigate = useNavigate();
 
   function handleClick(value: any){
-    navigate("/UnitUser/BlockNormal", {state: value})
+    navigate("/UnitUser/BlockNormal", {state: [toSlug(value),curUnit]})
   }
   const menuItems2 = [
     <Menu.Item key="0" onClick={() => {
