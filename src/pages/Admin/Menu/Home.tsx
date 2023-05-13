@@ -1,4 +1,4 @@
-import { Avatar, Breadcrumb, Button, Card, Layout, Modal, Space, Tag, Typography, theme } from "antd"
+import { Avatar, Breadcrumb, Button, Card, Empty, Layout, Modal, Space, Tag, Typography, theme } from "antd"
 import { HomeOutlined, CrownFilled, TeamOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -89,7 +89,7 @@ export default function () {
                     <Card
                         title="Tập dữ liệu"
                         style={{
-                            minHeight: "380px"
+                            minHeight: 300
                         }}
                         extra={<Button type="primary"
                             onClick={showModal}
@@ -124,6 +124,7 @@ export default function () {
                             </Card>
                         </Card.Grid>
                     </Card>
+
                 </Layout.Content>
             </Layout>
 

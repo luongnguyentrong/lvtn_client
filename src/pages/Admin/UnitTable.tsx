@@ -1,7 +1,6 @@
-import { TableColumnsType, Typography, Table, Tooltip, Space, Avatar, Button } from 'antd'
+import { TableColumnsType, Typography, Table, Tooltip, Space, Avatar, Button, Popconfirm } from 'antd'
 import { EditOutlined, DeleteFilled } from '@ant-design/icons';
 import type { IUnit } from './Units'
-import { Link } from 'react-router-dom';
 
 export default function (props: { units: Array<IUnit> }) {
     const columns: TableColumnsType<IUnit> = [
@@ -48,9 +47,16 @@ export default function (props: { units: Array<IUnit> }) {
                     <Tooltip title="Chỉnh sửa thông tin đơn vị">
                         <Button icon={<EditOutlined />} />
                     </Tooltip>
-                    <Tooltip title="Xoá đơn vị">
-                        <Button icon={<DeleteFilled />} />
-                    </Tooltip>
+                    <Popconfirm
+                        title="Xoá đơn vị"
+                        description="Bạn có chắc muốn xóa đơn vị ?"
+                        okText="Có"
+                        cancelText="Không"
+                    >
+                        <Tooltip title="Xoá đơnvị">
+                            <Button icon={<DeleteFilled />} />
+                        </Tooltip>
+                    </Popconfirm>
                 </Space>
             ),
         },

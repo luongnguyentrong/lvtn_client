@@ -1,13 +1,14 @@
-import { Button, Card, Empty, Form, Space, Table, TableProps } from "antd";
+import { Button, Card, Empty, Form, Space, Table, TableProps, message } from "antd";
 import { TableOutlined, FolderAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import uniqid from 'uniqid';
 
 
 import { ITable, IFolder } from '../NewBlock'
-import DefineSheet from "../Modals/DefineSheet";
+import DefineSheet from "../../Admin/Modals/DefineSheet";
 import { TableColumnsType } from 'antd'
-import DefineFolder from "../Modals/DefineFolder";
+import DefineFolder from "../../Admin/Modals/DefineFolder";
+import { toSlug } from "../../../utils";
 
 
 interface IProps {
@@ -73,9 +74,11 @@ export default function (props: IProps) {
                 props.onDefineSuccess(table)
             }
 
+            form.resetFields()
             setIsModalOpen(false);
         }).catch(err => {
-
+            setIsModalOpen(false);
+            message.error(err.message)
         })
     };
 
@@ -88,6 +91,11 @@ export default function (props: IProps) {
             setIsModalFolderOpen(false);
         })
     };
+
+    const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
+        form.setFieldValue(["table", "name"], toSlug(ele.target.value))
+    }
+
 
     const handleFolderCancel = () => {
         setIsModalFolderOpen(false);
@@ -113,7 +121,7 @@ export default function (props: IProps) {
 
         </Card>
 
-        <DefineSheet form={form} isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} />
+        <DefineSheet onDisplayChange={onDisplayChange} form={form} isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} />
         <DefineFolder form={folderForm} isOpen={isModalFolderOpen} handleOk={handleFolderOk} handleCancel={handleFolderCancel} />
     </div >
 }
