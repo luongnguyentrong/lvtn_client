@@ -28,23 +28,35 @@ function generateDashboards(dashboards: Array<IDashboard>) {
 export default function (props: IProps) {
     const [dashboards, setDashboard] = useState<Array<IDashboard> | undefined>()
 
+    const items: Array<IDashboard> = [{
+        key: "1",
+        dashboard_title: "Phân tích điểm sinh viên",
+        url: "/to_no_where", 
+    }, {
+        key: "2",
+        dashboard_title: "Phân tích đội ngũ",
+        url: "/to_no_where", 
+    }]
+
     useEffect(() => {
-        axios.get(API.Dashboards.List, getBearerHeader()).then(res => {
-            const items = res.data.dashboards.map((raw: any) => {
-                const item: IDashboard = {
-                    key: raw.id,
-                    dashboard_title: raw.dashboard_title,
-                    url: raw.url
-                }
+        // axios.get(API.Dashboards.List, getBearerHeader()).then(res => {
+        //     const items = res.data.dashboards.map((raw: any) => {
+        //         const item: IDashboard = {
+        //             key: raw.id,
+        //             dashboard_title: raw.dashboard_title,
+        //             url: raw.url
+        //         }
 
-                return item
-            })
+        //         return item
+        //     })
 
-            setDashboard(items)
-        })
+        //     setDashboard(items)
+        // })
+
+        setDashboard(items)
     }, [])
 
-    return <Card title="Phân tích" style={{ marginTop: "24px", minHeight: 300 }}
+    return <Card title="Phân tích" style={{ minHeight: 300 }}
         extra={<Button type="primary"
             onClick={props.showModal}
             icon={<PlusOutlined />}

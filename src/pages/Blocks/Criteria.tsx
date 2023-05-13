@@ -1,4 +1,5 @@
-import { Avatar, Card, Layout, List } from "antd";
+import { Avatar, Button, Card, Layout, List } from "antd";
+import { CheckSquareOutlined, PlusOutlined } from '@ant-design/icons';
 
 const data = [
     {
@@ -28,14 +29,14 @@ export default function () {
             minHeight: 280,
         }}
     >
-        <Card title="Tiêu chí">
+        <Card title="Tiêu chí" extra={<Button icon={<PlusOutlined />}>Thêm tiêu chí</Button>}>
             <List
                 itemLayout="horizontal"
                 dataSource={data}
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
-                            avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                            avatar={<Avatar icon={<CheckSquareOutlined />} style={{ backgroundColor: "#f56a00" }} />}
                             title={<a href="https://ant.design">{item.title}</a>}
                             description={item.description}
                         />

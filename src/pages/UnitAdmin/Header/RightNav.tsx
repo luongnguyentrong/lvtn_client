@@ -1,5 +1,5 @@
 import { Dropdown, Menu, MenuProps } from "antd";
-import { UserOutlined, BellOutlined } from '@ant-design/icons';
+import { UserOutlined, QuestionCircleOutlined, BellOutlined } from '@ant-design/icons';
 
 export default function () {
     const drop_items: MenuProps['items'] = [
@@ -35,6 +35,10 @@ export default function () {
             key: "notification",
             icon: <BellOutlined />,
             label: "Thông báo"
+        }, {
+            key: "contact",
+            icon: <QuestionCircleOutlined />,
+            label: "Liên hệ"
         },
         {
             key: "profile",

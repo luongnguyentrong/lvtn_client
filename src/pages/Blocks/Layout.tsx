@@ -1,40 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { LaptopOutlined, FolderOutlined, BarsOutlined, NotificationOutlined, UserOutlined, TableOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
+import { LineChartOutlined, FolderAddOutlined, FileAddOutlined, FolderOutlined, BarsOutlined, PlusOutlined, TableOutlined, FilePdfOutlined } from '@ant-design/icons';
+import { Button, Dropdown, MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import API from '../../api';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getBearerHeader } from '../../utils';
 
-const { Header, Content, Sider } = Layout;
+const { Sider } = Layout;
 
-const items1: MenuProps['items'] = ['1', '2', '3'].map((key) => ({
-    key,
-    label: `nav ${key}`,
-}));
-
-const items2: MenuProps['items'] = [UserOutlined, LaptopOutlined, NotificationOutlined].map(
-    (icon, index) => {
-        const key = String(index + 1);
-
-        return {
-            key: `sub${key}`,
-            icon: React.createElement(icon),
-            label: `subnav ${key}`,
-
-            children: new Array(4).fill(null).map((_, j) => {
-                const subKey = index * 4 + j + 1;
-                return {
-                    key: subKey,
-                    label: `option${subKey}`,
-                };
-            }),
-        };
-    },
-);
-
-const App: React.FC = () => {
+export default function () {
     const { block_name } = useParams()
     const [tables, setTables] = useState<MenuProps['items']>([])
     const navigate = useNavigate()
@@ -45,7 +20,11 @@ const App: React.FC = () => {
                 const items = res.data.map((table: any) => ({
                     key: table.ID,
                     label: table.display_name,
-                    icon: <TableOutlined />
+                    icon: <TableOutlined />,
+                    onClick: () => {
+                        navigate("tables/" + table.name)
+                    }
+
                 }))
 
                 setTables(items)
@@ -58,17 +37,48 @@ const App: React.FC = () => {
         token: { colorBgContainer },
     } = theme.useToken();
 
+    const items: MenuProps['items'] = [
+        {
+            key: 'add_table',
+            label: "Tạo bảng mới",
+            icon: <FileAddOutlined />,
+        },
+        {
+            key: 'add_folder',
+            label: "Tạo folder mới",
+            icon: <FolderAddOutlined />,
+        },
+    ];
+
     const menuItems: MenuProps['items'] = [
         {
             key: "tables",
-            label: "Dữ liệu dạng bảng",
+            label: "Danh sách dữ liệu",
             icon: <TableOutlined />,
             children: tables
         },
         {
             key: "folders",
             label: "Danh sách folders",
-            icon: <FolderOutlined />
+            icon: <FolderOutlined />,
+            children: [
+                {
+                    key: "dsn",
+                    label: "Vật lý 1",
+                    icon: <FolderOutlined />,
+                    onClick: () => {
+                        navigate("folders/dsn")
+                    }
+                }
+            ]
+        },
+        {
+            key: "analyze",
+            label: "Phân tích",
+            icon: <LineChartOutlined />,
+            onClick: () => {
+                navigate("analytics")
+            }
         },
         {
             key: "criteria",
@@ -80,9 +90,14 @@ const App: React.FC = () => {
         }
     ]
 
+
     return (
         <Layout>
-            <Sider width={250} style={{ background: colorBgContainer }}>
+            <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
+                <Dropdown menu={{ items }} trigger={['click']} >
+                    <Button style={{ marginLeft: 28, marginBottom: 12 }} type='primary' icon={<PlusOutlined />}>Mới</Button>
+                </Dropdown>
+
                 <Menu
                     mode="inline"
                     defaultSelectedKeys={['tables']}
@@ -96,5 +111,3 @@ const App: React.FC = () => {
         </Layout>
     );
 };
-
-export default App;

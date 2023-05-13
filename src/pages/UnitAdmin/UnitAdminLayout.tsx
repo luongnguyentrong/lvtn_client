@@ -1,7 +1,6 @@
 import { Col, Input, Layout, Row } from "antd"
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import RightNav from "./Header/RightNav";
-import { getCurrentUser } from "../../utils";
 
 const { Header, Footer } = Layout;
 
@@ -36,8 +35,8 @@ export default function () {
                         </div>
                     </Link>
                 </Col>
-                <Col span={12} style={{ display: "inherit" }}><Input.Search size='middle' placeholder='Nhập tên tập dữ liệu...' /></Col>
-                <Col flex="auto">
+                <Col span={12} style={{ display: "inherit", justifyContent: "center" }}><Input.Search style={{ width: 400}} size='middle' placeholder='Nhập tên tập dữ liệu...' /></Col>
+                <Col span={6}>
                     <RightNav />
                 </Col>
             </Row>

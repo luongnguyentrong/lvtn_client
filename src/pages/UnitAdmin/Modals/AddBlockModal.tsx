@@ -1,6 +1,5 @@
 import { Col, Form, Input, Modal, Row } from "antd"
 import { useForm } from "antd/es/form/Form";
-import { FormInstance } from "antd/lib/form";
 import { useNavigate } from "react-router-dom";
 import { toSlug } from "../../../utils";
 
