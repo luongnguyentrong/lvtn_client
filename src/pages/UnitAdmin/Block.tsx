@@ -125,7 +125,10 @@ const Main: React.FC = () => {
   const [addUser, setAddUser] = useState<string>("")
   const [Users, setUsers] = useState<User[]>([])
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const showModal2 = () => { setIsModalOpen2(true); handleCriteria(); };
+  const showModal2 = () => { 
+    setIsModalOpen2(true); 
+    handleCriteria(); 
+  };
   const [ShowAddModal, setShowAddModal] = useState(false);
   const [ShowAddModal1, setShowAddModal1] = useState(false);
   const handleCancel2 = () => { setIsModalOpen2(false); };
@@ -174,7 +177,7 @@ const Main: React.FC = () => {
       return [];
     }
   }
-  const getMenuItems = async (e: any) => {
+  const getTable = async (e: any) => {
     e.preventDefault();
     let item: Array<string> = [];
     let items2: MenuProps['items'] = [];
@@ -203,7 +206,7 @@ const Main: React.FC = () => {
     setFormData2({ ...formData2, [name]: value });
   };
 
-  const onClick: MenuProps['onClick'] = async (e) => {
+  const ShowTable: MenuProps['onClick'] = async (e) => {
     let column: TableRow[] = [];
     setTableName(e.key)
     let row: TableRow[] = [];
@@ -346,6 +349,7 @@ const Main: React.FC = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
+  
   const menuItems2 = [
     <Menu.Item key="0" onClick={() => {
       const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
@@ -372,7 +376,7 @@ const Main: React.FC = () => {
       Log out
     </Menu.Item>,
   ];
-  return (<Layout onLoad={getMenuItems} style={{ backgroundColor: '#E8E8E8' }}>
+  return (<Layout onLoad={getTable} style={{ backgroundColor: '#E8E8E8' }}>
     <Header style={{ backgroundColor: '#020547', height: '50px' }}>
       <Row gutter={[16, 16]}>
         <Col className="Logo" xs={{ span: 2 }} sm={{ span: 2 }} md={{ span: 2 }} lg={{ span: 6 }} style={{ display: 'flex' }}>
@@ -438,7 +442,7 @@ const Main: React.FC = () => {
             </div>
           </Modal>
           <Menu
-            onClick={onClick}
+            onClick={ShowTable}
             mode="inline"
             defaultSelectedKeys={['1']}
             defaultOpenKeys={['sub1']}

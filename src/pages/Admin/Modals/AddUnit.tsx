@@ -19,15 +19,6 @@ interface IUnitData {
     parent_unit: string
 }
 
-interface IUserData {
-    fname: string
-    lname: string
-    email: string
-    username: string
-    password: string
-    unit_name: string
-}
-
 export default function (props: IProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [current, setCurrent] = useState(0);

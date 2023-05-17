@@ -239,7 +239,6 @@ const Main = () => {
     setNewRow(false)
   };
   const handleEditData = async () => {
-    // const formValues = Object.values(formData2);
     let k: any = {}
     k["table"] = name
     k["cond"] = currentRecord["id"]
@@ -429,6 +428,7 @@ const Main = () => {
     link.download = "fileName.txt";
     link.click();
   };
+  
   const newColumns = columns.slice(0, -1);
   const excelColumns: IExcelColumn[] = newColumns.map(column => ({
     title: column.title,
@@ -444,6 +444,7 @@ const Main = () => {
       })
       .saveAs(`${name}.xlsx`);
   };
+
 const menuItems2 = [
   <Menu.Item key="0" onClick={() => {
     const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
