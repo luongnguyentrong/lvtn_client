@@ -1,6 +1,6 @@
 import { Button, List, Typography } from "antd"
 import { PlusOutlined } from '@ant-design/icons';
-import AddCritModal from "../Modals/AddCritModal";
+import AddCritModal from "../../../modals/AddCritModal";
 import { useState } from "react";
 
 interface IProps {

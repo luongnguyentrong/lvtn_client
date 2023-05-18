@@ -9,8 +9,6 @@ import Admin from './pages/Admin';
 import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Layout } from 'antd';
-import UnitAdminLayout from './pages/UnitAdmin/UnitAdminLayout';
 
 function getAuthParams() {
     const data = {
@@ -26,7 +24,6 @@ function getAuthParams() {
 }
 
 function App() {
-    //return <UnitAdmin name="manh"/>
     const [mainRole, setMainRole] = useState<string>("")
     const navigate = useNavigate()
     const [username, setUserName] = useState<string>("")
@@ -50,7 +47,6 @@ function App() {
 
             axios.post(userinfo_endpoint, {}, config).then((res) => {
                 if (res.status === 200) {
-                    console.log(res.data)
                     if (res.data.roles && Array.isArray(res.data.roles)) {
                         const roles: string[] = res.data.roles
 
@@ -59,10 +55,8 @@ function App() {
                         } else if (roles.includes("unit_admin")) {
                             setMainRole("unit_admin")
                             navigate("/unit_admin")
-                            setUserName(res.data["preferred_username"])
                         } else if (roles.includes("unit_normal")) {
                             setMainRole("unit_normal")
-                            setUserName(res.data["preferred_username"])
                         }
                     }
                 }

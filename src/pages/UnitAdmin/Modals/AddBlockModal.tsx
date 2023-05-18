@@ -1,7 +1,10 @@
-import { Col, Form, Input, Modal, Row } from "antd"
+import { Col, Form, SelectProps, Input, Modal, Row, Select, message } from "antd"
 import { useForm } from "antd/es/form/Form";
 import { useNavigate } from "react-router-dom";
-import { toSlug } from "../../../utils";
+import { getBearerHeader, getCurrentUser, toSlug } from "../../../utils";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import API from "../../../api";
 
 interface IProps {
     isModalOpen: boolean;
@@ -9,6 +12,38 @@ interface IProps {
 }
 
 export default function (props: IProps) {
+    const [users, setUsers] = useState<SelectProps['options']>([])
+
+    useEffect(() => {
+        getBearerHeader().then(config => {
+            return axios.get(API.Users.List, config)
+        }).then(res => {
+            const data = res.data
+
+            let new_users: SelectProps['options'] = []
+            if (data.unit_admin) {
+                new_users = new_users.concat(data.unit_admin.map((user: any) => {
+                    return {
+                        value: user.id,
+                        label: user.firstName + " " + user.lastName
+                    }
+                }))
+            }
+
+            if (data.normal) {
+                new_users = new_users.concat(data.normal.map((user: any) => {
+                    return {
+                        value: user.id,
+                        label: user.firstName + " " + user.lastName
+                    }
+                }))
+            }
+
+            setUsers(new_users)
+        })
+    }, [])
+
+
     const navigate = useNavigate()
     const [form] = useForm()
 
@@ -17,15 +52,22 @@ export default function (props: IProps) {
     }
 
     const handleOk = () => {
-        form.validateFields().then(data => {
-            data['items'] = []
+        getCurrentUser().then(user => {
+            if (user) {
+                form.validateFields().then(data => {
+                    data.block.created_by = user.sub
 
-            props.close()
-            navigate("/unit_admin/blocks/new", {
-                state: {
-                    block: data
-                }
-            })
+                    getBearerHeader().then(config => {
+                        return axios.post(API.Blocks.Create, data.block, config)
+                    }).then(res => {
+                        if (res.status === 201) {
+                            props.close()
+                            message.success("Tạo tập dữ liệu thành công!")
+                        }
+                    })
+
+                })
+            }
         })
     }
 
@@ -63,6 +105,17 @@ export default function (props: IProps) {
                 name={["block", "description"]}
             >
                 <Input />
+            </Form.Item>
+
+            <Form.Item
+                label="Chọn người quản lý"
+                rules={[{ required: true, message: 'Hãy chọn người quản lý tập dữ liệu!' }]}
+                name={["block", "manager_id"]}
+            >
+                <Select
+                    placeholder="Select a option and change input text above"
+                    options={users}
+                />
             </Form.Item>
         </Form>
     </Modal>

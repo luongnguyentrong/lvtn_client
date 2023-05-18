@@ -6,23 +6,26 @@ import API from '../../api';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getBearerHeader } from '../../utils';
+import Header from '../../Header';
 
 const { Sider } = Layout;
 
 export default function () {
-    const { block_name } = useParams()
+    const { block_id } = useParams()
     const [tables, setTables] = useState<MenuProps['items']>([])
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (block_name) {
-            axios.get(API.Blocks.Tables.List(block_name), getBearerHeader()).then(res => {
+        if (block_id) {
+            getBearerHeader().then(config => {
+                return axios.get(API.Blocks.Tables.List(block_id), config)
+            }).then(res => {
                 const items = res.data.map((table: any) => ({
                     key: table.ID,
                     label: table.display_name,
                     icon: <TableOutlined />,
                     onClick: () => {
-                        navigate("tables/" + table.name)
+                        navigate("tables/" + table.id)
                     }
 
                 }))
@@ -42,6 +45,9 @@ export default function () {
             key: 'add_table',
             label: "Tạo bảng mới",
             icon: <FileAddOutlined />,
+            onClick: () => {
+                navigate("new_table")
+            }
         },
         {
             key: 'add_folder',
@@ -92,21 +98,28 @@ export default function () {
 
 
     return (
-        <Layout>
-            <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
-                <Dropdown menu={{ items }} trigger={['click']} >
-                    <Button style={{ marginLeft: 28, marginBottom: 12 }} type='primary' icon={<PlusOutlined />}>Mới</Button>
-                </Dropdown>
+        <Layout style={{ minHeight: "100%" }}>
+            <Header />
 
-                <Menu
-                    mode="inline"
-                    defaultSelectedKeys={['tables']}
-                    style={{ height: '100%', borderRight: 0 }}
-                    items={menuItems}
-                />
-            </Sider>
+            <Layout>
+                <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
+                    <Dropdown menu={{ items }} trigger={['click']} >
+                        <Button style={{ marginLeft: 28, marginBottom: 12 }} type='primary' icon={<PlusOutlined />}>Mới</Button>
+                    </Dropdown>
 
-            <Outlet />
+                    <Menu
+                        mode="inline"
+                        defaultSelectedKeys={['tables']}
+                        style={{ height: '100%', borderRight: 0 }}
+                        items={menuItems}
+                    />
+                </Sider>
+
+                <Layout>
+                    <Outlet />
+                    <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
+                </Layout>
+            </Layout>
 
         </Layout>
     );
