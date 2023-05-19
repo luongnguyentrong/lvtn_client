@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Select, Space } from "antd"
+import { Button, Col, Form, Input, Modal, Row, Select, Space } from "antd"
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { FormInstance } from "antd/lib/form";
 
@@ -6,6 +6,7 @@ interface IProps {
     isModalOpen: boolean
     handleOk: () => void
     handleCancel: () => void
+    onDisplayChange: (ele: React.ChangeEvent<HTMLInputElement>) => void
     form: FormInstance<any>
 }
 
@@ -17,19 +18,26 @@ export default function (props: IProps) {
             style={{ maxWidth: 600 }}
             layout="vertical"
         >
-            <Form.Item
-                label="Tên table"
-                name={["table", "display_name"]}
-                rules={[{ required: true, message: 'Hãy điền tên của table' }]}>
-                <Input />
-            </Form.Item>
+            <Row gutter={12}>
+                <Col span={18}>
+                    <Form.Item
+                        label="Tên table"
+                        name={["table", "display_name"]}
+                        rules={[{ required: true, message: 'Hãy điền tên của table' }]}>
+                        <Input onChange={props.onDisplayChange} />
+                    </Form.Item>
+                </Col>
 
-            <Form.Item
-                label="Mã table"
-                name={["table", "name"]}
-                rules={[{ required: true, message: 'Hãy điền mã của table' }]}>
-                <Input />
-            </Form.Item>
+                <Col span={6}>
+                    <Form.Item
+                        label="Mã table"
+                        name={["table", "name"]}
+                        rules={[{ required: true, message: 'Hãy điền mã của table' }]}>
+                        <Input />
+                    </Form.Item>
+                </Col>
+            </Row>
+
 
             <Form.Item
                 label='Định nghĩa column'
@@ -47,26 +55,28 @@ export default function (props: IProps) {
                                         name={[name, 'name']}
                                         rules={[{ required: true, message: 'Missing first name' }]}
                                     >
-                                        <Input placeholder="First Name" />
+                                        <Input />
                                     </Form.Item>
 
                                     <Form.Item
                                         {...restField}
-                                        name={[name, 'data_type']}
+                                        name={[name, 'column_type']}
                                     >
                                         <Select
                                             style={{ width: 120 }}
                                             options={[
-                                                { value: 'int', label: 'Integer' },
-                                                { value: 'float', label: 'Float' },
-                                                { value: 'string', label: 'String' },
+                                                { value: 'INT', label: 'Integer' },
+                                                { value: 'NUMERIC', label: 'Float' },
+                                                { value: 'TEXT', label: 'String' },
+                                                { value: 'BOOLEAN', label: 'Boolean' },
+                                                { value: 'DATE', label: 'Date' },
                                             ]}
                                         />
                                     </Form.Item>
 
                                     <Form.Item
                                         {...restField}
-                                        name={[name, 'description']}
+                                        name={[name, 'display_name']}
                                     >
                                         <Input placeholder="Last Name" />
                                     </Form.Item>

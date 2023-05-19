@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, FormInstance, Form, Input } from 'antd';
 
-import { IFolder } from '../NewBlock'
+import { IFolder } from '../../UnitAdmin/NewBlock'
 
 interface IProps {
     isOpen: boolean

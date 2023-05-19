@@ -10,6 +10,7 @@ import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Layout } from 'antd';
+import UnitAdminLayout from './pages/UnitAdmin/UnitAdminLayout';
 
 function getAuthParams() {
     const data = {
@@ -57,6 +58,7 @@ function App() {
                             setMainRole("admin")
                         } else if (roles.includes("unit_admin")) {
                             setMainRole("unit_admin")
+                            navigate("/unit_admin")
                             setUserName(res.data["preferred_username"])
                         } else if (roles.includes("unit_normal")) {
                             setMainRole("unit_normal")
@@ -79,11 +81,8 @@ function App() {
                 <Outlet />
             </Admin>
 
-        case "unit_admin":
-            return <UnitAdmin name={username}/>
-
         case "unit_normal":
-            return <Normal name={username}/>
+            return <Normal name={username} />
 
         default:
             return <Loading />
@@ -91,4 +90,3 @@ function App() {
 }
 
 export default App;
- 
