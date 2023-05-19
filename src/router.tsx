@@ -15,8 +15,9 @@ import Default from "./pages/Blocks/Default";
 import Criteria from "./pages/Blocks/Criteria";
 import DisplayTable from "./pages/Blocks/DisplayTable";
 import DisplayFolder from "./pages/Blocks/DisplayFolder";
-import AnalyzeCard from "./pages/UnitNormal/Cards/AnalyzeCard";
 import DisplayAnalytics from "./pages/Blocks/DisplayAnalytics";
+import UserManagement from "./pages/UnitAdmin/UserManagement";
+import New from "./pages/Blocks/Tables/NewTable";
 
 export const router = createBrowserRouter([
     {
@@ -43,37 +44,45 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <UnitAdmin name="something" />
+                element: <UnitAdmin name="something" />,
+            },
+            {
+                path: "users",
+                element: <UserManagement />
             },
             {
                 path: "blocks/new",
                 element: <NewBlock />
             },
+        ]
+    },
+    {
+        path: "/blocks/:block_id",
+        element: <BlockLayout />,
+        children: [
             {
-                path: "blocks/:block_name",
-                element: <BlockLayout />,
-                children: [
-                    {
-                        index: true,
-                        element: <Default />
-                    },
-                    {
-                        path: "criteria",
-                        element: <Criteria />
-                    },
-                    {
-                        path: "tables/:table_id",
-                        element: <DisplayTable />
-                    },
-                    {
-                        path: "folders/:folder_name",
-                        element: <DisplayFolder />
-                    },
-                    {
-                        path: "analytics",
-                        element: <DisplayAnalytics />
-                    }
-                ]
+                index: true,
+                element: <Default />
+            },
+            {
+                path: "new_table",
+                element: <New />
+            },
+            {
+                path: "criteria",
+                element: <Criteria />
+            },
+            {
+                path: "tables/:table_id",
+                element: <DisplayTable />
+            },
+            {
+                path: "folders/:folder_name",
+                element: <DisplayFolder />
+            },
+            {
+                path: "analytics",
+                element: <DisplayAnalytics />
             }
         ]
     },

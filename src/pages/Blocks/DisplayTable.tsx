@@ -2,104 +2,45 @@ import { Card, Layout, Spin, TableProps, TableColumnsType, Table, Space, Button 
 import { PlusOutlined, UploadOutlined, DownloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import { getBearerHeader } from "../../utils";
+import axios from "axios";
+import API from "../../api";
+import DataTable from "./DataTable";
 
-interface DataType {
-    key: React.Key;
-    mssv: string;
-    name: string;
-    chinese: number;
-    math: number;
-    english: number;
+function add_keys(data: Array<any>) {
+    return data.map(row => {
+        const primary_key = Object.keys(row)[0]
+
+        return {
+            ...row,
+            key: row[primary_key],
+        }
+    })
 }
 
-const columns: TableColumnsType<DataType> = [
-    {
-        title: "Mã số sinh viên",
-        dataIndex: "mssv",
-    },
-    {
-        title: 'Họ và tên',
-        dataIndex: 'name',
-    },
-    {
-        title: 'Điểm toán',
-        dataIndex: 'chinese',
-        sorter: {
-            compare: (a, b) => a.chinese - b.chinese,
-            multiple: 3,
-        },
-    },
-    {
-        title: 'Điểm H',
-        dataIndex: 'math',
-        sorter: {
-            compare: (a, b) => a.math - b.math,
-            multiple: 2,
-        },
-    },
-    {
-        title: 'Điểm G',
-        dataIndex: 'english',
-        sorter: {
-            compare: (a, b) => a.english - b.english,
-            multiple: 1,
-        },
-    },
-    {
-        title: "Hành động",
-        fixed: "right",
-        width: 100,
-        render: (_, record) => {
-            return <Space> <Button icon={<EditOutlined />} /> <Button icon={<DeleteOutlined />} /></Space>
-        }
-    }
-];
-
-const data: DataType[] = [
-    {
-        key: '1',
-        mssv: "1914079",
-        name: 'John Brown',
-        chinese: 98,
-        math: 60,
-        english: 70,
-    },
-    {
-        key: '2',
-        mssv: "1919448",
-        name: 'Jim Green',
-        chinese: 98,
-        math: 66,
-        english: 89,
-    },
-    {
-        key: '3',
-        mssv: "1938384",
-        name: 'Joe Black',
-        chinese: 98,
-        math: 90,
-        english: 70,
-    },
-    {
-        key: '4',
-        mssv: '2001122',
-        name: 'Jim Red',
-        chinese: 88,
-        math: 99,
-        english: 89,
-    },
-];
-
-const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra);
-};
-
 export default function () {
-    const { table_id } = useParams()
-    const [tableData, setTableData] = useState([])
+    const { block_id, table_id } = useParams()
+    const [columns, setColumns] = useState<TableColumnsType<any>>()
+    const [tableData, setTableData] = useState<Array<any>>([])
 
     useEffect(() => {
-        if (table_id) {
+        if (table_id && block_id) {
+            getBearerHeader().then(config => {
+                return axios.get(API.Blocks.Tables.GET(block_id, table_id), config)
+            }).then(res => {
+                const { columns, data } = res.data
+
+                if (columns && data) {
+                    setColumns(columns.map((col: any) => {
+                        if (col.column_type != 'serial')
+                            col.editable = true
+
+                        return col
+                    }))
+
+                    setTableData(add_keys(data))
+                }
+            })
 
         }
     }, [table_id])
@@ -111,7 +52,7 @@ export default function () {
             minHeight: 280,
         }}
     >
-        {tableData === undefined ?
+        {tableData === undefined || columns === undefined ?
             <Card style={{ minHeight: 250, paddingTop: 24, textAlign: "center" }}>
                 <Spin />
             </Card>
@@ -121,7 +62,7 @@ export default function () {
                 <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
                 <Button icon={<DownloadOutlined />}>Tải dữ liệu</Button>
             </Space>}>
-                <Table columns={columns} dataSource={data} onChange={onChange} />
+                <DataTable data={tableData} setData={setTableData} columns={columns} />
             </Card>}
     </Layout.Content>
 }

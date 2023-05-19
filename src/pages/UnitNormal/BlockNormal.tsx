@@ -18,7 +18,7 @@ import { getBearerHeader, getUnit } from '../../utils';
 import Cookies from 'universal-cookie';
 import AnalyzeCard from './Cards/AnalyzeCard';
 import RightNav from './Header/RightNav';
-import NewDashboardModal from './Modals/NewDashboardModal';
+import NewDashboardModal from '../../modals/NewDashboardModal';
 
 interface IExcelColumn {
     title: string;

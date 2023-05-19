@@ -4,9 +4,7 @@ const { Content } = Layout;
 import { Input, Button, Avatar, Breadcrumb, Menu, theme, Dropdown, Table, Divider, Space, Card } from 'antd';
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import { DatabaseTwoTone, PlusOutlined, EllipsisOutlined, ExclamationCircleFilled, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-const { Search } = Input;
-const onSearch = (value: string) => console.log(value);
+import { ClusterOutlined, UsergroupAddOutlined, BlockOutlined, ExclamationCircleFilled, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { Modal } from 'antd';
 import './Unitadmin.css';
@@ -82,6 +80,7 @@ const UnitAdmin = (props: IProps) => {
             return [];
         }
     }
+
     let k = 1;
     const ChangeBlockName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEditBlockName(event.target.value);
@@ -180,42 +179,44 @@ const UnitAdmin = (props: IProps) => {
     ];
     const navigate = useNavigate();
 
-    function handleClick(value: any) {
-        navigate("/Unitadmin/block", { state: [toSlug(value), curUnit] })
-    }
 
-    const menuItems2 = [
-        <Menu.Item key="0" onClick={() => {
-            const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
-
-            const config = getBearerHeader()
-
-            if (config !== undefined) {
-                const cookies = new Cookies()
-                const params = new URLSearchParams()
-                params.append("client_id", "console")
-                params.append("refresh_token", cookies.get("refresh_token"))
-
-                axios.post(logoutEndpoint, params, config).then(res => {
-                    if (res.status === 204) {
-                        cookies.remove("access_token")
-                        cookies.remove("refresh_token")
-
-                        location.reload()
+    const menuItems: MenuProps['items'] = [
+        {
+            key: "tables",
+            icon: <BlockOutlined />,
+            label: "Danh sách tập dữ liệu",
+        },
+        {
+            key: "folders",
+            label: "Sơ đồ tổ chức",
+            icon: <ClusterOutlined />,
+            children: [
+                {
+                    key: "dsn",
+                    label: "Vật lý 1",
+                    onClick: () => {
+                        navigate("folders/dsn")
                     }
-                })
+                }
+            ]
+        },
+        {
+            key: "analyze",
+            label: "Quản lý người dùng",
+            icon: <UsergroupAddOutlined />,
+            onClick: () => {
+                navigate("users")
             }
-        }}
-            style={{ color: 'red' }}>
-            Log out
-        </Menu.Item>,
-    ];
+        },
+    ]
+
     return (
         <Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
             <Layout style={{ padding: '0 24px 24px' }}>
                 <BlockCard />
             </Layout>
         </Content>
+
     )
 };
 export default UnitAdmin;

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import { getUnit } from '../utils';
+import Loading from '../pages/Loading';
 
 function SSOCallback() {
     const navigate = useNavigate()
@@ -62,7 +63,7 @@ function SSOCallback() {
             });
     }, [navigate]);
 
-    return <div>Processing SSO callback...</div>;
+    return <Loading title='Proccessing SSO Callback...' />;
 }
 
 export default SSOCallback

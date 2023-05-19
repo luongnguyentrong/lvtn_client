@@ -19,8 +19,13 @@ export default function (props: IProps) {
         })
     }
 
+    const handleCancel = () => {
+        form.resetFields()
+        props.close()
+    }
+
     return (
-        <Modal title="Thêm tiêu chí" open={props.open} onOk={handleOk} onCancel={props.close}>
+        <Modal title="Thêm tiêu chí" open={props.open} onOk={handleOk} onCancel={handleCancel}>
             <Form
                 name="basic"
                 style={{ maxWidth: 600 }}

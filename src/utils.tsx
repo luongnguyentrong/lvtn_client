@@ -1,5 +1,7 @@
 import axios from "axios"
 import Cookies from "universal-cookie"
+import API from "./api"
+import { Navigate } from "react-router-dom"
 
 export function getUnit(): string {
     if (process.env.NODE_ENV === "development") {
@@ -32,14 +34,7 @@ export async function getCurrentUser(): Promise<IUser | undefined> {
     const userinfo_endpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/userinfo`
 
     if (cookies.get("access_token")) {
-        const access_token = cookies.get("access_token")
-
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${access_token}`,
-            },
-        };
-
+        const config = await getBearerHeader()
         const result = await axios.post(userinfo_endpoint, {}, config)
 
         if (result.status === 200) {
@@ -77,20 +72,60 @@ export function toSlug(str: string) {
     return "";
 }
 
-export function getBearerHeader() {
+export async function getBearerHeader() {
     const cookies = new Cookies()
-    const access_token = cookies.get("access_token")
+    let current_access_token = cookies.get("access_token")
 
-    if (access_token) {
+    if (!current_access_token) {
+        const current_refresh_token = cookies.get("refresh_token")
+
+        if (current_refresh_token) {
+            const data = new URLSearchParams();
+            data.append('grant_type', 'refresh_token');
+            data.append('client_id', 'console');
+            data.append('refresh_token', current_refresh_token);
+
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            };
+
+            const response = await axios.post(API.Keycloak.Token(getUnit()), data, config)
+
+            const cookies = new Cookies()
+            const { access_token, expires_in, id_token, refresh_expires_in, refresh_token } = response.data;
+
+            cookies.set("access_token", access_token, {
+                path: "/",
+                maxAge: expires_in,
+            })
+
+            cookies.set("id_token", id_token, {
+                path: "/"
+            })
+            cookies.set("refresh_token", refresh_token, {
+                path: "/",
+                maxAge: refresh_expires_in
+            })
+
+            current_access_token = access_token
+        } else {
+            Navigate({ to: "/" })
+        }
+    }
+
+    if (current_access_token) {
         const config = {
             headers: {
-                'Authorization': `Bearer ${access_token}`,
+                'Authorization': `Bearer ${current_access_token}`,
             },
         };
 
         return config
     }
 }
+
 
 export function getAPIHost(): string {
     if (process.env.NODE_ENV === "development") {
