@@ -1,8 +1,8 @@
 import { Button, Form, Input, Modal, message } from "antd"
 import { useForm } from "antd/es/form/Form"
 import axios from "axios"
-import API from "../../../api"
-import { getBearerHeader } from "../../../utils"
+import API from "../api"
+import { getBearerHeader } from "../utils"
 
 interface IProps {
     open: boolean

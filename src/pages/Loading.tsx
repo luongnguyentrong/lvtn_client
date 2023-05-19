@@ -11,6 +11,12 @@ const OutlineStyles = {
     alignItems: 'center'
 }
 
-const App: React.FC = () => <Space color='#e6f4ff' direction='vertical' style={OutlineStyles}><Spin size='large' tip="Loading" indicator={antIcon} /></Space>;
+interface IProps {
+    title?: string
+}
 
-export default App;
+export default function (props: IProps) {
+    return <Space color='#e6f4ff' direction='vertical' style={OutlineStyles}>
+        <Spin size='large' tip={props.title ? props.title : "Loading"} indicator={antIcon} />
+    </Space>
+}

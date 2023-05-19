@@ -26,11 +26,16 @@ const API = {
         Create: BaseURL + "/blocks/",
         Tables: {
             Create: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
-            List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/"
+            List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
+            GET: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id,
+            Upsert: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/data", 
         }
     },
     Users: {
         List: BaseURL + "/users/"
+    },
+    Keycloak: {
+        Token: (cur_unit: string) => `https://sso.ducluong.monster/realms/${cur_unit}/protocol/openid-connect/token`
     }
 }
 

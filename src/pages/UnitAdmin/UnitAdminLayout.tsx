@@ -1,49 +1,62 @@
-import { Col, Input, Layout, Row } from "antd"
-import { Link, Outlet } from "react-router-dom";
-import RightNav from "./Header/RightNav";
-
-const { Header, Footer } = Layout;
-
-const emptyHeaderStyle: React.CSSProperties = {
-    height: "48px",
-    lineHeight: "48px",
-    background: "transparent",
-}
-
-const headerStyles: React.CSSProperties = {
-    position: "fixed",
-    top: 0,
-    height: "48px",
-    lineHeight: "48px",
-    width: "100%",
-    zIndex: "100",
-    right: "0px",
-    backgroundColor: "white",
-    borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
-}
+import { MenuProps, Layout, Menu } from "antd"
+import { ClusterOutlined, UsergroupAddOutlined, BlockOutlined } from '@ant-design/icons';
+import { Outlet, useNavigate } from "react-router-dom";
+import Header from "../../Header";
 
 export default function () {
+    const navigate = useNavigate();
 
+
+    const menuItems: MenuProps['items'] = [
+        {
+            key: "tables",
+            icon: <BlockOutlined />,
+            label: "Danh sách tập dữ liệu",
+            onClick: () => {
+                navigate("/unit_admin")
+            }
+        },
+        {
+            key: "folders",
+            label: "Sơ đồ tổ chức",
+            icon: <ClusterOutlined />,
+            children: [
+                {
+                    key: "dsn",
+                    label: "Vật lý 1",
+                    onClick: () => {
+                        navigate("folders/dsn")
+                    }
+                }
+            ]
+        },
+        {
+            key: "analyze",
+            label: "Quản lý người dùng",
+            icon: <UsergroupAddOutlined />,
+            onClick: () => {
+                navigate("users")
+            }
+        },
+    ]
     return <Layout style={{ height: "100%" }}>
-        <Header style={emptyHeaderStyle} />
-        <Header style={headerStyles}>
-            <Row align="middle">
-                <Col span={6}>
-                    <Link to={"/"}>
-                        <div className="logo">
-                            <img src="/logo.png" alt="logo" style={{ width: 32 }} />
-                        </div>
-                    </Link>
-                </Col>
-                <Col span={12} style={{ display: "inherit", justifyContent: "center" }}><Input.Search style={{ width: 400}} size='middle' placeholder='Nhập tên tập dữ liệu...' /></Col>
-                <Col span={6}>
-                    <RightNav />
-                </Col>
-            </Row>
-        </Header>
+        <Header />
 
-        <Outlet />
+        <Layout>
+            <Layout.Sider width={250} style={{ background: "white", paddingTop: 24 }}>
+                <Menu
+                    mode="inline"
+                    defaultSelectedKeys={['tables']}
+                    style={{ height: '100%', borderRight: 0 }}
+                    items={menuItems}
+                />
+            </Layout.Sider>
 
-        {/* <Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Footer> */}
+            <Layout>
+                <Outlet />
+                <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
+            </Layout>
+        </Layout>
+
     </Layout>
 }
