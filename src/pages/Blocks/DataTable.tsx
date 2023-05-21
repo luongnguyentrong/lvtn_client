@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Form, Input, InputNumber, Popconfirm, Select, Table, TableColumnsType, Typography, message } from 'antd';
 import { getBearerHeader, toSlug } from '../../utils';
 import axios from 'axios';
 import API from '../../api';
 import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 export interface Item {
     key: string;
@@ -33,11 +34,12 @@ interface IProps {
     columns: Array<any>
 }
 
-function BuildInput(props: { name: string; column_type: string }) {
+function BuildInput(props: { name: string; column_type: string; old_value: any }) {
     if (props.column_type.includes("int"))
         return <Form.Item
             name={props.name}
             style={{ margin: 0 }}
+            initialValue={props.old_value}
         >
             <InputNumber style={{ width: "100%" }} />
         </Form.Item>
@@ -51,6 +53,7 @@ function BuildInput(props: { name: string; column_type: string }) {
                     message: `Giá trị không hợp lệ!`,
                 },
             ]}
+            initialValue={props.old_value}
         >
             <Input />
         </Form.Item>
@@ -64,10 +67,11 @@ function BuildInput(props: { name: string; column_type: string }) {
                     message: `Giá trị không hợp lệ!`,
                 },
             ]}
+            initialValue={props.old_value}
         >
             <Input />
         </Form.Item>
-    else if (props.column_type.includes("date"))
+    else if (props.column_type.includes("date")) {
         return <Form.Item
             name={props.name}
             style={{ margin: 0 }}
@@ -77,9 +81,12 @@ function BuildInput(props: { name: string; column_type: string }) {
                     message: `Giá trị không hợp lệ!`,
                 },
             ]}
+            initialValue={props.old_value && dayjs(props.old_value, 'M/D/YYYY')}
         >
             <DatePicker format={DATE_FORMAT} />
         </Form.Item>
+
+    }
 
     return <Form.Item>
         <Input />
@@ -93,6 +100,7 @@ export default function (props: IProps) {
     const { block_id, table_id } = useParams()
 
     const [editingKey, setEditingKey] = useState('');
+    const [isSaving, setIsSaving] = useState(false)
 
     const isEditing = (record: Item) => record.key === editingKey;
 
@@ -117,6 +125,7 @@ export default function (props: IProps) {
 
         setData(data.concat(emptyRow))
         setEditingKey(emptyRow['key'])
+        form.resetFields()
     }
 
     const EditableCell: React.FC<EditableCellProps> = ({
@@ -130,8 +139,10 @@ export default function (props: IProps) {
         ...restProps
     }) => {
         if (editing) {
+            const row = data.find((row: Item) => row.key === editingKey) as { [k: string]: any }
+
             return <td {...restProps}>
-                <BuildInput name={dataIndex} column_type={inputType} />
+                <BuildInput old_value={row && row[dataIndex]} name={dataIndex} column_type={inputType} />
             </td>
         }
 
@@ -173,6 +184,7 @@ export default function (props: IProps) {
                         form.resetFields()
 
                         message.success("Lưu thành công!")
+                        setIsSaving(false)
                     } else {
                         message.error("Lưu thất bại!")
                     }
@@ -183,7 +195,7 @@ export default function (props: IProps) {
                     form.resetFields()
                 }
             } catch (errInfo) {
-                console.log(errInfo)
+
             }
         }
     };
@@ -197,17 +209,21 @@ export default function (props: IProps) {
 
             return editable ? (
                 <span>
-                    <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                        Lưu
-                    </Typography.Link>
+                    <Button loading={isSaving} onClick={() => {
+                        setIsSaving(true)
+
+                        save(record.key)
+                    }} icon={<SaveOutlined />} style={{
+                        marginRight: 8
+                    }}>Lưu</Button>
                     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
                         <Typography.Link>Hủy</Typography.Link>
                     </Popconfirm>
                 </span>
             ) : (
-                <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                <Button icon={<EditOutlined />} onClick={() => edit(record)}>
                     Chỉnh sửa
-                </Typography.Link>
+                </Button>
             );
         },
     })
