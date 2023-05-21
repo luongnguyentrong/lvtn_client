@@ -66,11 +66,11 @@ const UnitAdmin = (props: IProps) => {
 
     const handleShowBlock = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/show_folders_normal?user=' + props.name);
+            const response = await axios.get('https://api.ducluong.monster/show_folders_normal?user=' + props.name);
             const response1 = response.data["body"].map((item: any) => item.substring(item.indexOf("_") + 1));
             let folderList: VirtualFolder[] = []
             for (var ele of response1) {
-                var c: VirtualFolder = { name: "" };
+                var c: VirtualFolder = { name: "", norname: "" };
                 c.name = ele
                 folderList.push(c)
             }
@@ -213,7 +213,7 @@ const UnitAdmin = (props: IProps) => {
     return (
         <Content style={{ width: '100%', height: '1000px', margin: '20px 0px' }}>
             <Layout style={{ padding: '0 24px 24px' }}>
-                <BlockCard />
+                <BlockCard/>
             </Layout>
         </Content>
 

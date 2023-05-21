@@ -75,7 +75,7 @@ export default function () {
 
     const GenerateCards = (props: { blocks: Array<IBlock> }) => {
         if (props.blocks === undefined || props.blocks.length === 0)
-            return <Empty />
+            return <Empty/>
 
         return <Space size={"middle"} wrap>
             {props.blocks.map(block => {
