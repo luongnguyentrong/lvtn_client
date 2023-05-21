@@ -62,7 +62,7 @@ export default function () {
 
     const handleDelete = (block_name: string) => {
         setConfirmLoading(true);
-
+        
         setTimeout(() => {
             if (blocks) {
                 const new_blocks = blocks.filter(block => block.name != block_name)

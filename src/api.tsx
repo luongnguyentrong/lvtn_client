@@ -19,7 +19,8 @@ const API = {
         Create: "http://localhost:5000" + "/superset/",
     },
     Folders: {
-        Show: BaseURL + "/show_folders_normal?user="
+        Show: BaseURL + "/show_folders_normal?user=",
+        List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/folders/",
     },
     Blocks: {
         List: BaseURL + "/blocks/",
