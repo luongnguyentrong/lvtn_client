@@ -1,3 +1,4 @@
+export const BASE_URL = "ducluong.monster"
 
 const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster"
 
@@ -15,7 +16,7 @@ const API = {
         URL: BaseURL + "/units/org"
     },
     Dashboards: {
-        List: "http://localhost:5000" + "/superset/",
+        List: BaseURL + "/superset/",
         Create: "http://localhost:5000" + "/superset/",
     },
     Folders: {
@@ -29,6 +30,7 @@ const API = {
             List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
             GET: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id,
             Upsert: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/data", 
+            UploadFromExcel: (block_id?: string, table_id?: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/upload",
         }
     },
     Users: {
