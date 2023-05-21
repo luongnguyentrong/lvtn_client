@@ -47,6 +47,7 @@ const Normal = (props: IProps) => {
   const [columns, setColumns] = useState<TableRow[]>([]);
   const ref2 = useRef<TableRow[]>()
   ref2.current = columns
+  const curUnit = getUnit()
   const [colName, setColName] = useState([]);
   const [count, setCount] = useState(0);
   const [formData, setFormData] = useState({});
