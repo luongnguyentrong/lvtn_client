@@ -124,7 +124,7 @@ export default function () {
                     <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
                 </Upload>
 
-                <Button icon={<DownloadOutlined />}>Tải dữ liệu</Button>
+                <Button onClick={ExportExcel} icon={<DownloadOutlined />}>Tải dữ liệu</Button>
                 <Button icon={<DeleteOutlined />}>Xóa bảng</Button>
             </Space>}>
                 <DataTable data={tableData} setData={setTableData} columns={columns} />
