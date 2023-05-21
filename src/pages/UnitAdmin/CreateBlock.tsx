@@ -222,6 +222,7 @@ const CreateBlock: React.FC<IProps> = (props: IProps) => {
     padding: 20,
     marginTop: 30,
   };
+  
   return (
     <>{contextHolder}<div key={props.key} style={{ width: "700px" }}>
       <Steps current={current} items={items} />
