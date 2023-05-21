@@ -6,6 +6,15 @@ import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
 import DataTable from "./DataTable";
+import { Excel } from "antd-table-saveas-excel";
+
+interface IExcelColumn {
+    title: string;
+    dataIndex: string;
+}
+interface TableRow {
+    [key: string]: any;
+}
 
 function add_keys(data: Array<any>) {
     return data.map(row => {
@@ -17,10 +26,12 @@ function add_keys(data: Array<any>) {
         }
     })
 }
+ 
 
-export default function () {
+const DisplayTable = () => {
     const { block_id, table_id } = useParams()
-    const [columns, setColumns] = useState<TableColumnsType<any>>()
+    // const [columns, setColumns] = useState<TableColumnsType<any>>()
+    const [columns, setColumns] = useState<TableRow[]>([]);
     const [tableData, setTableData] = useState<Array<any>>([])
 
     useEffect(() => {
@@ -41,9 +52,24 @@ export default function () {
                     setTableData(add_keys(data))
                 }
             })
-
+            
         }
     }, [table_id])
+
+    const excelColumns: IExcelColumn[] = columns.map(column => ({
+        title: column.title,
+        dataIndex: column.dataIndex
+    }));
+    const ExportExcel = () => {
+        const excel = new Excel();
+        excel
+            .addSheet("test")
+            .addColumns(excelColumns)
+            .addDataSource(tableData, {
+                str2Percent: true
+            })
+            .saveAs(`Export.xlsx`);
+    };
 
     return <Layout.Content
         style={{
@@ -58,11 +84,11 @@ export default function () {
             </Card>
             :
             <Card title="Danh sách sinh viên" extra={<Space>
-                <Button icon={<PlusOutlined />}>Thêm mới</Button>
                 <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
-                <Button icon={<DownloadOutlined />}>Tải dữ liệu</Button>
+                <Button onClick={ExportExcel} icon={<DownloadOutlined />}>Tải dữ liệu</Button>
             </Space>}>
                 <DataTable data={tableData} setData={setTableData} columns={columns} />
             </Card>}
     </Layout.Content>
 }
+export default DisplayTable

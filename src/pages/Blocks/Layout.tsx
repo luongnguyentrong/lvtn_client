@@ -7,6 +7,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getBearerHeader } from '../../utils';
 import Header from '../../Header';
+import DisplayTable from './DisplayTable';
 
 const { Sider } = Layout;
 
@@ -14,6 +15,7 @@ export default function () {
     const { block_id } = useParams()
     const [tables, setTables] = useState<MenuProps['items']>([])
     const navigate = useNavigate()
+    const [tableName, setTableName] = useState("")
 
     useEffect(() => {
         if (block_id) {
@@ -100,7 +102,6 @@ export default function () {
     return (
         <Layout style={{ minHeight: "100%" }}>
             <Header />
-
             <Layout>
                 <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
                     <Dropdown menu={{ items }} trigger={['click']} >
