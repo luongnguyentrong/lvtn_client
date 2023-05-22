@@ -9,7 +9,6 @@ const onSearch = (value: string) => console.log(value);
 import axios from 'axios';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Modal } from 'antd';
-import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import { Link, useLocation } from "react-router-dom";
 import { Excel } from "antd-table-saveas-excel";

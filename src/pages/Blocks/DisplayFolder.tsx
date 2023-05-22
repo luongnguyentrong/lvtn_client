@@ -1,12 +1,15 @@
 import { Button, Card, Layout, Space, Table, TableColumnsType } from "antd"
 import { UploadOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getBearerHeader } from "../../utils";
+import axios from "axios";
+import API from "../../api";
 
 interface DataType {
     key: React.Key;
     name: string;
-    age: number;
-    address: string;
+    size: string;
 }
 
 const columns: TableColumnsType<DataType> = [
@@ -14,16 +17,12 @@ const columns: TableColumnsType<DataType> = [
         title: 'Tên',
         dataIndex: 'name',
         render: (data) => {
-            return <span><FilePdfOutlined /> {data}</span>
+            return <span><FilePdfOutlined />{data}</span>
         }
     },
     {
-        title: 'Người sở hữu',
-        dataIndex: 'age',
-    },
-    {
         title: 'Kích cỡ tệp',
-        dataIndex: 'address',
+        dataIndex: 'size',
     },
 ];
 
@@ -32,15 +31,15 @@ for (let i = 0; i < 46; i++) {
     data.push({
         key: i,
         name: `Edward King ${i}`,
-        age: 32,
-        address: `London, Park Lane no. ${i}`,
+        size: `London, Park Lane no. ${i}`,
     });
 }
 
 export default function () {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const [listTable,setListTable] = useState<DataType[]>([]);
+    const { block_id, folder_name } = useParams()
 
     const start = () => {
         setLoading(true);
@@ -50,18 +49,36 @@ export default function () {
             setLoading(false);
         }, 1000);
     };
-
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         console.log('selectedRowKeys changed: ', newSelectedRowKeys);
         setSelectedRowKeys(newSelectedRowKeys);
     };
-
     const rowSelection = {
         selectedRowKeys,
         onChange: onSelectChange,
     };
-
     const hasSelected = selectedRowKeys.length > 0;
+
+    useEffect(() => {
+        if (block_id) {
+            getBearerHeader().then(config => {
+                return axios.get(API.Folders.List(block_id) + folder_name, config)
+            }).then(res => {
+                let i = 0
+                const data1: DataType[] = [];
+                console.log(res.data)
+                res.data.items.forEach((folder1:{name:string, size: string}) => {
+                    let newData: DataType = {key: 0,name: "", size: ""}
+                    newData.key = i
+                    newData.name = folder1.name
+                    newData.size = folder1.size
+                    data1.push(newData)
+                    i = i + 1
+                });
+                setListTable(data1)
+            })
+        }
+    }, [folder_name])
 
     return <Layout.Content
         style={{
@@ -81,7 +98,7 @@ export default function () {
                 </span>
             </div>
 
-            <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+            <Table rowSelection={rowSelection} columns={columns} dataSource={listTable} />
 
         </Card >
     </Layout.Content >

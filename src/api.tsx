@@ -1,6 +1,6 @@
 export const BASE_URL = "ducluong.monster"
 
-const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster"
+export const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster"
 
 const API = {
     CreateUnits: {
@@ -20,7 +20,8 @@ const API = {
         Create: "http://localhost:5000" + "/superset/",
     },
     Folders: {
-        Show: BaseURL + "/show_folders_normal?user="
+        Show: BaseURL + "/show_folders_normal?user=",
+        List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/folders/",
     },
     Blocks: {
         List: BaseURL + "/blocks/",

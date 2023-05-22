@@ -6,6 +6,17 @@ import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
 import DataTable from "./DataTable";
+
+import { Excel } from "antd-table-saveas-excel";
+
+interface IExcelColumn {
+    title: string;
+    dataIndex: string;
+}
+interface TableRow {
+    [key: string]: any;
+}
+
 import dayjs from 'dayjs';
 
 function add_keys(data: Array<any>, primary_key: string) {
@@ -16,6 +27,7 @@ function add_keys(data: Array<any>, primary_key: string) {
         }
     })
 }
+ 
 
 function transform_date(data: { [k: string]: string }, dataIndex: string) {
     const dateString = data[dataIndex];
@@ -33,7 +45,8 @@ function transform_date(data: { [k: string]: string }, dataIndex: string) {
 
 export default function () {
     const { block_id, table_id } = useParams()
-    const [columns, setColumns] = useState<TableColumnsType<any>>()
+    // const [columns, setColumns] = useState<TableColumnsType<any>>()
+    const [columns, setColumns] = useState<TableRow[]>([]);
     const [tableData, setTableData] = useState<Array<any>>([])
     const [config, setConfig] = useState<any>()
 
@@ -64,9 +77,24 @@ export default function () {
                     setTableData(data)
                 }
             })
-
+            
         }
     }, [table_id])
+
+    const excelColumns: IExcelColumn[] = columns.map(column => ({
+        title: column.title,
+        dataIndex: column.dataIndex
+    }));
+    const ExportExcel = () => {
+        const excel = new Excel();
+        excel
+            .addSheet("test")
+            .addColumns(excelColumns)
+            .addDataSource(tableData, {
+                str2Percent: true
+            })
+            .saveAs(`Export.xlsx`);
+    };
 
     useEffect(() => {
         getBearerHeader().then(bearerConfig => setConfig(bearerConfig))
@@ -96,7 +124,7 @@ export default function () {
                     <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
                 </Upload>
 
-                <Button icon={<DownloadOutlined />}>Tải dữ liệu</Button>
+                <Button onClick={ExportExcel} icon={<DownloadOutlined />}>Tải dữ liệu</Button>
                 <Button icon={<DeleteOutlined />}>Xóa bảng</Button>
             </Space>}>
                 <DataTable data={tableData} setData={setTableData} columns={columns} />

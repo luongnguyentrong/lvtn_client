@@ -7,6 +7,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getBearerHeader } from '../../utils';
 import Header from '../../Header';
+import DisplayTable from './DisplayTable';
 
 const { Sider } = Layout;
 
@@ -14,6 +15,28 @@ export default function () {
     const { block_id } = useParams()
     const [tables, setTables] = useState<MenuProps['items']>([])
     const navigate = useNavigate()
+    const [folders, setFolders] = useState([])
+
+    useEffect(() => {
+        if (block_id) {
+            getBearerHeader().then(config => {
+                return axios.get(API.Folders.List(block_id) + "", config)
+            }).then(res => {
+                let folderList: any = []
+                res.data.forEach((folder: { name: any; display_name: any; }) => {
+                    folderList.push({
+                        key: `${folder.name}`,
+                        label: `${folder.display_name}`,
+                        icon: <FolderOutlined />,
+                        onClick: () => {
+                            navigate("folders/" + `${folder.name}`)
+                        }
+                    })
+                });
+                setFolders(folderList)
+            })
+        }
+    }, [])
 
     useEffect(() => {
         if (block_id) {
@@ -37,8 +60,7 @@ export default function () {
     }, [])
 
     const {
-        token: { colorBgContainer },
-    } = theme.useToken();
+        token: { colorBgContainer }, } = theme.useToken();
 
     const items: MenuProps['items'] = [
         {
@@ -67,16 +89,17 @@ export default function () {
             key: "folders",
             label: "Danh sách folders",
             icon: <FolderOutlined />,
-            children: [
-                {
-                    key: "dsn",
-                    label: "Vật lý 1",
-                    icon: <FolderOutlined />,
-                    onClick: () => {
-                        navigate("folders/dsn")
-                    }
-                }
-            ]
+            children: folders
+            // [
+            //     // {
+            //     //     key: "dsn",
+            //     //     label: "Vật lý 1",
+            //     //     icon: <FolderOutlined />,
+            //     //     onClick: () => {
+            //     //         navigate("folders/dsn")
+            //     //     }
+            //     // }
+            // ]
         },
         {
             key: "relationships",
@@ -97,10 +120,11 @@ export default function () {
     ]
 
 
+
+
     return (
         <Layout style={{ minHeight: "100%" }}>
             <Header />
-
             <Layout>
                 <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
                     <Dropdown menu={{ items }} trigger={['click']} >
