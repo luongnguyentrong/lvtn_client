@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LineChartOutlined, FolderAddOutlined, FileAddOutlined, FolderOutlined, BarsOutlined, PlusOutlined, TableOutlined, FilePdfOutlined } from '@ant-design/icons';
+import { PartitionOutlined, FolderAddOutlined, FileAddOutlined, FolderOutlined, BarsOutlined, PlusOutlined, TableOutlined, FilePdfOutlined } from '@ant-design/icons';
 import { Button, Dropdown, MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import API from '../../api';
@@ -79,11 +79,11 @@ export default function () {
             ]
         },
         {
-            key: "analyze",
-            label: "Phân tích",
-            icon: <LineChartOutlined />,
+            key: "relationships",
+            label: "Liên kết",
+            icon: <PartitionOutlined />,
             onClick: () => {
-                navigate("analytics")
+                navigate("relationships")
             }
         },
         {

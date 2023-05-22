@@ -18,6 +18,7 @@ import DisplayFolder from "./pages/Blocks/DisplayFolder";
 import DisplayAnalytics from "./pages/Blocks/DisplayAnalytics";
 import UserManagement from "./pages/UnitAdmin/UserManagement";
 import New from "./pages/Blocks/Tables/NewTable";
+import Relationships from "./pages/Blocks/Relationships";
 
 export const router = createBrowserRouter([
     {
@@ -81,8 +82,8 @@ export const router = createBrowserRouter([
                 element: <DisplayFolder />
             },
             {
-                path: "analytics",
-                element: <DisplayAnalytics />
+                path: "relationships",
+                element: <Relationships />
             }
         ]
     },

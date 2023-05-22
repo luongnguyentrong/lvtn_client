@@ -29,8 +29,15 @@ const API = {
             Create: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
             List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
             GET: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id,
-            Upsert: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/data", 
+            Upsert: (block_id: string, table_id: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/data",
             UploadFromExcel: (block_id?: string, table_id?: string) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/upload",
+            Columns: {
+                List: (block_id: string, table_id: number) => BaseURL + "/blocks/" + block_id + "/tables/" + table_id + "/columns",
+            }
+        },
+        References: {
+            List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
+            Create: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
         }
     },
     Users: {
