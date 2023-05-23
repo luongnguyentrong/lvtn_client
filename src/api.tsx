@@ -26,6 +26,7 @@ const API = {
     Blocks: {
         List: BaseURL + "/blocks/",
         Create: BaseURL + "/blocks/",
+        Get: (block_id: string) => BaseURL + "/blocks/" + block_id,
         Tables: {
             Create: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",
             List: (block_name: string) => BaseURL + "/blocks/" + block_name + "/tables/",

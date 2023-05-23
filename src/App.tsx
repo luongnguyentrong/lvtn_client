@@ -64,7 +64,8 @@ function App() {
                 cookies.remove("access_token")
                 cookies.remove("id_token")
                 cookies.remove("refresh_token")
-                navigate("/")
+                
+                location.reload()
             })
         }
     }, [])

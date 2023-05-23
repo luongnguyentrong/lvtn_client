@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PartitionOutlined, FolderAddOutlined, FileAddOutlined, FolderOutlined, BarsOutlined, PlusOutlined, TableOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { Button, Dropdown, MenuProps } from 'antd';
+import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import API from '../../api';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -8,32 +8,37 @@ import axios from 'axios';
 import { getBearerHeader } from '../../utils';
 import Header from '../../Header';
 import DisplayTable from './DisplayTable';
+import { table } from 'console';
 
 const { Sider } = Layout;
 
+export interface ITable {
+    id: number
+    name: string
+    description: string | null
+    display_name: string
+}
+
 export default function () {
     const { block_id } = useParams()
-    const [tables, setTables] = useState<MenuProps['items']>([])
+    const [tables, setTables] = useState<Array<ITable>>([])
     const navigate = useNavigate()
-    const [folders, setFolders] = useState([])
+    const [folders, setFolders] = useState<Array<string>>([])
 
     useEffect(() => {
         if (block_id) {
             getBearerHeader().then(config => {
                 return axios.get(API.Folders.List(block_id) + "", config)
             }).then(res => {
-                let folderList: any = []
-                res.data.forEach((folder: { name: any; display_name: any; }) => {
-                    folderList.push({
-                        key: `${folder.name}`,
-                        label: `${folder.display_name}`,
-                        icon: <FolderOutlined />,
-                        onClick: () => {
-                            navigate("folders/" + `${folder.name}`)
-                        }
+                const { folders } = res.data
+
+                if (folders && folders.length > 0) {
+                    const new_folders = folders.map((folder: any) => {
+                        return folder.Prefix
                     })
-                });
-                setFolders(folderList)
+
+                    setFolders(new_folders)
+                }
             })
         }
     }, [])
@@ -43,17 +48,8 @@ export default function () {
             getBearerHeader().then(config => {
                 return axios.get(API.Blocks.Tables.List(block_id), config)
             }).then(res => {
-                const items = res.data.map((table: any) => ({
-                    key: table.ID,
-                    label: table.display_name,
-                    icon: <TableOutlined />,
-                    onClick: () => {
-                        navigate("tables/" + table.id)
-                    }
-
-                }))
-
-                setTables(items)
+                if (res.data && res.data.length > 0)
+                    setTables(res.data)
             })
         }
 
@@ -73,7 +69,7 @@ export default function () {
         },
         {
             key: 'add_folder',
-            label: "Tạo folder mới",
+            label: "Tạo thư mục mới",
             icon: <FolderAddOutlined />,
         },
     ];
@@ -83,23 +79,33 @@ export default function () {
             key: "tables",
             label: "Danh sách dữ liệu",
             icon: <TableOutlined />,
-            children: tables
+            children: tables.map(table => {
+                return {
+                    key: table.id,
+                    label: table.display_name,
+                    icon: <TableOutlined />,
+                    onClick: () => {
+                        navigate("tables/" + table.id)
+                    }
+                }
+            })
         },
         {
             key: "folders",
             label: "Danh sách folders",
             icon: <FolderOutlined />,
-            children: folders
-            // [
-            //     // {
-            //     //     key: "dsn",
-            //     //     label: "Vật lý 1",
-            //     //     icon: <FolderOutlined />,
-            //     //     onClick: () => {
-            //     //         navigate("folders/dsn")
-            //     //     }
-            //     // }
-            // ]
+            children: folders.map(folder => {
+                const folder_name = folder.split("/").filter(Boolean).pop()
+
+                return {
+                    key: folder,
+                    label: folder_name,
+                    icon: < FolderOutlined />,
+                    onClick: () => {
+                        navigate("folders/" + folder_name)
+                    }
+                }
+            })
         },
         {
             key: "relationships",
@@ -119,12 +125,26 @@ export default function () {
         }
     ]
 
-
-
+    const searchOptions = [
+        {
+            label: "Bảng dữ liệu",
+            options: tables.map(table => ({
+                value: table.id,
+                label: <Space><TableOutlined />{table.display_name}</Space>
+            }))
+        },
+        {
+            label: "Thư mục",
+            options: folders.map(folder => ({
+                value: folder,
+                label: <Space><FolderOutlined />{folder.split("/").filter(Boolean).pop()}</Space>
+            }))
+        }
+    ]
 
     return (
         <Layout style={{ minHeight: "100%" }}>
-            <Header />
+            <Header searchOptions={searchOptions} />
             <Layout>
                 <Sider width={250} style={{ background: colorBgContainer, paddingTop: 24 }}>
                     <Dropdown menu={{ items }} trigger={['click']} >
@@ -134,13 +154,12 @@ export default function () {
                     <Menu
                         mode="inline"
                         defaultSelectedKeys={['tables']}
-                        style={{ height: '100%', borderRight: 0 }}
                         items={menuItems}
                     />
                 </Sider>
 
                 <Layout>
-                    <Outlet />
+                    <Outlet context={{ folders, tables }} />
                     <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
                 </Layout>
             </Layout>

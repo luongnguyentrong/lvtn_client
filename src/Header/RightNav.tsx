@@ -1,5 +1,8 @@
 import { Dropdown, Menu, MenuProps, Space } from "antd";
 import { UserOutlined, LogoutOutlined, QuestionCircleOutlined, BellOutlined } from '@ant-design/icons';
+import axios from "axios";
+import Cookies from "universal-cookie";
+import { getBearerHeader, getUnit } from "../utils";
 
 export default function () {
     const profile_items: MenuProps['items'] = [
@@ -14,7 +17,12 @@ export default function () {
         {
             key: '1',
             label: "Logout",
-            icon: <LogoutOutlined />
+            icon: <LogoutOutlined />,
+            onClick: () => {
+                const url = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+
+                window.location.replace(url);
+            }
         },
     ];
 
@@ -30,7 +38,7 @@ export default function () {
             label: "Liên hệ"
         },
         {
-            key: "profile",
+            key: "user",
             label: <Dropdown menu={{ items: profile_items }} placement="bottomRight" trigger={['click']}>
                 <Space>
                     <UserOutlined /> Lương

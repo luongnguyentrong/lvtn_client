@@ -1,4 +1,4 @@
-import { Col, Layout, Row } from "antd"
+import { Col, Layout, Row, AutoCompleteProps } from "antd"
 import { Link } from "react-router-dom"
 import Search from "./Search"
 import RightNav from "./RightNav"
@@ -23,7 +23,17 @@ const headerStyles: React.CSSProperties = {
     borderBottom: '1px solid rgba(5, 5, 5, 0.06)'
 }
 
-export default function () {
+export interface IOption {
+    label: string
+    options?: Array<IOption>
+    value?: string
+}
+
+interface IProps {
+    searchOptions?: IOption[]
+}
+
+export default function (props: IProps) {
     return <>
         <Header style={emptyHeaderStyle} />
         <Header style={headerStyles}>
@@ -36,7 +46,7 @@ export default function () {
                     </Link>
                 </Col>
                 <Col span={12} style={{ display: "inherit", justifyContent: "center" }}>
-                    <Search />
+                    <Search options={props.searchOptions} />
                 </Col>
                 <Col span={6}>
                     <RightNav />

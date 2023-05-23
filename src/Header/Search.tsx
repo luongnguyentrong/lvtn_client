@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
-import { AutoComplete, Input } from 'antd';
+import { AutoComplete, AutoCompleteProps, Input } from 'antd';
+import { IOption } from './index'
 
 const renderTitle = (title: string) => (
     <span>
@@ -40,10 +41,14 @@ const options = [
     },
 ];
 
-export default function () {
+interface IProps {
+    options?: Array<IOption>
+}
+
+export default function (props: IProps) {
     return (
         <AutoComplete
-            options={options}
+            options={props.options}
         >
             <Input.Search style={{ width: 400 }} size='middle' placeholder='Nhập tên tập dữ liệu...' />
         </AutoComplete>
