@@ -1,6 +1,6 @@
 import { Avatar, Button, Card, Collapse, Divider, Empty, Layout, List } from "antd";
 import { BookOutlined, FilePdfFilled, PlusOutlined, LineChartOutlined } from '@ant-design/icons';
-import AddCriteriaModal from "./Modals/AddCriteriaModal";
+//import AddCriteriaModal from "./Modals/AddCriteriaModal";
 import AddCritModal from "../../modals/AddCritModal";
 import { useState } from "react";
 import AddSource from "./Modals/AddSource";
