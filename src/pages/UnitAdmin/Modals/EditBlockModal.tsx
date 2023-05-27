@@ -80,10 +80,7 @@ export default function (props: IProps) {
                     display_name: props.initials.display_name,
                     name: props.initials.name,
                     description: props.initials.description,
-                    manager_ids: props.initials.managers.map(manager => ({
-                        label: manager.first_name + " " + manager.last_name,
-                        value: manager.id
-                    }))
+                    manager_ids: props.initials.manager_ids
                 }
             })
         }
