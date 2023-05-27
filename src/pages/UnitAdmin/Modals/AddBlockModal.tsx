@@ -9,6 +9,7 @@ import API from "../../../api";
 interface IProps {
     isModalOpen: boolean;
     close: () => void
+    update: () => void
 }
 
 export default function (props: IProps) {
@@ -66,6 +67,8 @@ export default function (props: IProps) {
                             setLoading(false)
                             props.close()
                             message.success("Tạo tập dữ liệu thành công!")
+
+                            props.update()
                         }
                     })
                 })

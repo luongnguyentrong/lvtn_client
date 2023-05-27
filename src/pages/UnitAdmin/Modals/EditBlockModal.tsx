@@ -1,51 +1,77 @@
-import { Col, Form, SelectProps, Input, Modal, Row, Select } from "antd"
+import { Col, Form, SelectProps, Input, Modal, Row, Select, message } from "antd"
 import { useForm } from "antd/es/form/Form";
 import { useNavigate } from "react-router-dom";
-import { toSlug } from "../../../utils";
+import { getBearerHeader, toSlug } from "../../../utils";
 import { IBlock } from "../Cards/BlockCard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import API from "../../../api";
 
 interface IProps {
     isModalOpen: boolean;
     initials: IBlock | undefined
     close: () => void
+    update: () => void
 }
 
 export default function (props: IProps) {
-    const navigate = useNavigate()
     const [form] = useForm()
-
-    const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
-        form.setFieldValue(["block", "name"], toSlug(ele.target.value))
-    }
+    const [users, setUsers] = useState<SelectProps['options']>([])
+    const [loading, setLoading] = useState(false)
 
     const handleOk = () => {
-        form.validateFields().then(data => {
-            data['items'] = []
+        setLoading(true)
 
-            props.close()
-            navigate("/unit_admin/blocks/new", {
-                state: {
-                    block: data
+        form.validateFields().then(data => {
+            getBearerHeader().then(config => {
+                if (props.initials) {
+                    axios.put(API.Blocks.Delete(props.initials.id), data.block, config).then(res => {
+                        if (res.status === 200) {
+                            setLoading(false)
+                            props.close()
+
+                            message.success("Cập nhật thành công!")
+                            props.update()
+                        }
+                    }).catch(err => {
+                        setLoading(false)
+                        message.error(err.message)
+                    })
                 }
             })
         })
     }
 
-    const options: SelectProps['options'] = [
-        {
-            label: "Nguyễn Trọng Đức Lương",
-            value: "38383833",
-        },
-        {
-            label: "Nguyễn Văn Khoa",
-            value: "383892891"
-        },
-        {
-            label: "Nguyễn Văn Mạnh",
-            value: "383892895"
-        }
-    ]
+    useEffect(() => {
+        getBearerHeader().then(config => {
+            return axios.get(API.Users.List, config)
+        }).then(res => {
+            const data = res.data
+
+            let new_users: SelectProps['options'] = []
+            if (data.unit_admin) {
+                new_users = new_users.concat(data.unit_admin.map((user: any) => {
+                    return {
+                        value: user.id,
+                        label: user.firstName + " " + user.lastName
+                    }
+                }))
+            }
+
+            if (data.normal) {
+                new_users = new_users.concat(data.normal.map((user: any) => {
+                    return {
+                        value: user.id,
+                        label: user.firstName + " " + user.lastName
+                    }
+                }))
+            }
+
+            setUsers(new_users)
+        })
+    }, [])
+
+
 
     useEffect(() => {
         if (props.initials) {
@@ -54,13 +80,16 @@ export default function (props: IProps) {
                     display_name: props.initials.display_name,
                     name: props.initials.name,
                     description: props.initials.description,
-                    manager: props.initials.manager
+                    manager_ids: props.initials.managers.map(manager => ({
+                        label: manager.first_name + " " + manager.last_name,
+                        value: manager.id
+                    }))
                 }
             })
         }
     }, [form, props.initials])
 
-    return <Modal title="Chỉnh sửa tập dữ liệu" open={props.isModalOpen} onOk={handleOk} onCancel={props.close}>
+    return <Modal title="Chỉnh sửa tập dữ liệu" open={props.isModalOpen} confirmLoading={loading} onOk={handleOk} onCancel={props.close}>
         <Form
             name="basic"
             layout="vertical"
@@ -74,7 +103,7 @@ export default function (props: IProps) {
                         name={["block", "display_name"]}
                         rules={[{ required: true, message: 'Hãy điền tên tập dữ liệu!' }]}
                     >
-                        <Input onChange={onDisplayChange} />
+                        <Input />
                     </Form.Item>
                 </Col>
 
@@ -84,7 +113,7 @@ export default function (props: IProps) {
                         name={["block", "name"]}
                         rules={[{ required: true, message: 'Hãy điền mã tập dữ liệu!' }]}
                     >
-                        <Input />
+                        <Input disabled />
                     </Form.Item>
                 </Col>
             </Row>
@@ -99,11 +128,12 @@ export default function (props: IProps) {
             <Form.Item
                 label="Chọn người quản lý"
                 rules={[{ required: true, message: 'Hãy chọn người quản lý tập dữ liệu!' }]}
-                name={["block", "manager"]}
+                name={["block", "manager_ids"]}
             >
                 <Select
+                    mode="multiple"
                     placeholder="Select a option and change input text above"
-                    options={options}
+                    options={users}
                 />
             </Form.Item>
         </Form>

@@ -20,6 +20,7 @@ export interface IBlock {
     name: string
     display_name: string
     description: string
+    manager_ids: Array<string>
     managers: Array<{
         id: string
         email: string
@@ -55,13 +56,23 @@ export default function () {
         setOpenEdit(false)
     }
 
-    useEffect(() => {
-        getBearerHeader().then(config => {
-            return axios.get(API.Blocks.List, config)
-        }).then(res => {
-            if (res.data)
-                setBlocks(res.data)
+    const fetch_blocks = async () => {
+        const config = await getBearerHeader()
+
+        const res = await axios.get(API.Blocks.List, config)
+
+        return res.data
+    }
+
+    const update_blocks = () => {
+        fetch_blocks().then(blocks => {
+            if (blocks)
+                setBlocks(blocks)
         })
+    }
+
+    useEffect(() => {
+        update_blocks()
     }, [])
 
     const handleDelete = (block_id: number) => {
@@ -135,11 +146,11 @@ export default function () {
                     minHeight: 300,
 
                 }}
-                bodyStyle={
+                bodyStyle={blocks ?
                     {
                         display: "flex",
                         flexWrap: "wrap"
-                    }
+                    } : undefined
                 }
                 extra={<Button type="primary"
                     onClick={showModal}
@@ -150,8 +161,8 @@ export default function () {
                 }
             </Card >
 
-            <EditBlockModal initials={curBlock} isModalOpen={openEdit} close={closeEdit} />
-            <AddBlockModal isModalOpen={openModal} close={close} />
+            <EditBlockModal update={update_blocks} initials={curBlock} isModalOpen={openEdit} close={closeEdit} />
+            <AddBlockModal update={update_blocks} isModalOpen={openModal} close={close} />
         </>
     )
 }
