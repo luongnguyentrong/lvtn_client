@@ -362,7 +362,6 @@ export default function (props: IProps) {
                 pagination={false}
                 footer={() => <Button icon={<PlusOutlined />} onClick={addNewRow}> Thêm cột mới </Button>}
             />
-
         </Form>
     );
 };

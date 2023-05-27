@@ -6,13 +6,14 @@ import { useForm } from "antd/es/form/Form";
 import { getBearerHeader, getCurrentUser, toSlug } from "../../../utils";
 import axios from "axios";
 import API from "../../../api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function () {
     const { block_id } = useParams()
     const [data, setData] = useState<Array<Item>>([])
     const [loading, setLoading] = useState(false)
     const [form] = useForm()
+    const navigate = useNavigate()
 
     const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
         form.setFieldValue(["block", "name"], toSlug(ele.target.value))
@@ -20,26 +21,27 @@ export default function () {
 
     const handleSubmit = () => {
         form.validateFields().then(table => {
-            console.log(table, data)
-            // table.block.columns = data
+            table.block.columns = data
 
-            // if (block_id) {
-            //     getCurrentUser().then(user => {
-            //         if (user) {
-            //             table.block.created_by = user.sub
+            if (block_id) {
+                getCurrentUser().then(user => {
+                    if (user) {
+                        table.block.created_by = user.sub
 
-            //             getBearerHeader().then(config => {
-            //                 return axios.post(API.Blocks.Tables.Create(block_id), table.block, config)
-            //             }).then(res => {
-            //                 if (res.status === 201) {
-            //                     setData([])
-            //                     form.resetFields()
-            //                     message.success("Tạo bảng dữ liệu thành công!")
-            //                 }
-            //             })
-            //         }
-            //     })
-            // }
+                        getBearerHeader().then(config => {
+                            return axios.post(API.Blocks.Tables.Create(block_id), table.block, config)
+                        }).then(res => {
+                            if (res.status === 201) {
+                                setData([])
+                                form.resetFields()
+
+                                navigate(`/blocks/${block_id}/tables/${res.data.id}`)
+                                message.success("Tạo bảng dữ liệu thành công!")
+                            }
+                        })
+                    }
+                })
+            }
         })
     }
 
@@ -96,7 +98,7 @@ export default function () {
                     type="primary"
                     icon={<PlusOutlined />}
                     onClick={() => {
-                        // setLoading(true)
+                        setLoading(true)
 
                         handleSubmit()
                     }}
