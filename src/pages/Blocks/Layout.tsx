@@ -9,6 +9,7 @@ import { getBearerHeader } from '../../utils';
 import Header from '../../Header';
 import DisplayTable from './DisplayTable';
 import { table } from 'console';
+import AddFolderModal from '../../modals/AddFolderModal';
 
 const { Sider } = Layout;
 
@@ -24,6 +25,30 @@ export default function () {
     const [tables, setTables] = useState<Array<ITable>>([])
     const navigate = useNavigate()
     const [folders, setFolders] = useState<Array<string>>([])
+    const [open, setOpen] = useState(false)
+
+    const openModal = () => {
+        setOpen(true)
+    }
+
+    const closeModal = () => {
+        setOpen(false)
+    }
+
+    const addFolder = (name: string) => {
+        // if (block_id) {
+        //     console.log(API.Folders.Add(block_id) + "/"+encodeURIComponent(name))
+        // }
+        if (block_id) {
+            getBearerHeader().then(config => {
+                return axios.get(API.Folders.Add(block_id) + "/" + encodeURIComponent(name), config)
+            }).then(res => {
+                const { response } = res.data
+                console.log(response)
+            })
+        }
+        folders.push(name)
+    }
 
     useEffect(() => {
         if (block_id) {
@@ -71,6 +96,9 @@ export default function () {
             key: 'add_folder',
             label: "Tạo thư mục mới",
             icon: <FolderAddOutlined />,
+            onClick: () =>{
+                openModal()
+            }
         },
     ];
 
@@ -163,7 +191,7 @@ export default function () {
                     <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
                 </Layout>
             </Layout>
-
+            <AddFolderModal open={open} close={closeModal} addFolder={addFolder}/>
         </Layout>
     );
 };

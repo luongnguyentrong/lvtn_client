@@ -22,6 +22,7 @@ const API = {
     Folders: {
         Show: BaseURL + "/show_folders_normal?user=",
         List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/folders/",
+        Add: (block_id: string) => BaseURL + "/blocks/" + block_id + "/folders/add",
     },
     Blocks: {
         List: BaseURL + "/blocks/",
