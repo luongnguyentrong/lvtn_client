@@ -1,5 +1,5 @@
 import { MenuProps, Layout, Menu } from "antd"
-import { ClusterOutlined, UsergroupAddOutlined, BlockOutlined } from '@ant-design/icons';
+import { ClusterOutlined, HomeOutlined, UsergroupAddOutlined, BlockOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../../Header";
 
@@ -10,8 +10,8 @@ export default function () {
     const menuItems: MenuProps['items'] = [
         {
             key: "tables",
-            icon: <BlockOutlined />,
-            label: "Danh sách tập dữ liệu",
+            icon: <HomeOutlined />,
+            label: "Trang chủ",
             onClick: () => {
                 navigate("/unit_admin")
             }
@@ -20,15 +20,9 @@ export default function () {
             key: "folders",
             label: "Sơ đồ tổ chức",
             icon: <ClusterOutlined />,
-            children: [
-                {
-                    key: "dsn",
-                    label: "Vật lý 1",
-                    onClick: () => {
-                        navigate("folders/dsn")
-                    }
-                }
-            ]
+            onClick: () => {
+                navigate("/org")
+            }
         },
         {
             key: "analyze",

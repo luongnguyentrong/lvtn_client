@@ -13,6 +13,7 @@ interface IProps {
 
 export default function (props: IProps) {
     const [users, setUsers] = useState<SelectProps['options']>([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         getBearerHeader().then(config => {
@@ -44,7 +45,6 @@ export default function (props: IProps) {
     }, [])
 
 
-    const navigate = useNavigate()
     const [form] = useForm()
 
     const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,23 +55,25 @@ export default function (props: IProps) {
         getCurrentUser().then(user => {
             if (user) {
                 form.validateFields().then(data => {
+                    setLoading(true)
+
                     data.block.created_by = user.sub
 
                     getBearerHeader().then(config => {
                         return axios.post(API.Blocks.Create, data.block, config)
                     }).then(res => {
                         if (res.status === 201) {
+                            setLoading(false)
                             props.close()
                             message.success("Tạo tập dữ liệu thành công!")
                         }
                     })
-
                 })
             }
         })
     }
 
-    return <Modal title="Tạo tập dữ liệu mới" open={props.isModalOpen} onOk={handleOk} onCancel={props.close}>
+    return <Modal title="Tạo tập dữ liệu mới" confirmLoading={loading} open={props.isModalOpen} onOk={handleOk} onCancel={props.close}>
         <Form
             name="basic"
             layout="vertical"
@@ -110,9 +112,10 @@ export default function (props: IProps) {
             <Form.Item
                 label="Chọn người quản lý"
                 rules={[{ required: true, message: 'Hãy chọn người quản lý tập dữ liệu!' }]}
-                name={["block", "manager_id"]}
+                name={["block", "manager_ids"]}
             >
                 <Select
+                    mode="multiple"
                     placeholder="Select a option and change input text above"
                     options={users}
                 />

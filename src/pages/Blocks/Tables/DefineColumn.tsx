@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { KeyOutlined } from '@ant-design/icons';
-import { Button, Form, Input, InputNumber, Popconfirm, Select, Table, Typography } from 'antd';
+import { KeyOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { Badge, Button, Dropdown, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Table, Typography } from 'antd';
 import { toSlug } from '../../../utils';
+import { BlockNoteEditor } from "@blocknote/core";
+import { BlockNoteView, useBlockNote } from "@blocknote/react";
 
 export interface Item {
     key: string;
@@ -9,6 +11,9 @@ export interface Item {
     display_name: string;
     column_type: string;
     is_primary?: boolean
+    is_indexed: boolean
+    not_null: boolean
+    order: number
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -51,17 +56,26 @@ export default function (props: IProps) {
     };
 
     const cancel = () => {
-        form.validateFields().then(() => {
-            setEditingKey('');
-        })
+        form.resetFields()
+
+        const new_data = data.slice(0, -1)
+        setData(new_data)
+        setEditingKey('');
     };
 
-    const addNewRow = () => {
+    const addNewRow = async () => {
+        if (editingKey != '') {
+            await save(editingKey)
+        }
+
         setData(data.concat({
             key: `row_${data.length}`,
             name: '',
             display_name: '',
             column_type: '',
+            is_indexed: false,
+            not_null: false,
+            order: data.length
         }))
 
         setEditingKey(`row_${data.length}`)
@@ -138,27 +152,56 @@ export default function (props: IProps) {
                         {inputNode}
                     </Form.Item>
                 </td>
-
-        }
-
-        return (
-            <td {...restProps}>
-                {editing ? (
+            else if (dataIndex === 'column_type')
+                return <td {...restProps}>
                     <Form.Item
                         name={dataIndex}
                         style={{ margin: 0 }}
                         rules={[
                             {
                                 required: true,
-                                message: `Hãy nhập ${title}!`,
+                                message: `Kiểu cột không hợp lệ!`,
                             },
                         ]}
                     >
-                        {inputNode}
+                        <Select
+                            options={column_type_options}
+                        />
                     </Form.Item>
-                ) : (
-                    children
-                )}
+                </td>
+            else if (dataIndex === "is_indexed") {
+                return (
+                    <td {...restProps}>
+                        <Form.Item
+                            name={dataIndex}
+                            style={{ margin: 0 }}
+                            initialValue={record.is_indexed}
+                            valuePropName="checked"
+                        >
+                            <Switch />
+                        </Form.Item>
+                    </td>
+                );
+            }
+            else if (dataIndex === "not_null") {
+                return (
+                    <td {...restProps}>
+                        <Form.Item
+                            name={dataIndex}
+                            style={{ margin: 0 }}
+                            valuePropName="checked"
+                            initialValue={record.not_null}
+                        >
+                            <Switch />
+                        </Form.Item>
+                    </td>
+                );
+            }
+        }
+
+        return (
+            <td {...restProps}>
+                {children}
             </td>
         );
     };
@@ -181,6 +224,7 @@ export default function (props: IProps) {
                     ...item,
                     ...row,
                 });
+
                 setData(newData);
                 setEditingKey('');
                 form.resetFields()
@@ -222,6 +266,24 @@ export default function (props: IProps) {
             }
         },
         {
+            title: 'Bắt buộc',
+            editable: true,
+            width: 100,
+            dataIndex: "not_null",
+            render: (not_null: boolean) => {
+                return <Switch disabled checked={not_null} />
+            }
+        },
+        {
+            title: 'Chỉ mục',
+            editable: true,
+            width: 100,
+            dataIndex: "is_indexed",
+            render: (is_indexed: boolean) => {
+                return <Switch disabled checked={is_indexed} />
+            }
+        },
+        {
             title: 'Hành động',
             dataIndex: 'operation',
             width: "15%",
@@ -229,9 +291,11 @@ export default function (props: IProps) {
                 const editable = isEditing(record);
                 return editable ? (
                     <span>
-                        <Typography.Link onClick={() => save(record.key)} style={{ marginRight: 8 }}>
-                            Lưu
-                        </Typography.Link>
+                        <Button onClick={() => {
+                            save(record.key)
+                        }} icon={<SaveOutlined />} style={{
+                            marginRight: 8
+                        }}>Lưu</Button>
                         <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
                             <Typography.Link>Hủy</Typography.Link>
                         </Popconfirm>
@@ -250,17 +314,10 @@ export default function (props: IProps) {
             return col;
         }
 
-        let inputType = 'text'
-        if (col.dataIndex === 'age')
-            inputType = 'number'
-        else if (col.dataIndex === 'column_type')
-            inputType = 'select'
-
         return {
             ...col,
             onCell: (record: Item) => ({
                 record,
-                inputType: inputType,
                 dataIndex: col.dataIndex,
                 title: col.title,
                 editing: isEditing(record),
@@ -274,7 +331,7 @@ export default function (props: IProps) {
                 rowSelection={{
                     columnTitle: <KeyOutlined />,
                     type: "radio",
-                    selectedRowKeys: ["row_0"],
+                    defaultSelectedRowKeys: ["row_0"],
                     onChange: (keys: React.Key[], rows: Item[]) => {
                         if (keys.length === 1) {
                             const new_data = data.map(col => {
@@ -284,10 +341,10 @@ export default function (props: IProps) {
                                     return col
                                 }
 
+                                col.is_primary = false
                                 return col
                             })
 
-                            console.log(new_data)
                             setData(new_data)
                         }
                     }
@@ -303,7 +360,7 @@ export default function (props: IProps) {
                 columns={mergedColumns}
                 rowClassName="editable-row"
                 pagination={false}
-                footer={() => <Button onClick={addNewRow}> Thêm cột mới </Button>}
+                footer={() => <Button icon={<PlusOutlined />} onClick={addNewRow}> Thêm cột mới </Button>}
             />
 
         </Form>
