@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
+import UploadModal from "../../modals/UploadModal";
 
 interface DataType {
     key: React.Key;
@@ -26,20 +27,24 @@ const columns: TableColumnsType<DataType> = [
     },
 ];
 
-const data: DataType[] = [];
-for (let i = 0; i < 46; i++) {
-    data.push({
-        key: i,
-        name: `Edward King ${i}`,
-        size: `London, Park Lane no. ${i}`,
-    });
-}
-
 export default function () {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [loading, setLoading] = useState(false);
     const [listTable,setListTable] = useState<DataType[]>([]);
     const { block_id, folder_name } = useParams()
+    const [open, setOpen] = useState(false)
+
+    const openModal = () => {
+        setOpen(true)
+    }
+
+    const closeModal = () => {
+        setOpen(false)
+    }
+
+    const uploadFile = (file: any) => {
+        
+    }
 
     const start = () => {
         setLoading(true);
@@ -86,9 +91,8 @@ export default function () {
             margin: 0,
             minHeight: 280,
         }}>
-        <Card title="Thư mục Vật lý 1" extra={<Space>
-            <Button icon={<UploadOutlined />}>Tải tệp lên</Button>
-        </Space>}>
+        <Card title={folder_name} extra={
+            <Space><Button icon={<UploadOutlined />} onClick={openModal}>Tải tệp lên</Button></Space>}>
             <div style={{ marginBottom: 16 }}>
                 <Button type="primary" onClick={start} disabled={!hasSelected} loading={loading}>
                     Reload
@@ -101,5 +105,6 @@ export default function () {
             <Table rowSelection={rowSelection} columns={columns} dataSource={listTable} />
 
         </Card >
-    </Layout.Content >
+        <UploadModal open={open} close={closeModal} upload={uploadFile}/>
+    </Layout.Content>
 }

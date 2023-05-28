@@ -33,7 +33,7 @@ export default function (props: IProps) {
                 form={form}
             >
                 <Form.Item
-                    label="Yêu cầu dữ liệu"
+                    label="Nhập nội dung tiêu chí"
                     name="criteria"
                     rules={[{ required: true, message: 'Hãy nhập tiêu chí!' }]}
                 >
