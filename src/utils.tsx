@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom"
 
 export function getUnit(): string {
     if (process.env.NODE_ENV === "development") {
-        return "pck"
+        return "master"
     }
 
     const arr = window.location.hostname.split(".")

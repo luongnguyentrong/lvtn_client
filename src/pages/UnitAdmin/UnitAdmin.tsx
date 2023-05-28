@@ -1,11 +1,21 @@
-import React from 'react';
-import { Descriptions, Layout, Space, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Badge, Descriptions, Layout, Space, Typography } from 'antd';
 const { Content } = Layout;
 import './Unitadmin.css';
 import BlockCard from './Cards/BlockCard';
 import AnalyzeCard from '../UnitNormal/Cards/AnalyzeCard';
+import axios from 'axios';
+import { PresetStatusColorType } from 'antd/es/_util/colors';
 
 const UnitAdmin = () => {
+    const [superset, setSuperset] = useState<{
+        state: PresetStatusColorType
+        label: string
+    }>({
+        state: "success",
+        label: "Đang chạy"
+    })
+
     return (
         <Content style={{ width: '100%', height: '1000px' }}>
             <Descriptions column={2} title="Phòng của Khoa" style={{
@@ -21,8 +31,8 @@ const UnitAdmin = () => {
                 <Descriptions.Item label="Link truy cập">
                     <Typography.Link copyable>https://pck.ducluong.monster</Typography.Link>
                 </Descriptions.Item>
-                <Descriptions.Item label="Link superset">
-                    <Typography.Link copyable>https://pck.superset.ducluong.monster</Typography.Link>
+                <Descriptions.Item label="Trạng thái của superset">
+                    <Badge status={superset.state} text={superset.label} />
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Mô tả">empty</Descriptions.Item>

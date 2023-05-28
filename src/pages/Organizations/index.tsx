@@ -1,3 +1,4 @@
+
 import { MenuProps, Layout, Menu } from "antd"
 import { ClusterOutlined, HomeOutlined, UsergroupAddOutlined, BlockOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate } from "react-router-dom";
@@ -21,7 +22,7 @@ export default function () {
             label: "Sơ đồ tổ chức",
             icon: <ClusterOutlined />,
             onClick: () => {
-                navigate("/organizations")
+                navigate("/org")
             }
         },
         {
@@ -36,10 +37,13 @@ export default function () {
     return <Layout style={{ height: "100%" }}>
         <Header />
 
-        <Layout>
+        <Layout style={{
+            minHeight: "initial",
+        }}>
             <Layout.Sider width={250} style={{ background: "white", paddingTop: 24 }}>
                 <Menu
                     mode="inline"
+                    defaultSelectedKeys={['tables']}
                     style={{ height: '100%', borderRight: 0 }}
                     items={menuItems}
                 />
@@ -50,6 +54,7 @@ export default function () {
                 <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
             </Layout>
         </Layout>
+
 
     </Layout>
 }
