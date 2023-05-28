@@ -1,7 +1,7 @@
-import { Card, Layout, Spin, TableProps, TableColumnsType, Table, Space, Button, Upload, message } from "antd"
-import { PlusOutlined, UploadOutlined, DownloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Layout, Space, Button, Upload, message, Skeleton, Descriptions, Typography, Popconfirm } from "antd"
+import { UploadOutlined, TableOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
@@ -27,7 +27,7 @@ function add_keys(data: Array<any>, primary_key: string) {
         }
     })
 }
- 
+
 
 function transform_date(data: { [k: string]: string }, dataIndex: string) {
     const dateString = data[dataIndex];
@@ -43,21 +43,34 @@ function transform_date(data: { [k: string]: string }, dataIndex: string) {
     return data
 }
 
+interface ITable {
+    id: string
+    name: string
+    display_name: string
+    description: string
+}
+
+
 export default function () {
     const { block_id, table_id } = useParams()
-    // const [columns, setColumns] = useState<TableColumnsType<any>>()
     const [columns, setColumns] = useState<TableRow[]>([]);
     const [tableData, setTableData] = useState<Array<any>>([])
+    const [table, setTable] = useState<ITable>()
     const [config, setConfig] = useState<any>()
+    const navigate = useNavigate()
+
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (table_id && block_id) {
+            setLoading(true)
+
             getBearerHeader().then(config => {
                 return axios.get(API.Blocks.Tables.GET(block_id, table_id), config)
             }).then(res => {
-                let { columns, data } = res.data
+                let { columns, data, table } = res.data
 
-                if (columns && data) {
+                if (columns && data && table) {
                     columns.forEach((col: any) => {
                         if (col.column_type != 'serial')
                             col.editable = true
@@ -75,9 +88,12 @@ export default function () {
 
                     setColumns(columns)
                     setTableData(data)
+                    setTable(table)
+
+                    setLoading(false)
                 }
             })
-            
+
         }
     }, [table_id])
 
@@ -100,19 +116,25 @@ export default function () {
         getBearerHeader().then(bearerConfig => setConfig(bearerConfig))
     }, [])
 
-    return <Layout.Content
-        style={{
-            padding: 24,
-            margin: 0,
-            minHeight: 280,
-        }}
-    >
-        {tableData === undefined || columns === undefined ?
-            <Card style={{ minHeight: 250, paddingTop: 24, textAlign: "center" }}>
-                <Spin />
-            </Card>
-            :
-            <Card title="Danh sách sinh viên" extra={<Space>
+    return loading || table === undefined ?
+        <Card style={{ minHeight: 250, margin: 24, textAlign: "center" }}>
+            <Skeleton active />
+        </Card>
+        : <Layout.Content>
+            <Descriptions title={<><TableOutlined /> {table.display_name}</>} style={{
+                padding: 24,
+                backgroundColor: "white"
+            }}>
+                <Descriptions.Item label="Mã bảng"><Typography.Text mark>{table.name}</Typography.Text></Descriptions.Item>
+                <Descriptions.Item label="Mô tả">{table.description}</Descriptions.Item>
+            </Descriptions>
+
+            <Card style={
+                {
+                    margin: 24,
+                    minHeight: 280,
+                }
+            } extra={<Space>
                 <Upload action={API.Blocks.Tables.UploadFromExcel(block_id, table_id)} headers={config && config.headers} accept="test/csv" beforeUpload={(file) => {
                     if (file.type !== 'text/csv' && file.type !== 'text/xlsx') {
                         message.error(`${file.name} không hợp lệ`);
@@ -125,9 +147,27 @@ export default function () {
                 </Upload>
 
                 <Button onClick={ExportExcel} icon={<DownloadOutlined />}>Tải dữ liệu</Button>
-                <Button icon={<DeleteOutlined />}>Xóa bảng</Button>
+
+                <Popconfirm
+                    title={`Xoá bảng ${table.display_name}`}
+                    description="Bạn có chắc muốn xóa bảng này"
+                    okText="Có"
+                    cancelText="Không"
+                    onConfirm={() => {
+                        if (block_id && table_id)
+                            getBearerHeader().then(config => {
+                                return axios.delete(API.Blocks.Tables.GET(block_id, table_id), config)
+                            }).then(res => {
+                                if (res.status === 200) {
+                                    navigate(`/blocks/${block_id}`)
+                                }
+                            })
+                    }}
+                >
+                    <Button icon={<DeleteOutlined />}>Xóa bảng</Button>
+                </Popconfirm>
             </Space>}>
                 <DataTable data={tableData} setData={setTableData} columns={columns} />
-            </Card>}
-    </Layout.Content>
+            </Card>
+        </Layout.Content>
 }

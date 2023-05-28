@@ -3,16 +3,21 @@ import { PlusOutlined } from '@ant-design/icons';
 import DefineColumn, { Item } from "./DefineColumn"
 import { useState } from "react";
 import { useForm } from "antd/es/form/Form";
-import { getBearerHeader, getCurrentUser } from "../../../utils";
+import { getBearerHeader, getCurrentUser, toSlug } from "../../../utils";
 import axios from "axios";
 import API from "../../../api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function () {
     const { block_id } = useParams()
     const [data, setData] = useState<Array<Item>>([])
     const [loading, setLoading] = useState(false)
     const [form] = useForm()
+    const navigate = useNavigate()
+
+    const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
+        form.setFieldValue(["block", "name"], toSlug(ele.target.value))
+    }
 
     const handleSubmit = () => {
         form.validateFields().then(table => {
@@ -29,6 +34,8 @@ export default function () {
                             if (res.status === 201) {
                                 setData([])
                                 form.resetFields()
+
+                                navigate(`/blocks/${block_id}/tables/${res.data.id}`)
                                 message.success("Tạo bảng dữ liệu thành công!")
                             }
                         })
@@ -58,7 +65,7 @@ export default function () {
                             name={["block", "display_name"]}
                             rules={[{ required: true, message: 'Hãy điền tên tập dữ liệu!' }]}
                         >
-                            <Input />
+                            <Input onChange={onDisplayChange} />
                         </Form.Item>
                     </Col>
 
@@ -91,7 +98,7 @@ export default function () {
                     type="primary"
                     icon={<PlusOutlined />}
                     onClick={() => {
-                        // setLoading(true)
+                        setLoading(true)
 
                         handleSubmit()
                     }}

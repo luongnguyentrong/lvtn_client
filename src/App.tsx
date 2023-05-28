@@ -9,6 +9,7 @@ import Admin from './pages/Admin';
 import Normal from './pages/UnitNormal/Normal';
 import { getUnit } from './utils';
 import { Outlet, useNavigate } from 'react-router-dom';
+import "@blocknote/core/style.css";
 
 function getAuthParams() {
     const data = {

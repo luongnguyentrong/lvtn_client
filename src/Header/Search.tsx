@@ -48,7 +48,7 @@ interface IProps {
 export default function (props: IProps) {
     return (
         <AutoComplete
-            options={props.options}
+            // options={props.options}
         >
             <Input.Search style={{ width: 400 }} size='middle' placeholder='Nhập tên tập dữ liệu...' />
         </AutoComplete>

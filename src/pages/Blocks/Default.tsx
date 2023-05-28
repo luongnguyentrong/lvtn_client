@@ -26,7 +26,7 @@ export default function () {
     const { block_id } = useParams()
 
     const [block, setBlock] = useState<IBlock>()
-    const [manager, setManager] = useState<IManager>()
+    const [managers, setManagers] = useState<Array<IManager>>()
 
     const { tables, folders } = useOutletContext<{ tables: Array<ITable>; folders: Array<string> }>()
     const navigate = useNavigate()
@@ -37,7 +37,7 @@ export default function () {
                 return axios.get(API.Blocks.Get(block_id), config)
             }).then(res => {
                 if (res.data) {
-                    const { block, schema_size, manager } = res.data
+                    const { block, schema_size, managers } = res.data
 
                     if (block) {
                         setBlock({
@@ -49,13 +49,15 @@ export default function () {
                         })
                     }
 
-                    if (manager) {
-                        setManager({
+                    if (managers) {
+                        const mappedManagers = managers.map((manager: any) => ({
                             id: manager.id,
                             email: manager.email,
                             first_name: manager.first_name,
                             last_name: manager.last_name
-                        })
+                        }))
+
+                        setManagers(mappedManagers)
                     }
                 }
             })
@@ -67,16 +69,22 @@ export default function () {
                 minHeight: 280,
             }}
         >
-            {block && manager ?
+            {block && managers ?
                 <>
                     <Descriptions title={block.display_name} column={2} style={{
                         backgroundColor: "white",
                         padding: 24
                     }}>
                         <Descriptions.Item label="Mã tập dữ liệu"><Typography.Text mark copyable>{block.name}</Typography.Text></Descriptions.Item>
-                        <Descriptions.Item label="Người quản lý"><Link to={`/users/${manager.id}`}>
-                            {manager.first_name + " " + manager.last_name}
-                        </Link> </Descriptions.Item>
+                        <Descriptions.Item label="Người quản lý">
+                            <Space>
+                                {managers && managers.map(manager => {
+                                    return <Link to={`/users/${manager}`}>
+                                        {manager.first_name + " " + manager.last_name}
+                                    </Link >
+                                })}
+                            </Space>
+                        </Descriptions.Item>
                         <Descriptions.Item label="Mô tả">{block.description}</Descriptions.Item>
                     </Descriptions>
 

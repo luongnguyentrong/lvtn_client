@@ -4,7 +4,7 @@ import App from "./App";
 import SSOCallback from "./components/SSOCallback"
 import Units from "./pages/Admin/Units";
 import NewBlock from "./pages/UnitAdmin/NewBlock";
-import Home from "./pages/Admin/Menu/Home";
+import Home from "./pages/Admin/Home";
 import Block from "./pages/UnitAdmin/Block"
 import BlockNormal from "./pages/UnitNormal/BlockNormal";
 import UserManager from "./pages/Admin/UserManager";
@@ -19,6 +19,9 @@ import DisplayAnalytics from "./pages/Blocks/DisplayAnalytics";
 import UserManagement from "./pages/UnitAdmin/UserManagement";
 import New from "./pages/Blocks/Tables/NewTable";
 import Relationships from "./pages/Blocks/Relationships";
+import Organizations from "./pages/Organizations";
+import OrganizationsDefault from "./pages/Organizations/Default";
+import ViewUnit from "./pages/Organizations/ViewUnit";
 
 export const router = createBrowserRouter([
     {
@@ -36,6 +39,20 @@ export const router = createBrowserRouter([
             {
                 path: "/users",
                 element: <UserManager />
+            }
+        ]
+    },
+    {
+        path: "/organizations",
+        element: <Organizations />,
+        children: [
+            {
+                index: true,
+                element: <OrganizationsDefault />,
+            },
+            {
+                path: "views/:unit_name",
+                element: <ViewUnit />
             }
         ]
     },

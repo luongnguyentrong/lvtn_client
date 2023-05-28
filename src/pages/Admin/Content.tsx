@@ -1,6 +1,6 @@
 import { Layout } from "antd"
 import React from "react";
-import Home from "./Menu/Home";
+import Home from "./Home";
 import Units from "./Units";
 
 export default function () {
