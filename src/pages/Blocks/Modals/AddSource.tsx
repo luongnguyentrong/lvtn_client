@@ -5,12 +5,14 @@ import { useState } from "react";
 import { BlockNoteView, useBlockNote} from "@blocknote/react";
 import "@blocknote/core/style.css";
 import { BlockNoteEditor } from "@blocknote/core";
+import { Props } from "@ant-design/graphs/es/components/conversion-dagre-graph/types";
 
 const { Option } = Select;
 
 interface IProps {
     open: boolean
     close: () => void
+    addSource: (name: string, title: string) => void
 }
 
 export default function (props: IProps) {
@@ -31,9 +33,12 @@ export default function (props: IProps) {
 
     const handleOk = () => {
         form.validateFields().then(res => {
-            console.log(res.title)
-
-            form.resetFields()
+            //console.log(res.title)
+            // let request_body: never
+            // console.log(request_body)
+            // form.resetFields()
+            // props.attachemnts.push(request_body)
+            props.addSource(markdown,res.title)
             props.close()
         })
     }

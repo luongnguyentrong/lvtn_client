@@ -12,6 +12,7 @@ import * as markdownpdf from 'markdown-pdf';
 import { jsPDF } from "jspdf";
 import { BlockNoteEditor } from "@blocknote/core";
 import { BlockNoteView, useBlockNote } from "@blocknote/react";
+import Item from "antd/es/list/Item";
 // import { saveAs } from 'file-saver';
 // import htmlDocx from 'html-docx-js';
 //import MarkdownPDF from "markdown-pdf";
@@ -20,9 +21,11 @@ import { BlockNoteView, useBlockNote } from "@blocknote/react";
 
 export default function () {
     const { block_id } = useParams()
-    const [criterias, setCriteria] = useState<{ title: string, description: string}[]>([])
+    const [criterias, setCriteria] = useState<{title: string, description: string,attachments: any,id: number}[]>([])
     const [open, setOpen] = useState(false)
     const [openSource, setOpenSource] = useState(false)
+    const [curCriteria, setCurCriteria] = useState<number>(0)
+    const [curSourceId, setSourceId] = useState<number>(0)
     const openModal = () => {
         setOpen(true)
     }
@@ -42,46 +45,30 @@ export default function () {
     });
     ;
     const reportExport = () =>{
-        
+        console.log(criterias)
         var downloadfile: string = ''
         criterias.forEach((crit: any)=>{
-            downloadfile += '<h2>' + crit.id + '.  ' + crit.description 
-            // crit.attachments.forEach((evi: any) => {
-            //     downloadfile += '<h1>'+crit.id + '.' + evi.id+ ' ' + evi.title + '</h1>'
-            //     downloadfile += evi.name
-            // });
+            const sup1 = crit.description.replaceAll(' ', '_');
+            downloadfile += '<h2>' + crit.id + '.' + sup1
+            crit.attachments.forEach((evi: any) => {
+                const sup2 = evi.title.replaceAll(' ', '_');
+                downloadfile += '<h3>'+crit.id + '.' + evi.id+ '.' + sup2 + '</h3>'
+                // downloadfile += evi.name
+                
+            });
             downloadfile += '</h2>'
         })
-        
         var secrect: string = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><div><h2>1)Programme_Specification</h2><h3>1.1.Dan_chung_1</h3><h3>1.2.Dan_chung 2</h3><p>Noi dung 2</p><h2>2)DANH_GIa_SINH VIEN</h2><p></p></div></body></html>'
         // const htmlString = secrect.replace(/(\r\n|\n|\r)/gm, '');
         // console.log(htmlString)
         var pdf = new jsPDF('p', 'pt', 'a4');
-        // const doc = new jsPDF({
-        //     orientation: "landscape",
-        //     unit: "in",
-        //     format: [4, 2]
-        // });
-
-        // doc.text("Cấu trúc chương trình", 1, 1);
-        // doc.save("two-by-four.pdf");
-        // pdf.text("Hello world!", 10, 10);
-        // pdf.save("two-by-four.pdf");
-        pdf.html(secrect,{
+        pdf.html(downloadfile,{
             callback: function (doc) {
                 doc.save();
             },
-            margin:[100,100,100,100],
-            width: 5000,
-            fontFaces: [{
-                family: 'BeVietnamPro-Thin.ttf',
-                src: [
-                    {
-                        url: '/fonts/BeVietnamPro-Thin.ttf',
-                        format: 'truetype',
-                    },
-                ],
-            },]
+            margin:[50,50,50,50],
+            width: 180,
+            autoPaging: true
         });
     }
     const getPanelStyle = (index: any) => {
@@ -112,8 +99,10 @@ export default function () {
         // Use modulo operator to cycle through the colors array
         return colors[index % colors.length];
     };
-    const openSourceModal = () => {
+    const openSourceModal = (id: number, source_id: number) => {
         setOpenSource(true)
+        setCurCriteria(id)
+        setSourceId(source_id)
     }
 
     const closeModal = () => {
@@ -122,6 +111,21 @@ export default function () {
 
     const closeSourceModal = () => {
         setOpenSource(false)
+    }
+    const addSource = (name1: string, title1: string) =>{
+        let newSource = {
+            id: curSourceId + 1,
+            name: name1,
+            title: title1
+        }
+        if (block_id) {
+            getBearerHeader().then(config => {
+                return axios.post(API.Blocks.AddSource(block_id,curCriteria.toString()), newSource, config)
+            }).then(res => {
+                console.log(res)
+            })
+        }
+        criterias[curCriteria-1].attachments.push(newSource)
     }
 
     const addCriteria = (crit: string) => {
@@ -138,7 +142,9 @@ export default function () {
             })
             let newCrit = {
                 title: "Tiêu chí #" + (criterias.length + 1),
-                description: crit
+                description: crit,
+                attachments: [],
+                id: criterias.length + 1
             }
             criterias.push(newCrit)
         }
@@ -208,7 +214,7 @@ export default function () {
                         }
                         style={getPanelStyle(idx)}
                     >
-                        <Button icon={<PlusOutlined />} onClick={openSourceModal}>
+                        <Button icon={<PlusOutlined />} onClick={() => openSourceModal(item.id,item.attachments.length)}>
                             Thêm dẫn chứng
                         </Button>
                         <Divider />
@@ -235,7 +241,7 @@ export default function () {
         </Card>
         <BlockNoteView editor={editor} />        
         <AddCritModal open={open} close={closeModal} addCrit={addCriteria} />
-        <AddSource open={openSource} close={closeSourceModal} />
+        <AddSource open={openSource} close={closeSourceModal} addSource={addSource}/>
     </Layout.Content >
 }
 

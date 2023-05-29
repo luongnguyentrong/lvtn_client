@@ -45,7 +45,8 @@ const API = {
         },
         GetCrit: (block_id: string) => BaseURL + "/blocks/" + block_id+"/criteria/get",
         AddCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/add",
-        GetEvi: (block_id: string,crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/"+crit_id+"/get"
+        GetEvi: (block_id: string,crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/"+crit_id+"/get",
+        AddSource: (block_id: string, crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/" + crit_id + "/source/add"
     },
     Users: {
         List: BaseURL + "/users/"
