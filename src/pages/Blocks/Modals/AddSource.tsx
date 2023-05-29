@@ -2,21 +2,43 @@ import { Form, Input, Modal, Select, Space, Spin } from "antd"
 import { FileAddOutlined, LoadingOutlined, LinkOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useForm } from "antd/es/form/Form"
 import { useState } from "react";
+import { BlockNoteView, useBlockNote} from "@blocknote/react";
+import "@blocknote/core/style.css";
+import { BlockNoteEditor } from "@blocknote/core";
+import { Props } from "@ant-design/graphs/es/components/conversion-dagre-graph/types";
 
 const { Option } = Select;
 
 interface IProps {
     open: boolean
     close: () => void
+    addSource: (name: string, title: string) => void
 }
 
 export default function (props: IProps) {
+    const [markdown, setMarkdown] = useState<string>("");
+    const editor: BlockNoteEditor | null = useBlockNote({
+        onEditorContentChange: (editor: BlockNoteEditor) => {
+            const saveBlocksAsMarkdown = async () => {
+                const markdown: string =
+                    await editor.blocksToHTML(editor.topLevelBlocks);
+                setMarkdown(markdown);
+            };
+            saveBlocksAsMarkdown();
+        }
+    });
+    // console.log(markdown)
     const [form] = useForm()
     const [loading, setLoading] = useState(false)
 
     const handleOk = () => {
         form.validateFields().then(res => {
-            form.resetFields()
+            //console.log(res.title)
+            // let request_body: never
+            // console.log(request_body)
+            // form.resetFields()
+            // props.attachemnts.push(request_body)
+            props.addSource(markdown,res.title)
             props.close()
         })
     }
@@ -35,14 +57,19 @@ export default function (props: IProps) {
                 form={form}
             >
                 <Form.Item
-                    label="Mô tả"
-                    name="description"
-                    rules={[{ required: true, message: 'Hãy nhập mô tả!' }]}
+                    label="Tên dẫn chứng"
+                    name="title"
                 >
                     <Input />
                 </Form.Item>
-
                 <Form.Item
+                    label="Nội dung"
+                    name="editor"
+                >
+                    <BlockNoteView editor={editor} />
+                </Form.Item>
+               
+                {/* <Form.Item
                     label="Dữ liệu đính kèm"
                     name="criteria"
                     rules={[{ required: true, message: 'Hãy chọn dữ kiểu để đính kèm!' }]}
@@ -69,7 +96,7 @@ export default function (props: IProps) {
                         </Option>
                     </Select>
 
-                </Form.Item>
+                </Form.Item> */}
 
                 {loading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} /> : null}
 
