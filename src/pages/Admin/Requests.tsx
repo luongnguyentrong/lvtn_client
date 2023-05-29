@@ -1,100 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, List, Skeleton } from 'antd';
+import { Avatar, Button, List, Typography } from 'antd';
+import axios from 'axios';
+import { getBearerHeader } from '../../utils';
+import API from '../../api';
+import { Link } from 'react-router-dom';
+import UnitRequest from './Modals/UnitRequest';
 
-interface DataType {
-    gender?: string;
-    name: {
-        title?: string;
-        first?: string;
-        last?: string;
-    };
-    email?: string;
-    picture: {
-        large?: string;
-        medium?: string;
-        thumbnail?: string;
-    };
-    nat?: string;
-    loading: boolean;
+export interface IUnitRequest {
+    description: string | null,
+    display_name: string
+    name: string
+    parent_unit: string
+    manager: {
+        email: string
+        fname: string
+        lname: string
+        password: string
+        username: string
+    },
+}
+interface IRequest {
+    id: number,
+    created_by: string
+    status: string
+    request_type: string
+    body: IUnitRequest,
+    creator: {
+        email: string
+        email_constraint: string
+        first_name: string
+        id: string
+        last_name: string
+        realm_id: string
+        username: "khoa12"
+    }
 }
 
-const count = 3;
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`;
 
 const App: React.FC = () => {
-    const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<DataType[]>([]);
-    const [list, setList] = useState<DataType[]>([]);
+    const [requests, setRequests] = useState<Array<IRequest>>([])
+    const [open, setOpen] = useState(false)
+    const [detail, setDetail] = useState<IUnitRequest>()
 
     useEffect(() => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                setInitLoading(false);
-                setData(res.results);
-                setList(res.results);
-            });
-    }, []);
+        getBearerHeader().then(config => {
+            return axios.get(API.Requests.List, config)
+        }).then(res => {
+            if (res.status === 200)
+                setRequests(res.data)
+        })
+    }, [])
 
-    const onLoadMore = () => {
-        setLoading(true);
-        setList(
-            data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} }))),
-        );
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((res) => {
-                const newData = data.concat(res.results);
-                setData(newData);
-                setList(newData);
-                setLoading(false);
-                // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-                // In real scene, you can using public method of react-virtualized:
-                // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-                window.dispatchEvent(new Event('resize'));
-            });
-    };
-
-    const loadMore =
-        !initLoading && !loading ? (
-            <div
-                style={{
-                    textAlign: 'center',
-                    marginTop: 12,
-                    height: 32,
-                    lineHeight: '32px',
-                }}
-            >
-                <Button onClick={onLoadMore}>loading more</Button>
-            </div>
-        ) : null;
+    const close = () => {
+        setOpen(false)
+    }
 
     return (
-        <List
-            className="demo-loadmore-list"
-            loading={initLoading}
-            itemLayout="horizontal"
-            loadMore={loadMore}
-            dataSource={list}
-            style={{
-                maxWidth: 600,
-                margin: "0 auto"
-            }}
-            renderItem={(item, i) => (
-                <List.Item
-                    actions={[<a key="list-loadmore-edit">Chấp nhận</a>, <a key="list-loadmore-more">Từ chối</a>]}
-                >
-                    <Skeleton avatar title={false} loading={item.loading} active>
+        <>
+            <List
+                className="demo-loadmore-list"
+                loading={requests.length === 0}
+                itemLayout="horizontal"
+                dataSource={requests}
+                style={{
+                    maxWidth: 600,
+                    margin: "0 auto"
+                }}
+                renderItem={(item, i) => (
+                    <List.Item
+                        actions={[<a key="list-loadmore-edit">Chấp nhận</a>, <a key="list-loadmore-more">Từ chối</a>]}
+                    >
                         <List.Item.Meta
-                            avatar={<Avatar src={item.picture.large} />}
-                            title={`#${i} Yêu cầu tạo đơn vị`}
-                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                            title={<div>
+                                <Typography.Text mark>{`#${item.id}`} </Typography.Text>
+                                <Typography.Text><Link to={`/users/${item.creator.id}`}>{item.creator.first_name + " " + item.creator.last_name}</Link>  đã gửi yêu cầu tạo đơn vị</Typography.Text>
+                            </div>}
+                            description={<Button onClick={() => {
+                                setOpen(true)
+                                setDetail(item.body)
+                            }}>Xem chi tiết</Button>}
                         />
-                    </Skeleton>
-                </List.Item>
-            )}
-        />
+                    </List.Item>
+                )}
+            />
+
+            <UnitRequest open={open} close={close} unit={detail} />
+        </>
     );
 };
 

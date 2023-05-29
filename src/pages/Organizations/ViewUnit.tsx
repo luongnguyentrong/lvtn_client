@@ -17,6 +17,8 @@ export default function () {
             ]}
         />
 
-        <UnitAdmin />
+        <Card>
+            <UnitAdmin />
+        </Card>
     </Card>
 }
