@@ -28,10 +28,12 @@ export default function () {
                     items={menuItems}
                 />
             </Layout.Sider>
+
             <Layout>
                 <Outlet />
                 <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
             </Layout>
         </Layout>
+
     </Layout>
 }
