@@ -3,6 +3,7 @@ import { UserOutlined, LogoutOutlined, QuestionCircleOutlined, BellOutlined } fr
 import axios from "axios";
 import Cookies from "universal-cookie";
 import { getBearerHeader, getUnit } from "../utils";
+import { config } from "process";
 
 export default function () {
     const profile_items: MenuProps['items'] = [
@@ -19,9 +20,23 @@ export default function () {
             label: "Logout",
             icon: <LogoutOutlined />,
             onClick: () => {
-                const url = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout?redirect_uri=${location.hostname}`
+                const logoutEndpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+                const cookies = new Cookies()
 
-                window.location.replace(url);
+                getBearerHeader().then(config => {
+                    const params = new URLSearchParams()
+                    params.append("client_id", "console")
+                    params.append("refresh_token", cookies.get("refresh_token"))
+
+                    return axios.post(logoutEndpoint, params, config)
+                }).then(res => {
+                    if (res.status === 204) {
+                        cookies.remove("access_token")
+                        cookies.remove("refresh_token")
+
+                        location.reload()
+                    }
+                })
             }
         },
     ];

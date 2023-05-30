@@ -1,12 +1,13 @@
-import { Button, Card, Col, Row, Skeleton, Space, Typography } from "antd"
+import { Button, Card, Col, Divider, Row, Skeleton, Space, Typography } from "antd"
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
-import { Form, Input, Table, Modal } from 'antd';
+import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
-import Units from "../Admin/Units";
+import AddUserModal from "./Modals/AddUserModal";
+import AddUnit from "../Admin/Modals/AddUnit";
 
 const columns: ColumnsType<IUser> = [
     {
@@ -95,24 +96,15 @@ export default function () {
         })
     }, [])
 
-    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
 
 
-    const handleOk = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            setOpen(false);
-        }, 3000);
-    };
-
-    const handleCancel = () => {
-        setOpen(false);
-    };
-
     const showModal = () => {
         setOpen(true);
+    }
+
+    const closeModal = () => {
+        setOpen(false);
     }
 
     if (users === undefined || users.length === 0)
@@ -136,74 +128,11 @@ export default function () {
                     onClick={showModal}
                     icon={<PlusOutlined />}
                 >Tạo người dùng</Button>}>
+
                 <Table columns={columns} rowKey={"id"} dataSource={users} bordered />
             </Card >
 
-            <Modal
-                open={open}
-                title="Tạo người dùng"
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="Hủy" onClick={handleCancel}>
-                        Hủy
-                    </Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-                        Tạo
-                    </Button>,
-                ]}
-            >
-                <Form
-                    style={{ maxWidth: 600 }}
-                    layout="vertical"
-                >
-                    <Row gutter={16}>
-                        <Col span={14}>
-                            <Form.Item name="fname" label="Họ" rules={[{ required: true, type: "string", max: 20, message: "Hãy nhập họ!" }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-
-                        <Col span={10}>
-                            <Form.Item name="lname" label="Tên" rules={[{ required: true, type: "string", max: 20 }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="username" label="Tên đăng nhập" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item name="password" label="Mật khẩu" rules={[{ required: true }]}>
-                        <Input.Password />
-                    </Form.Item>
-                    <Form.Item
-                        name="confirm"
-                        label="Xác nhận mật khẩu"
-                        dependencies={['password']}
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Hãy xác nhận lại mật khẩu!',
-                            },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (!value || getFieldValue('password') === value) {
-                                        return Promise.resolve()
-                                    }
-                                    return Promise.reject(new Error('Mật khẩu không giống nhau!'))
-                                },
-                            }),
-                        ]}
-                    >
-                        <Input.Password />
-                    </Form.Item>
-                </Form>
-
-            </Modal>
+            <AddUserModal open={open} close={closeModal} />
         </>
     )
 }
