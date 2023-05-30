@@ -135,14 +135,16 @@ export default function () {
                     minHeight: 280,
                 }
             } extra={<Space>
-                <Upload action={API.Blocks.Tables.UploadFromExcel(block_id, table_id)} headers={config && config.headers} accept="test/csv" beforeUpload={(file) => {
-                    if (file.type !== 'text/csv' && file.type !== 'text/xlsx') {
-                        message.error(`${file.name} không hợp lệ`);
-                        return Upload.LIST_IGNORE
-                    }
+                <Upload action={API.Blocks.Tables.UploadFromExcel(block_id, table_id)} headers={config && config.headers} accept="test/csv" 
+                // beforeUpload={(file) => {
+                //     if (file.type !== 'text/csv' && file.type !== 'text/xlsx') {
+                //         message.error(`${file.name} không hợp lệ`);
+                //         return Upload.LIST_IGNORE
+                //     }
 
-                    return true
-                }}>
+                //     return true
+                // }}>
+                >
                     <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
                 </Upload>
 
