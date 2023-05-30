@@ -3,6 +3,9 @@ export const BASE_URL = "ducluong.monster"
 export const BaseURL = import.meta.env.DEV ? "http://localhost:5000" : "https://api.ducluong.monster"
 
 const API = {
+    Units: {
+        Get: (unit_name: string) => BaseURL + "/units/" + unit_name
+    },
     CreateUnits: {
         URL: BaseURL + "/units/"
     },
@@ -13,11 +16,14 @@ const API = {
         URL: BaseURL + "/units/"
     },
     ListOrg: {
-        URL: BaseURL + "/units/org"
+        URL: BaseURL + "/units/organizations"
     },
     Dashboards: {
         List: BaseURL + "/superset/",
         Create: "http://localhost:5000" + "/superset/",
+    },
+    Requests: {
+        List: BaseURL + "/requests/",
     },
     Folders: {
         Show: BaseURL + "/show_folders_normal?user=",

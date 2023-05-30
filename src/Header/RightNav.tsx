@@ -19,7 +19,7 @@ export default function () {
             label: "Logout",
             icon: <LogoutOutlined />,
             onClick: () => {
-                const url = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout`
+                const url = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/logout?redirect_uri=${location.hostname}`
 
                 window.location.replace(url);
             }

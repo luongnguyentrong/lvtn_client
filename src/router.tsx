@@ -60,16 +60,22 @@ export const router = createBrowserRouter([
         ]
     },
     {
+        path: "/users",
+        element: <Organizations />,
+        children: [
+            {
+                index: true,
+                element: <UserManagement />,
+            },
+        ]
+    },
+    {
         path: "/unit_admin",
         element: <UnitAdminLayout />,
         children: [
             {
                 index: true,
                 element: <UnitAdmin />,
-            },
-            {
-                path: "users",
-                element: <UserManagement />
             },
             {
                 path: "blocks/new",

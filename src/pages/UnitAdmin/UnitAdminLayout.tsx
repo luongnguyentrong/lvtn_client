@@ -29,7 +29,7 @@ export default function () {
             label: "Quản lý người dùng",
             icon: <UsergroupAddOutlined />,
             onClick: () => {
-                navigate("users")
+                navigate("/users")
             }
         },
     ]
