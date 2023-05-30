@@ -22,6 +22,9 @@ import Relationships from "./pages/Blocks/Relationships";
 import Organizations from "./pages/Organizations";
 import OrganizationsDefault from "./pages/Organizations/Default";
 import ViewUnit from "./pages/Organizations/ViewUnit";
+import UnitUserLayout from "./pages/UnitNormal/Unit-userLayout";
+import UnitUser from "./pages/UnitNormal/UnitUser";
+import Normal from "./pages/UnitNormal/Normal";
 
 export const router = createBrowserRouter([
     {
@@ -73,6 +76,24 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <UnitAdmin />,
+            },
+            {
+                path: "blocks/new",
+                element: <NewBlock />
+            },
+        ]
+    },
+    {
+        path: "/unit_user",
+        element: <Normal />,
+        children: [
+            {
+                index: true,
+                element: <UnitUser />,
+            },
+            {
+                path: "users",
+                element: <UserManagement />
             },
             {
                 path: "blocks/new",

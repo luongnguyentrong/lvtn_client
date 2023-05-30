@@ -1,0 +1,31 @@
+.header h1 {
+    display: inline-block;
+}
+
+.header .btn-wrapper {
+    float: right;
+}
+
+.BlockName:hover {
+    color: rgb(24, 165, 208);
+    display: block;
+}
+
+.Edit:hover {
+    color: rgb(255, 255, 255);
+    background-color: rgb(223, 223, 223);
+    border-radius: 5px;
+}
+
+.anticon {
+    display: inline !important;
+}
+
+.bell {
+    display: inline !important;
+}
+
+.custom-modal .ant-modal-content {
+    border: 1px solid rgb(170, 170, 170);
+    box-shadow: rgba(221, 221, 221, 0.2) 0px 3px 3px;
+}

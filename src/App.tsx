@@ -78,7 +78,7 @@ function App() {
             </Admin>
 
         case "unit_normal":
-            return <Normal name={username} />
+            return <Normal/>
 
         default:
             return <Loading />
