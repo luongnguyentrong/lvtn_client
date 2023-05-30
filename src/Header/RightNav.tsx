@@ -41,7 +41,7 @@ export default function () {
             key: "user",
             label: <Dropdown menu={{ items: profile_items }} placement="bottomRight" trigger={['click']}>
                 <Space>
-                    <UserOutlined /> Lương
+                    <UserOutlined /> User
                 </Space>
             </Dropdown>,
         }
