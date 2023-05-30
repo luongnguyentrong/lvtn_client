@@ -141,9 +141,9 @@ export default function () {
                 //         message.error(`${file.name} không hợp lệ`);
                 //         return Upload.LIST_IGNORE
                 //     }
-
                 //     return true
-                // }}>
+                // }}
+                showUploadList={false}
                 >
                     <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
                 </Upload>
