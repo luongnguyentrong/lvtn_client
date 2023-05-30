@@ -15,7 +15,6 @@ import Default from "./pages/Blocks/Default";
 import Criteria from "./pages/Blocks/Criteria";
 import DisplayTable from "./pages/Blocks/DisplayTable";
 import DisplayFolder from "./pages/Blocks/DisplayFolder";
-import DisplayAnalytics from "./pages/Blocks/DisplayAnalytics";
 import UserManagement from "./pages/UnitAdmin/UserManagement";
 import New from "./pages/Blocks/Tables/NewTable";
 import Relationships from "./pages/Blocks/Relationships";
@@ -70,7 +69,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/unit_admin",
-        element: <UnitAdminLayout />,
+        element:  <UnitAdminLayout />,
         children: [
             {
                 index: true,

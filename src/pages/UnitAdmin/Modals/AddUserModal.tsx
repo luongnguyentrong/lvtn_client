@@ -4,17 +4,23 @@ import { getBearerHeader, getUnit, toSlug } from "../../../utils"
 import { useState } from "react"
 import UnitManagerForm from "../../Admin/forms/UnitManagerForm"
 import AccessForm from "../../../forms/AccessForm"
+import API from "../../../api"
+import { } from '../UserManagement'
+
+interface IUser {
+    fname: string
+    lname: string
+    email: string
+    username: string
+    password: string
+    unit_name: string
+    role: string
+}
 
 interface IProps {
     open: boolean
     close: () => void
-}
-
-interface IUnitData {
-    unit_name: string
-    display_name: string
-    description: string
-    parent_unit: string
+    fetch_user: () => void
 }
 
 export default function (props: IProps) {
@@ -23,6 +29,8 @@ export default function (props: IProps) {
 
     const [firstForm] = Form.useForm()
     const [secondForm] = Form.useForm()
+
+    const [user, setUser] = useState<IUser>()
 
 
     const next = () => {
@@ -33,7 +41,7 @@ export default function (props: IProps) {
         setCurrent(current - 1);
     };
 
-    const createUser = async (unit_name: string) => {
+    const createUser = async () => {
         const fields = await firstForm.validateFields()
 
         const data = {
@@ -42,16 +50,13 @@ export default function (props: IProps) {
             email: fields.email,
             username: fields.username,
             password: fields.password,
-            unit_name: unit_name,
+            unit_name: getUnit(),
             role: "unit_normal"
         }
 
-
-
-        // const result = await axios.post(API.CreateUsers.URL, data, getBearerHeader())
-
+        setUser(data)
+        next()
     }
-
     const steps = [
         {
             key: "general_info",
@@ -68,23 +73,26 @@ export default function (props: IProps) {
     const handleCreate = async () => {
         setIsLoading(true)
 
-        const fields = await secondForm.validateFields()
+        const accessfields = await secondForm.validateFields()
 
-        console.log("FIELDS: ", fields)
+        try {
+            // create user
+            getBearerHeader().then(config => {
+                const data = {
+                    ...user,
+                    access: accessfields.access
+                }
 
-        // try {
-        //     // create new unit
-        //     const unit_name = await createUnit()
-
-        //     if (unit_name) {
-        //         // create new user
-        //         await createUser(unit_name)
-
-        //         message.success('Tạo đơn vị thành công!')
-        //     }
-        // } catch (err: any) {
-        //     message.error(err.message)
-        // }
+                return axios.post(API.Users.List, data, config)
+            }).then(res => {
+                if (res.status === 201) {
+                    message.success('Tạo người dùng thành công!')
+                    props.fetch_user()
+                }
+            })
+        } catch (err: any) {
+            message.error(err.message)
+        }
 
         props.close()
         setIsLoading(false)
@@ -103,12 +111,7 @@ export default function (props: IProps) {
         </div>
         <div style={{ marginTop: 24 }}>
             {current < steps.length - 1 && (
-                <Button type="primary" onClick={() => {
-                    firstForm.validateFields().then(fields => {
-                        next()
-                    })
-
-                }}>
+                <Button type="primary" onClick={createUser}>
                     Tiếp theo
                 </Button>
             )}
