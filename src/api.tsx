@@ -47,6 +47,7 @@ const API = {
         },
         References: {
             List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
+            Delete: (block_id: string, ref_id: number) => BaseURL + "/blocks/" + block_id + "/refs/" + ref_id,
             Create: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
         },
         GetCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/get",

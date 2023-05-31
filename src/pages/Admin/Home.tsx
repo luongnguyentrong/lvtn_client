@@ -7,28 +7,11 @@ import { useForm } from "antd/es/form/Form";
 import { DemoOrganizationGraph } from "../Organizations/Default";
 import AdminDescriptions from "./AdminDescriptions";
 import Requests from './Requests'
+import AddUnit from "./Modals/AddUnit";
+import UnitTable from "../Organizations/Tables/UnitTable";
 
 export default function () {
-    const navigate = useNavigate()
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalForm] = useForm()
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleOk = () => {
-        modalForm.validateFields().then(data => {
-            data['items'] = []
-
-            setIsModalOpen(false)
-            navigate("/new", {
-                state: {
-                    block: data
-                }
-            })
-        })
-    };
+    const [openAdd, setOpenAdd] = useState(false);
 
     const items: TabsProps['items'] = [
         {
@@ -36,11 +19,16 @@ export default function () {
             label: <Space><ClusterOutlined /> Sơ đồ tổ chức</Space>,
             children: <Card extra={
                 <Space>
-                    <Button icon={<PlusOutlined />} onClick={() => { }}>Tạo đơn vị</Button>
+                    <Button icon={<PlusOutlined />} onClick={() => { setOpenAdd(true) }}>Tạo đơn vị</Button>
                 </Space>
             }>
                 <DemoOrganizationGraph />
             </Card>
+        },
+        {
+            key: 'overall',
+            label: <Space><TableOutlined />Tổng quát</Space>,
+            children: <UnitTable />,
         },
         {
             key: 'user_management',
@@ -51,18 +39,12 @@ export default function () {
             key: '3',
             label: <Space><PullRequestOutlined />Xử lý yêu cầu</Space>,
             children: <Requests />
-        },
-        {
-            key: 'overall',
-            label: <Space><TableOutlined />Tổng quát</Space>,
-            children: `Content of Tab Pane 3`,
-        }
-    ];
+        }];
 
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
+    const closeAdd = () => {
+        setOpenAdd(false)
+    }
 
     return (
         <Layout>
@@ -76,7 +58,7 @@ export default function () {
                 </Layout.Content>
             </Layout>
 
-            <BlockInfo isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} modalForm={modalForm} />
+            <AddUnit open={openAdd} close={closeAdd} />
         </Layout>
     )
 }

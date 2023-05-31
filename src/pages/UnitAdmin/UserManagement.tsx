@@ -7,6 +7,7 @@ import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
 import AddUserModal from "./Modals/AddUserModal";
+import EditUserModal from "./Modals/EditUserModal";
 
 
 export interface IUser {
@@ -16,6 +17,7 @@ export interface IUser {
     lastName: string
     email: string
     role: string
+    block_ids: Array<string>
 }
 
 
@@ -69,7 +71,10 @@ export default function () {
             fixed: 'right',
             render: (_, record) => (
                 <Space size="middle">
-                    <a>Chỉnh sửa</a>
+                    <a onClick={() => {
+                        showEdit()
+                        setEdited(record)
+                    }}>Chỉnh sửa</a>
                     <a onClick={() => {
                         getBearerHeader().then(config => {
                             return axios.delete(API.Users.ID(record.id), config)
@@ -121,7 +126,16 @@ export default function () {
     }, [])
 
     const [open, setOpen] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
 
+
+    const showEdit = () => {
+        setOpenEdit(true);
+    }
+
+    const closeEdit = () => {
+        setOpenEdit(false);
+    }
 
     const showModal = () => {
         setOpen(true);
@@ -156,7 +170,7 @@ export default function () {
                 <Table columns={columns} rowKey={"id"} dataSource={users} scroll={{ x: 1500, y: 400 }} bordered />
             </Card >
 
-            {/* <EditUserModal /> */}
+            <EditUserModal user={edited} open={openEdit} close={closeEdit} fetch_user={fetch_users} />
             <AddUserModal fetch_user={fetch_users} open={open} close={closeModal} />
         </>
     )

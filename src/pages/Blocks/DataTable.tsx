@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { PlusOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, InputNumber, Popconfirm, Select, Table, TableColumnsType, Typography, message } from 'antd';
+import { PlusOutlined, SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Form, Input, InputNumber, Popconfirm, Select, Space, Table, TableColumnsType, Typography, message } from 'antd';
 import { getBearerHeader, toSlug } from '../../utils';
 import axios from 'axios';
 import API from '../../api';
@@ -195,7 +195,13 @@ export default function (props: IProps) {
                     form.resetFields()
                 }
             } catch (errInfo) {
+                message.error("Lưu thất bại!")
 
+
+                setData(data.slice(0, -1))
+                setIsSaving(false)
+                setEditingKey('');
+                form.resetFields()
             }
         }
     };
@@ -204,6 +210,7 @@ export default function (props: IProps) {
         title: 'Hành động',
         dataIndex: 'operation',
         width: "15%",
+        fixed: "right",
         render: (_: any, record: Item) => {
             const editable = isEditing(record);
 
@@ -221,9 +228,25 @@ export default function (props: IProps) {
                     </Popconfirm>
                 </span>
             ) : (
-                <Button icon={<EditOutlined />} onClick={() => edit(record)}>
-                    Chỉnh sửa
-                </Button>
+                <Space>
+                    <Button icon={<EditOutlined />} onClick={() => edit(record)} />
+                    <Button icon={<DeleteOutlined />} onClick={() => {
+                        getBearerHeader().then(config => {
+                            if (block_id && table_id && config)
+                                axios.delete(API.Blocks.Tables.Upsert(block_id, table_id), {
+                                    data: record,
+                                    headers: config.headers
+                                }).then(res => {
+                                    if (res.status === 200) {
+                                        const new_data = data.filter(something => something.key != record.key)
+
+                                        setData(new_data)
+                                        message.success("Xoá dữ liệu thành công!")
+                                    }
+                                })
+                        })
+                    }} />
+                </Space>
             );
         },
     })
@@ -254,7 +277,7 @@ export default function (props: IProps) {
                     },
                 }}
                 bordered
-                scroll={{ y: 500 }}
+                scroll={columns.length > 4 ? { x: 1500, y: 500 } : undefined}
                 dataSource={data}
                 columns={mergedColumns}
                 rowClassName="editable-row"
