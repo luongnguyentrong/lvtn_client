@@ -104,7 +104,7 @@ export default function () {
     }, [table_id])
 
     const excelColumns: IExcelColumn[] = columns.map(column => ({
-        title: column.name,
+        title: column.dataIndex,
         dataIndex: column.dataIndex
     }));
     const ExportExcel = () => {
