@@ -235,8 +235,7 @@ export default function () {
                     </Collapse.Panel>
                 ))}
             </Collapse>
-        </Card>
-        <BlockNoteView editor={editor} />        
+        </Card>     
         <AddCritModal open={open} close={closeModal} addCrit={addCriteria} />
         <AddSource open={openSource} close={closeSourceModal} addSource={addSource}/>
     </Layout.Content >
