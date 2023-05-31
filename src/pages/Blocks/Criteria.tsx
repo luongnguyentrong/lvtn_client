@@ -58,9 +58,6 @@ export default function () {
             });
             downloadfile += '</h2>'
         })
-        var secrect: string = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><div><h2>1)Programme_Specification</h2><h3>1.1.Dan_chung_1</h3><h3>1.2.Dan_chung 2</h3><p>Noi dung 2</p><h2>2)DANH_GIa_SINH VIEN</h2><p></p></div></body></html>'
-        // const htmlString = secrect.replace(/(\r\n|\n|\r)/gm, '');
-        // console.log(htmlString)
         var pdf = new jsPDF('p', 'pt', 'a4');
         pdf.html(downloadfile,{
             callback: function (doc) {
@@ -238,8 +235,7 @@ export default function () {
                     </Collapse.Panel>
                 ))}
             </Collapse>
-        </Card>
-        <BlockNoteView editor={editor} />        
+        </Card>     
         <AddCritModal open={open} close={closeModal} addCrit={addCriteria} />
         <AddSource open={openSource} close={closeSourceModal} addSource={addSource}/>
     </Layout.Content >
