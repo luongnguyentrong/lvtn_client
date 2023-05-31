@@ -24,6 +24,7 @@ const API = {
     },
     Requests: {
         List: BaseURL + "/requests/",
+        Update: (request_id: number) => BaseURL + "/requests/" + request_id + "/",
     },
     Folders: {
         Show: BaseURL + "/show_folders_normal?user=",

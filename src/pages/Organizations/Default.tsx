@@ -10,6 +10,8 @@ import API from "../../api";
 import Loading from "../Loading";
 import { OrganizationGraphData } from "@ant-design/graphs/es/components/organization-graph";
 import UnitTable from "./Tables/UnitTable";
+import RequestTable from "./Tables/RequestTable";
+import ProtectedRoute from "../../ProtectedRoute";
 
 interface IBlock {
     id: number
@@ -109,7 +111,7 @@ export default function () {
         {
             key: 'requests',
             label: "Yêu cầu",
-            children: `Content of Tab Pane 3`,
+            children: <RequestTable />,
         },
     ];
 
@@ -118,28 +120,29 @@ export default function () {
         setOpen(false)
     }
 
-    return <Layout.Content
-        style={{
-            minHeight: 280,
-        }}
-    >
-        <Card title="Sơ đồ tổ chức"
+    return <ProtectedRoute>
+        <Layout.Content
             style={{
-                margin: 24,
+                minHeight: 280,
             }}
-            extra={
-                <Space>
-                    <Button icon={<EyeOutlined />} onClick={() => {
-
-                    }}>Yêu cầu truy cập</Button>
-                    <Button icon={<PlusOutlined />} onClick={() => setOpen(true)}>Yêu cầu cấp đơn vị</Button>
-                </Space>
-            }
         >
-            <Tabs defaultActiveKey="diagram" items={items} />
-        </Card>
+            <Card title="Sơ đồ tổ chức"
+                style={{
+                    margin: 24,
+                }}
+                extra={
+                    <Space>
+                        <Button icon={<EyeOutlined />} onClick={() => {
 
-        <AddUnitRequest open={open} close={closeAdd} />
-    </Layout.Content>
+                        }}>Yêu cầu truy cập</Button>
+                        <Button icon={<PlusOutlined />} onClick={() => setOpen(true)}>Yêu cầu cấp đơn vị</Button>
+                    </Space>
+                }
+            >
+                <Tabs defaultActiveKey="diagram" items={items} />
+            </Card>
 
+            <AddUnitRequest open={open} close={closeAdd} />
+        </Layout.Content>
+    </ProtectedRoute>
 }

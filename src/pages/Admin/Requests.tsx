@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, List, Typography } from 'antd';
+import { Avatar, Button, List, Typography, message } from 'antd';
 import axios from 'axios';
 import { getBearerHeader } from '../../utils';
 import API from '../../api';
@@ -38,7 +38,7 @@ interface IRequest {
 
 
 const App: React.FC = () => {
-    const [requests, setRequests] = useState<Array<IRequest>>([])
+    const [requests, setRequests] = useState<Array<IRequest>>()
     const [open, setOpen] = useState(false)
     const [detail, setDetail] = useState<IUnitRequest>()
 
@@ -47,7 +47,7 @@ const App: React.FC = () => {
             return axios.get(API.Requests.List, config)
         }).then(res => {
             if (res.status === 200)
-                setRequests(res.data)
+                setRequests(res.data.filter((request: any) => request.status === "init"))
         })
     }, [])
 
@@ -59,7 +59,7 @@ const App: React.FC = () => {
         <>
             <List
                 className="demo-loadmore-list"
-                loading={requests.length === 0}
+                loading={requests === undefined}
                 itemLayout="horizontal"
                 dataSource={requests}
                 style={{
@@ -68,7 +68,20 @@ const App: React.FC = () => {
                 }}
                 renderItem={(item, i) => (
                     <List.Item
-                        actions={[<a key="list-loadmore-edit">Chấp nhận</a>, <a key="list-loadmore-more">Từ chối</a>]}
+                        actions={[<a key="list-loadmore-edit" onClick={() => {
+                            getBearerHeader().then(config => {
+                                axios.put(API.Requests.Update(item.id), { status: "accepted" }, config)
+                                    .then(res => {
+                                        if (res.status === 200) {
+                                            axios.post(API.ListUnits.URL, item.body, config).then(res => {
+                                                if (res.status === 201) 
+                                                    message.success("Xử lý yêu cầu thành công!")
+                                            })
+                                        }
+                                    })
+
+                            })
+                        }}>Chấp nhận</a>, <a key="list-loadmore-more">Từ chối</a>]}
                     >
                         <List.Item.Meta
                             title={<div>

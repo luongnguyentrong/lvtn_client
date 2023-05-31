@@ -61,7 +61,9 @@ export default function () {
 
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
+    const [uploadLoading, setUploadLoading] = useState(false)
+
+    const fetch_data = () => {
         if (table_id && block_id) {
             setLoading(true)
 
@@ -95,10 +97,14 @@ export default function () {
             })
 
         }
+    }
+
+    useEffect(() => {
+        fetch_data()
     }, [table_id])
 
     const excelColumns: IExcelColumn[] = columns.map(column => ({
-        title: column.title,
+        title: column.name,
         dataIndex: column.dataIndex
     }));
     const ExportExcel = () => {
@@ -112,6 +118,7 @@ export default function () {
             .saveAs(`Export.xlsx`);
     };
 
+    // set upload headers
     useEffect(() => {
         getBearerHeader().then(bearerConfig => setConfig(bearerConfig))
     }, [])
@@ -135,17 +142,22 @@ export default function () {
                     minHeight: 280,
                 }
             } extra={<Space>
-                <Upload action={API.Blocks.Tables.UploadFromExcel(block_id, table_id)} headers={config && config.headers} accept="test/csv" 
-                // beforeUpload={(file) => {
-                //     if (file.type !== 'text/csv' && file.type !== 'text/xlsx') {
-                //         message.error(`${file.name} không hợp lệ`);
-                //         return Upload.LIST_IGNORE
-                //     }
-                //     return true
-                // }}
-                showUploadList={false}
+                <Upload
+                    action={API.Blocks.Tables.UploadFromExcel(block_id, table_id)}
+                    headers={config && config.headers}
+                    accept="test/csv"
+                    showUploadList={false}
+                    onChange={(info) => {
+                        if (info.file.status === "uploading")
+                            setUploadLoading(true)
+                        else if (info.file.status === "done") {
+                            message.success("Upload dữ liệu thành công!")
+                            setUploadLoading(false)
+                            fetch_data()
+                        }
+                    }}
                 >
-                    <Button icon={<UploadOutlined />}>Nhập liệu từ Excel</Button>
+                    <Button icon={<UploadOutlined />} loading={uploadLoading}>Nhập liệu từ Excel</Button>
                 </Upload>
 
                 <Button onClick={ExportExcel} icon={<DownloadOutlined />}>Tải dữ liệu</Button>

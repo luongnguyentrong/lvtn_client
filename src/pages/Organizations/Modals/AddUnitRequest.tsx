@@ -13,7 +13,7 @@ interface IProps {
 }
 
 interface IUnitData {
-    unit_name: string
+    name: string
     display_name: string
     description: string
     parent_unit: string
@@ -57,26 +57,6 @@ export default function (props: IProps) {
         }
     }
 
-    const createUser = async (unit_name: string) => {
-        const fields = await secondForm.validateFields()
-
-        // const data = {
-        //     fname: fields.fname,
-        //     lname: fields.lname,
-        //     email: fields.email,
-        //     username: fields.username,
-        //     password: fields.password,
-        //     unit_name: unit_name,
-        //     role: "unit_admin"
-        // }
-
-        // const result = await axios.post(API.CreateUsers.URL, data, getBearerHeader())
-
-        // if (result.status != 201) {
-        //     throw new Error("Unexpected server response")
-        // }
-    }
-
     const onDisplayChange = (ele: React.ChangeEvent<HTMLInputElement>) => {
         firstForm.setFieldValue("name", toSlug(ele.target.value))
     }
@@ -98,28 +78,40 @@ export default function (props: IProps) {
         setIsLoading(true)
 
         try {
+            const fields = await secondForm.validateFields()
+
+            const user = {
+                fname: fields.fname,
+                lname: fields.lname,
+                email: fields.email,
+                username: fields.username,
+                password: fields.password,
+            }
             // create new unit
-            const unit_name = await createUnit()
+            getBearerHeader().then(config => {
+                if (unitData) {
+                    const data = {
+                        ...unitData,
+                        manager: user
+                    }
 
+                    axios.post(API.Requests.List, data, config).then(res => {
+                        if (res.status === 201) {
+                            message.success('Tạo yêu cầu thành công!')
+                        }
 
-
-            // if (unit_name) {
-            //     // create new user
-            //     await createUser(unit_name)
-
-            //     message.success('Tạo đơn vị thành công!')
-            // }
+                        props.close()
+                        setIsLoading(false)
+                        setUnitData(undefined)
+                        firstForm.resetFields()
+                        secondForm.resetFields()
+                    })
+                }
+            })
         } catch (err: any) {
             message.error(err.message)
         }
-
-        props.close()
-        setIsLoading(false)
-        firstForm.resetFields()
-        secondForm.resetFields()
     }
-
-
 
     return <Modal title="Yêu cầu cấp đơn vị" open={props.open} footer={null} onCancel={props.close} confirmLoading={isLoading}>
         <div style={{
@@ -136,7 +128,7 @@ export default function (props: IProps) {
                 <Button type="primary" onClick={() => {
                     firstForm.validateFields().then(fields => {
                         const data: IUnitData = {
-                            unit_name: fields.name,
+                            name: fields.name,
                             display_name: fields.display_name,
                             description: fields.description,
                             parent_unit: getUnit(),
