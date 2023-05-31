@@ -32,7 +32,7 @@ const column_type_options = [
     { value: 'bigint', label: 'Số nguyên lớn' },
     { value: 'serial', label: 'Tuần tự' },
     { value: 'double precision', label: 'Số thực' },
-    { value: 'varchar(25)', label: 'Chuỗi' },
+    { value: 'varchar(255)', label: 'Chuỗi' },
     { value: 'date', label: 'Ngày / giờ' },
 ]
 

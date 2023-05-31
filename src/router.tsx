@@ -15,14 +15,12 @@ import Default from "./pages/Blocks/Default";
 import Criteria from "./pages/Blocks/Criteria";
 import DisplayTable from "./pages/Blocks/DisplayTable";
 import DisplayFolder from "./pages/Blocks/DisplayFolder";
-import DisplayAnalytics from "./pages/Blocks/DisplayAnalytics";
 import UserManagement from "./pages/UnitAdmin/UserManagement";
 import New from "./pages/Blocks/Tables/NewTable";
 import Relationships from "./pages/Blocks/Relationships";
 import Organizations from "./pages/Organizations";
 import OrganizationsDefault from "./pages/Organizations/Default";
 import ViewUnit from "./pages/Organizations/ViewUnit";
-import UnitUserLayout from "./pages/UnitNormal/Unit-userLayout";
 import UnitUser from "./pages/UnitNormal/UnitUser";
 import Normal from "./pages/UnitNormal/Normal";
 
@@ -71,7 +69,7 @@ export const router = createBrowserRouter([
     },
     {
         path: "/unit_admin",
-        element: <UnitAdminLayout />,
+        element:  <UnitAdminLayout />,
         children: [
             {
                 index: true,
@@ -90,14 +88,6 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <UnitUser />,
-            },
-            {
-                path: "users",
-                element: <UserManagement />
-            },
-            {
-                path: "blocks/new",
-                element: <NewBlock />
             },
         ]
     },

@@ -133,10 +133,7 @@ export default function () {
                         flexWrap: "wrap"
                     } : undefined
                 }
-                extra={<Button type="primary"
-                    onClick={showModal}
-                    icon={<PlusOutlined />}
-                >Tạo dữ liệu mới</Button>}>
+>
                 {
                     blocks !== undefined ? <GenerateCards blocks={blocks} /> : <Loading title="Đang lấy dữ liệu" />
                 }

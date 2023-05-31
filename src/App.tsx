@@ -57,7 +57,7 @@ function App() {
                             setMainRole("unit_admin")
                             navigate("/unit_admin")
                         } else if (roles.includes("unit_normal")) {
-                            setMainRole("unit_normal")
+                            navigate("/unit_user")
                         }
                     }
                 }
@@ -76,9 +76,6 @@ function App() {
             return <Admin>
                 <Outlet />
             </Admin>
-
-        case "unit_normal":
-            return <Normal/>
 
         default:
             return <Loading />

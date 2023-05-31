@@ -49,13 +49,14 @@ const API = {
             List: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
             Create: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
         },
-        GetCrit: (block_id: string) => BaseURL + "/blocks/" + block_id+"/criteria/get",
+        GetCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/get",
         AddCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/add",
-        GetEvi: (block_id: string,crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/"+crit_id+"/get",
+        GetEvi: (block_id: string, crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/" + crit_id + "/get",
         AddSource: (block_id: string, crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/" + crit_id + "/source/add"
     },
     Users: {
-        List: BaseURL + "/users/"
+        List: BaseURL + "/users/",
+        ID: (user_id: string) => BaseURL + "/users/" + user_id
     },
     Keycloak: {
         Token: (cur_unit: string) => `https://sso.ducluong.monster/realms/${cur_unit}/protocol/openid-connect/token`

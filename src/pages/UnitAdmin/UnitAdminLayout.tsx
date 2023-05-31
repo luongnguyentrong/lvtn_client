@@ -2,6 +2,7 @@ import { MenuProps, Layout, Menu } from "antd"
 import { ClusterOutlined, HomeOutlined, UsergroupAddOutlined, BlockOutlined } from '@ant-design/icons';
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../../Header";
+import ProtectedRoute from "../../ProtectedRoute";
 
 export default function () {
     const navigate = useNavigate();
@@ -33,23 +34,26 @@ export default function () {
             }
         },
     ]
-    return <Layout style={{ height: "100%" }}>
-        <Header />
 
-        <Layout>
-            <Layout.Sider width={250} style={{ background: "white", paddingTop: 24 }}>
-                <Menu
-                    mode="inline"
-                    style={{ height: '100%', borderRight: 0 }}
-                    items={menuItems}
-                />
-            </Layout.Sider>
+    return <ProtectedRoute role="unit_admin">
+        <Layout style={{ height: "100%" }}>
+            <Header />
 
             <Layout>
-                <Outlet />
-                <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
-            </Layout>
-        </Layout>
+                <Layout.Sider width={250} style={{ background: "white", paddingTop: 24 }}>
+                    <Menu
+                        mode="inline"
+                        style={{ height: '100%', borderRight: 0 }}
+                        items={menuItems}
+                    />
+                </Layout.Sider>
 
-    </Layout>
+                <Layout>
+                    <Outlet />
+                    <Layout.Footer style={{ textAlign: 'center' }}>Hệ thống quản lý thông tin đảm bảo chất lượng cho một đơn vị giáo dục | Đồ án tốt nghiệp</Layout.Footer>
+                </Layout>
+            </Layout>
+
+        </Layout>
+    </ProtectedRoute>
 }

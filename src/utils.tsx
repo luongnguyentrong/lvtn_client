@@ -72,6 +72,19 @@ export function toSlug(str: string) {
     return "";
 }
 
+function getAuthParams() {
+    const data = {
+        "response_type": "code",
+        "client_id": "console",
+        "redirect_uri": window.location.origin + "/oauth2/token",
+        "scope": "openid profile email roles"
+    }
+
+    const params = new URLSearchParams(data)
+
+    return params.toString()
+}
+
 export async function getBearerHeader() {
     const cookies = new Cookies()
     let current_access_token = cookies.get("access_token")
@@ -111,7 +124,9 @@ export async function getBearerHeader() {
 
             current_access_token = access_token
         } else {
-            Navigate({ to: "/" })
+            const authorization_endpoint = `https://sso.ducluong.monster/realms/${getUnit()}/protocol/openid-connect/auth?${getAuthParams()}`
+
+            window.location.href = authorization_endpoint
         }
     }
 
