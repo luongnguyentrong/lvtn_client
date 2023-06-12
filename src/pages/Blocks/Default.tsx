@@ -79,7 +79,7 @@ export default function () {
                         <Descriptions.Item label="Người quản lý">
                             <Space>
                                 {managers && managers.map(manager => {
-                                    return <Link to={`/users/${manager}`}>
+                                    return <Link key={manager.id} to={`/users/${manager}`}>
                                         {manager.first_name + " " + manager.last_name}
                                     </Link >
                                 })}

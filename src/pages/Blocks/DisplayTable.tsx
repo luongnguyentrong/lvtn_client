@@ -94,6 +94,9 @@ export default function () {
 
                     setLoading(false)
                 }
+            }).catch(err => {
+                message.error(err)
+                setLoading(false)
             })
 
         }
@@ -154,6 +157,9 @@ export default function () {
                             message.success("Upload dữ liệu thành công!")
                             setUploadLoading(false)
                             fetch_data()
+                        } else if (info.file.status === "error") {
+                            message.error("Upload dữ liệu thất bại!")
+                            setUploadLoading(false)
                         }
                     }}
                 >

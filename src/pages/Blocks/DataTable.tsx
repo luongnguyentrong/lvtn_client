@@ -281,7 +281,6 @@ export default function (props: IProps) {
                 dataSource={data}
                 columns={mergedColumns}
                 rowClassName="editable-row"
-                pagination={false}
                 footer={() => <Button onClick={addNewRow} icon={<PlusOutlined />}>Thêm dữ liệu mới</Button>}
             />
 

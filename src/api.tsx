@@ -51,6 +51,9 @@ const API = {
             Delete: (block_id: string, ref_id: number) => BaseURL + "/blocks/" + block_id + "/refs/" + ref_id,
             Create: (block_id: string) => BaseURL + "/blocks/" + block_id + "/refs/",
         },
+        Criteria: {
+            Export: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/export",
+        },
         GetCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/get",
         AddCrit: (block_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/add",
         GetEvi: (block_id: string, crit_id: string) => BaseURL + "/blocks/" + block_id + "/criteria/" + crit_id + "/get",

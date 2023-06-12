@@ -21,7 +21,7 @@ import Item from "antd/es/list/Item";
 
 export default function () {
     const { block_id } = useParams()
-    const [criterias, setCriteria] = useState<{title: string, description: string,attachments: any,id: number}[]>([])
+    const [criterias, setCriteria] = useState<{ title: string, description: string, attachments: any, id: number }[]>([])
     const [open, setOpen] = useState(false)
     const [openSource, setOpenSource] = useState(false)
     const [curCriteria, setCurCriteria] = useState<number>(0)
@@ -40,33 +40,23 @@ export default function () {
                 setMarkdown(markdown);
             };
             saveBlocksAsHTML();
-            
+
         }
     });
     ;
-    const reportExport = () =>{
-        console.log(criterias)
-        var downloadfile: string = ''
-        criterias.forEach((crit: any)=>{
-            const sup1 = crit.description.replaceAll(' ', '_');
-            downloadfile += '<h2>' + crit.id + '.' + sup1
-            crit.attachments.forEach((evi: any) => {
-                const sup2 = evi.title.replaceAll(' ', '_');
-                downloadfile += '<h3>'+crit.id + '.' + evi.id+ '.' + sup2 + '</h3>'
-                // downloadfile += evi.name
-                
-            });
-            downloadfile += '</h2>'
+
+    const reportExport = () => {
+        getBearerHeader().then(config => {
+            if (block_id && config)
+                axios.get(API.Blocks.Criteria.Export(block_id), {
+                    headers: config.headers,
+                    responseType: "arraybuffer"
+                }).then(res => {
+                    var file = new Blob([res.data], { type: 'application/pdf' });
+                    var fileURL = URL.createObjectURL(file);
+                    window.open(fileURL);
+                })
         })
-        var pdf = new jsPDF('p', 'pt', 'a4');
-        pdf.html(downloadfile,{
-            callback: function (doc) {
-                doc.save();
-            },
-            margin:[50,50,50,50],
-            width: 180,
-            autoPaging: true
-        });
     }
     const getPanelStyle = (index: any) => {
         // Define the font style for the text
@@ -109,7 +99,7 @@ export default function () {
     const closeSourceModal = () => {
         setOpenSource(false)
     }
-    const addSource = (name1: string, title1: string) =>{
+    const addSource = (name1: string, title1: string) => {
         let newSource = {
             id: curSourceId + 1,
             name: name1,
@@ -117,12 +107,12 @@ export default function () {
         }
         if (block_id) {
             getBearerHeader().then(config => {
-                return axios.post(API.Blocks.AddSource(block_id,curCriteria.toString()), newSource, config)
+                return axios.post(API.Blocks.AddSource(block_id, curCriteria.toString()), newSource, config)
             }).then(res => {
                 console.log(res)
             })
         }
-        criterias[curCriteria-1].attachments.push(newSource)
+        criterias[curCriteria - 1].attachments.push(newSource)
     }
 
     const addCriteria = (crit: string) => {
@@ -133,7 +123,7 @@ export default function () {
                 contents: crit,
             }
             getBearerHeader().then(config => {
-                return axios.post(API.Blocks.AddCrit(block_id),body_req, config)
+                return axios.post(API.Blocks.AddCrit(block_id), body_req, config)
             }).then(res => {
                 console.log(res)
             })
@@ -152,12 +142,12 @@ export default function () {
                 return axios.get(API.Blocks.GetCrit(block_id), config)
             }).then(res => {
                 let critList: any = []
-                res.data["body"].forEach((crit: any)=>{
+                res.data["body"].forEach((crit: any) => {
                     let attachList: { id: number, name: string, title: string }[] = []
                     getBearerHeader().then(config => {
-                        return axios.get(API.Blocks.GetEvi(block_id,crit.id), config)
+                        return axios.get(API.Blocks.GetEvi(block_id, crit.id), config)
                     }).then(res1 => {
-                        res1.data["body"].forEach((evi: any) =>{
+                        res1.data["body"].forEach((evi: any) => {
                             attachList.push({
                                 id: evi.id,
                                 name: evi.contents,
@@ -169,7 +159,7 @@ export default function () {
                         title: "Tiêu chí #" + crit.id,
                         description: crit.contents,
                         attachments: attachList,
-                        id : crit.id
+                        id: crit.id
                     })
                 })
                 //console.log(critList)
@@ -211,7 +201,7 @@ export default function () {
                         }
                         style={getPanelStyle(idx)}
                     >
-                        <Button icon={<PlusOutlined />} onClick={() => openSourceModal(item.id,item.attachments.length)}>
+                        <Button icon={<PlusOutlined />} onClick={() => openSourceModal(item.id, item.attachments.length)}>
                             Thêm dẫn chứng
                         </Button>
                         <Divider />
@@ -235,9 +225,9 @@ export default function () {
                     </Collapse.Panel>
                 ))}
             </Collapse>
-        </Card>     
+        </Card>
         <AddCritModal open={open} close={closeModal} addCrit={addCriteria} />
-        <AddSource open={openSource} close={closeSourceModal} addSource={addSource}/>
+        <AddSource open={openSource} close={closeSourceModal} addSource={addSource} />
     </Layout.Content >
 }
 
