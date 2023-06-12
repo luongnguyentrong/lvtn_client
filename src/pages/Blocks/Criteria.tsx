@@ -8,16 +8,10 @@ import { getBearerHeader } from "../../utils";
 import axios from "axios";
 import API from "../../api";
 import { useParams } from "react-router-dom";
-import * as markdownpdf from 'markdown-pdf';
 import { jsPDF } from "jspdf";
 import { BlockNoteEditor } from "@blocknote/core";
 import { BlockNoteView, useBlockNote } from "@blocknote/react";
 import Item from "antd/es/list/Item";
-// import { saveAs } from 'file-saver';
-// import htmlDocx from 'html-docx-js';
-//import MarkdownPDF from "markdown-pdf";
-// import 'jspdf-autotable';
-// import 'jspdf/dist/polyfills.js';
 
 export default function () {
     const { block_id } = useParams()
@@ -213,7 +207,7 @@ export default function () {
                                 renderItem={(item1: any, index) => (
                                     <List.Item>
                                         <div>
-                                            <h2>Dẫn chứng số {item1.id}: {item1.title}</h2>
+                                            <h2>Dẫn chứng số {item1.id}:</h2>
                                             <div dangerouslySetInnerHTML={{ __html: item1.name }} />
                                         </div>
                                     </List.Item>

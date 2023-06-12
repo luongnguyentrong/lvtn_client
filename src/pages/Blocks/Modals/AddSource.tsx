@@ -33,12 +33,7 @@ export default function (props: IProps) {
 
     const handleOk = () => {
         form.validateFields().then(res => {
-            //console.log(res.title)
-            // let request_body: never
-            // console.log(request_body)
-            // form.resetFields()
-            // props.attachemnts.push(request_body)
-            props.addSource(markdown,res.title)
+            props.addSource(markdown,"")
             props.close()
         })
     }
@@ -56,12 +51,6 @@ export default function (props: IProps) {
                 layout="vertical"
                 form={form}
             >
-                <Form.Item
-                    label="Tên dẫn chứng"
-                    name="title"
-                >
-                    <Input />
-                </Form.Item>
                 <Form.Item
                     label="Nội dung"
                     name="editor"

@@ -1,7 +1,7 @@
 import { Form, Input, Modal, message } from "antd"
 import { useForm } from "antd/es/form/Form"
 import { useState } from "react"
-import API from "../api"
+import API, { BaseURL } from "../api"
 import BlockInfo from "../pages/Admin/Modals/BlockInfo"
 import { useParams } from "react-router-dom"
 import { getBearerHeader } from "../utils"
@@ -45,7 +45,7 @@ export default function (props: IProps) {
         try {
             if (folder_name){
             getBearerHeader().then(config => {
-                return axios.post('http://localhost:5000/blocks/' + block_id + '/folders/' + encodeURIComponent(folder_name) + '/upload', formData, config)
+                return axios.post(BaseURL+ "/blocks/" + block_id + '/folders/' + encodeURIComponent(folder_name) + '/upload', formData, config)
             }).then(res => {
                 if (res.status == 200) {
                     success("Upload file thành công");
