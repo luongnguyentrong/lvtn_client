@@ -45,10 +45,7 @@ export default function (props: IProps) {
                         </div>
                     </Link>
                 </Col>
-                <Col span={12} style={{ display: "inherit", justifyContent: "center" }}>
-                    <Search options={props.searchOptions} />
-                </Col>
-                <Col span={6}>
+                <Col span={18}>
                     <RightNav />
                 </Col>
             </Row>

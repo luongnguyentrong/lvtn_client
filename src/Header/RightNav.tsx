@@ -43,16 +43,6 @@ export default function () {
 
     const items: MenuProps['items'] = [
         {
-
-            key: "notification",
-            icon: <BellOutlined />,
-            label: "Thông báo"
-        }, {
-            key: "contact",
-            icon: <QuestionCircleOutlined />,
-            label: "Liên hệ"
-        },
-        {
             key: "user",
             label: <Dropdown menu={{ items: profile_items }} placement="bottomRight" trigger={['click']}>
                 <Space>

@@ -31,11 +31,6 @@ export default function () {
             children: <UnitTable />,
         },
         {
-            key: 'user_management',
-            label: <Space><UserOutlined /> Quản lý người dùng</Space>,
-            children: `Content of Tab Pane 2`,
-        },
-        {
             key: '3',
             label: <Space><PullRequestOutlined />Xử lý yêu cầu</Space>,
             children: <Requests />
